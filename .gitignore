@@ -1,0 +1,15 @@
+# R specific
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.Rprofile
+
+# only include renv.lock for now
+/renv
+
+# Mac specific
+.DS_Store
+
+# don't include data for now
+/data
