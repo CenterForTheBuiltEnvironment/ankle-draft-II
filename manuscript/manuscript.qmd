@@ -1,0 +1,67 @@
+---
+title: "Ankle Draft"
+author:
+  - Tobias Kramer
+  - Junmeng Lyu
+  - Stefano Schiavon
+date: "`r Sys.Date()`"
+format:
+  docx:
+    link-citations: true
+    reference-doc: template.docx
+    toc: false
+    number-sections: true
+bibliography: refs.bib
+csl: apa.csl
+execute:
+  echo: false
+  warning: false
+  error: false
+---
+
+```{r load-main-analysis}
+source(here::here("code_r", "main_analysis.R"))
+```
+
+# Abstract {.unnumbered}
+
+
+# Introduction
+
+
+# Methods {#sec-methods}
+
+
+# Results
+
+
+# Discussion
+
+
+## Limitations and outlook
+
+
+# Conclusions
+
+
+# CRediT authorship contribution statement {.unnumbered}
+
+**Tobias Kramer**: Conceptualization, Data curation, Formal analysis, Methodology, Investigation, Project administration, Software, Writing - original draft, Writing - review & editing. **Stefano Schiavon**: Conceptualization, Funding acquisition, Methodology, Project administration, Supervision, Writing - review & editing.
+
+# Declaration of competing interest {.unnumbered}
+
+All authors declare XYZ competing interest. The Center for the Built Environment (CBE) at the University of California, Berkeley, with which the authors are affiliated, is advised and funded in part by approximately 50 partners that represent a diversity of organizations from the building industry, including manufacturers, building owners, facility managers, contractors, architects, engineers, government agencies, and utilities.
+
+# Data availability
+
+The datasets generated and analyzed during the current study as well as the full source code of the data analysis workflow are available in the following GitHub repository: XXX.
+
+# Declaration of Generative AI and AI-assisted technologies in the writing process
+
+During the preparation of this work, the authors utilized the chatbot ChatGPT to enhance the language and readability of the content. Subsequently, they reviewed and edited the material as required, while maintaining full accountability for the publication’s content.
+
+# Acknowledgements {.unnumbered}
+
+The Center for the Built Environment at the University of California, Berkeley supported this research. The authors also want to thank dedicated undergraduate students Heijin Hong, Lana Fiona Lilienstein, Kevin Kim and Gayle Boyd for their voluntary support throughout the experimental phase.
+
+# References {.unnumbered}

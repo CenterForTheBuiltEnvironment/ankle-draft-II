@@ -160,3 +160,5 @@ power_result <- pwr.t.test(
 power_result
 
 ```
+
+For now, I am using the power for T-High, since this seems to be the edge case to base sample size on (also highest `n` required).

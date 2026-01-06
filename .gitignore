@@ -13,3 +13,6 @@
 
 # don't include data for now
 /data
+
+# Python specific
+*.pyc
