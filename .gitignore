@@ -16,3 +16,6 @@
 
 # Python specific
 *.pyc
+
+# Claude
+CLAUDE.md
