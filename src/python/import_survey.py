@@ -12,8 +12,8 @@ from constants import MyConstants
 from survey_config import question_mapping
 
 # Set working directory
-source_folder = Path(MyConstants.DIR_RAW_DATA_SURVEY)
-save_folder = Path(MyConstants.DIR_PROCESS_DATA_SURVEY)
+source_folder = Path(MyConstants.DIR_RAW_DATA_SURVEY.value)
+save_folder = Path(MyConstants.DIR_PROCESS_DATA_SURVEY.value)
 
 
 # ==================== CLASS DEFINITION ====================

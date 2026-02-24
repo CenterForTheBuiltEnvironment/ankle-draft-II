@@ -3,9 +3,11 @@
 # ==================== IMPORTS AND SETUP ====================
 import pandas as pd
 import numpy as np
+import os
 import re
 import logging
 from pathlib import Path
+
 
 # Import constants
 try:
@@ -14,8 +16,8 @@ except ImportError:
     from constants import MyConstants
 
 # Set working directory
-source_folder = Path(MyConstants.DIR_RAW_DATA_AIRFLOW)
-save_folder = Path(MyConstants.DIR_PROCESS_DATA_AIRFLOW)
+source_folder = Path(MyConstants.DIR_RAW_DATA_AIRFLOW.value)
+save_folder = Path(MyConstants.DIR_PROCESS_DATA_AIRFLOW.value)
 
 
 # ==================== CLASS DEFINITION ====================
@@ -162,6 +164,9 @@ class AirFlowProcessor:
 
     def import_airflow_files(self):
         if not self.source_folder.exists():
+            print("CWD =", os.getcwd())
+            print("SOURCE_FOLDER =", repr(source_folder))
+            print("EXISTS? =", Path(source_folder).exists())
             self.logger.error("Source folder does not exist")
             return pd.DataFrame()
 

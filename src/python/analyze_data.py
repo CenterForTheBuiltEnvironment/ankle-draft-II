@@ -1,16 +1,5 @@
-import os
-import datetime
 
-import pandas as pd
-import dataframe_image as dfi
-from statsmodels.stats.anova import AnovaRM
-from sklearn.linear_model import LinearRegression
-import statsmodels.formula.api as smf
-from scipy.stats import ttest_ind
-from statannot import add_stat_annotation
-import matplotlib as mpl
-from matplotlib import pyplot as plt
-import seaborn as sns
+
 
 folder_processed_files = os.path.join(os.getcwd(), "data/processed")
 

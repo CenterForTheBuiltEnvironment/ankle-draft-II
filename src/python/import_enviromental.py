@@ -114,12 +114,12 @@ def merge_monitors(df: pd.DataFrame, resample_rule: str = "1min") -> pd.DataFram
 if __name__ == "__main__":
     combined_data = load_and_combine_data(DATA_FOLDER)
 
-    combined_data.to_csv("data/00-raw/env/combined_env_data_raw.csv")
+    combined_data.to_csv("/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/env/combined_env_data_raw.csv")
 
     # --- Optional: combine readings from all monitors ---
     merge_option = True
 
     if merge_option:
         merged_data = merge_monitors(combined_data, resample_rule="1min")
-        merged_data.to_csv("data/01-processed/env/df_env.csv")
-        merged_data.to_csv("data/01-processed/env/df_env.csv.gzip", compression="gzip")
+        merged_data.to_csv("/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/env/df_env.csv")
+        merged_data.to_csv("/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/env/df_env.csv.gzip", compression="gzip")

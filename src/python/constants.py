@@ -8,41 +8,41 @@ class MyConstants(str, Enum):
     PROJECT_NAME = "Ankle Draft II"
 
     DIR_RAW_DATA_ENV = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/00-raw/env"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/env"
     )
     DIR_RAW_DATA_SURVEY = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/00-raw/survey"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/survey"
     )
     DIR_RAW_DATA_AIRFLOW = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/00-raw/air_flow"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/air_flow"
     )
     DIR_RAW_DATA_TSK = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/00-raw/physio"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/physio"
     )
     DIR_RAW_DATA_META = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/00-raw/metadata"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/00-raw/metadata"
     )
 
     DIR_PROCESS_DATA_ENV = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed/env"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/env"
     )
     DIR_PROCESS_DATA_SURVEY = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed/survey"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/survey"
     )
     DIR_PROCESS_DATA_AIRFLOW = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed/air_flow"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/air_flow"
     )
     DIR_PROCESS_DATA_TSK = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed/tsk"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/tsk"
     )
     DIR_PROCESS_DATA_META = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed/metadata"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed/metadata"
     )
 
     DIR_PROCESS_DATA = (
-        r"/Users/toby/Desktop/Repositories/ankle-draft-II/data/01-processed"
+        r"/Users/lyujunmeng/Documents/ankle-draft-II-main/data/01-processed"
     )
-    DIR_EXPORT_DATA = r"/Users/toby/Desktop/Repositories/ankle-draft-II/02-export"
+    DIR_EXPORT_DATA = r"/Users/lyujunmeng/Documents/ankle-draft-II-main/02-export"
 
     TIMEZONE = "America/Los_Angeles"
     COL_DATE_TIME = "timestamp"

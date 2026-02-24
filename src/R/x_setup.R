@@ -1,9 +1,9 @@
 
 pacman::p_load(
-  here, dplyr, ggplot2, readr, tidyr, purrr, stringr, lubridate, arrow,
-  janitor, scales, glue, yaml, data.table, rstatix, patchwork, pwr
+  here, dplyr, ggplot2, readr, tidyr, purrr, stringr, lubridate, arrow,ggeffects,
+  janitor, scales, glue, yaml, data.table, rstatix, patchwork, pwr, broom,
+  lme4,ggpubr
 )
-
 
 # Global settings ---------------------------------------------------------
 
@@ -53,3 +53,5 @@ thermal_preference_palette <- c("#82c6ed","#c9e0b0","#eb6b58")
 acceptability_palette <- c('#bc3e4d','#d99fa8','#f3e8e7','#c1e0b9','#38a257')
 
 session_type_palette <- c("#FFBE0B", "#FB5607", "#FF006E", "#8338EC")
+
+workstation_palette <- c("Low" = "#c9e0b0", "Medium" = "#b8e4f7", "High" = "#6b8dd6")

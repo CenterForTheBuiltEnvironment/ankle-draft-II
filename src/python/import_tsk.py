@@ -15,8 +15,8 @@ except ImportError:
     from constants import MyConstants
 
 # Set working directory
-source_folder = Path(MyConstants.DIR_RAW_DATA_TSK)
-save_folder = Path(MyConstants.DIR_PROCESS_DATA_TSK)
+source_folder = Path(MyConstants.DIR_RAW_DATA_TSK.value)
+save_folder = Path(MyConstants.DIR_PROCESS_DATA_TSK.value)
 
 
 def add_tsk_prefix(folder_path: str, recursive: bool = False):
