@@ -31,6 +31,8 @@ sessions <- read_csv(here::here("data", "00-raw", "metadata", "session_metadata.
   )
 
 
+
+
 # Environmental Measurements ----------------------------------------------
 
 env <- read_csv(here::here("data", "01-processed", "env", "df_env.csv")) %>%
@@ -71,6 +73,8 @@ env_sessions <- env %>%
       na.rm = TRUE
     )
   )
+
+
 
 
 # Skin Temperature Measurements ----------------------------------------------
@@ -116,6 +120,75 @@ tsk <- tsk %>%
   dplyr::select(timestamp, session_id, session_type, running_time_s, everything())
 
 
+
+
+# Airflow Measurements ----------------------------------------------------
+#
+# Airflow measurements were taken at 6 positions (dot1-dot6) before sessions
+# to characterize the air velocity profile at different supply conditions.
+#
+# Matching logic: Each airflow measurement set is matched to ALL sessions that:
+# 1. Occur on the same date as the measurement
+# 2. Start AFTER the measurement timestamp
+
+airflow <- read_csv(
+  here::here("data", "01-processed", "air_flow", "airflow_combined.csv"),
+  show_col_types = FALSE
+) %>%
+  janitor::clean_names() %>%
+  dplyr::mutate(
+    # Timestamps are labeled UTC but are actually local Pacific time
+    timestamp = lubridate::force_tz(
+      lubridate::as_datetime(timestamp),
+      tzone = "America/Los_Angeles"
+    ),
+    # Extract date for matching
+    date = lubridate::as_date(timestamp)
+  )
+
+# Prepare sessions for matching (get unique session_id rows, since sessions has one row per subject)
+sessions_for_airflow <- sessions %>%
+  as.data.frame() %>%
+  dplyr::select(session_id, session_time_start) %>%
+  dplyr::distinct() %>%
+  dplyr::filter(session_id != "CANCEL") %>%
+  dplyr::mutate(
+    date = lubridate::as_date(session_time_start)
+  )
+
+# Join airflow to sessions: match by date where session starts after airflow measurement
+airflow_with_sessions <- airflow %>%
+  dplyr::inner_join(sessions_for_airflow, by = "date", relationship = "many-to-many") %>%
+  dplyr::filter(session_time_start > timestamp) %>%
+  dplyr::select(-date, -session_time_start, -timestamp, -time_elapsed_s)
+
+# Mean by session_id and measurement_point (dot)
+airflow_sessions_dot_mean <- airflow_with_sessions %>%
+  dplyr::group_by(session_id, measurement_point) %>%
+  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
+  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
+  dplyr::arrange(session_id, measurement_point)
+
+# Mean by session_id only (averaged across all dots)
+airflow_sessions_all_mean <- airflow_with_sessions %>%
+  dplyr::group_by(session_id) %>%
+  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
+  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
+  dplyr::arrange(session_id)
+
+# Save summary files
+write_csv(
+  airflow_sessions_dot_mean,
+  here::here("data", "01-processed", "air_flow", "airflow_sessions_dot_mean.csv")
+)
+
+write_csv(
+  airflow_sessions_all_mean,
+  here::here("data", "01-processed", "air_flow", "airflow_sessions_all_mean.csv")
+)
+
+
+
 # Questionnaire Responses -------------------------------------------------
 
 # Read raw survey data
@@ -123,7 +196,87 @@ survey <- read_csv(here::here("data", "01-processed", "survey", "survey_combined
   janitor::clean_names() %>%
   dplyr::mutate(timestamp = lubridate::as_datetime(timestamp, tz = "America/Los_Angeles"))
 
-# more preprocessing required here
+
+# Analysis Dataframe -------------------------------------------------------
+#
+# Combines survey responses with environmental and airflow measurements.
+#
+# Airflow workstation mapping:
+# - ws01 → high_* columns (high fan speed position)
+# - ws02 → low_* columns (low fan speed position)
+# - ws03 → med_* columns (medium fan speed position)
+# - adaptation → NA (no airflow data for adaptation period)
+
+# Join survey with environmental data (session-level means)
+analysis <- survey %>%
+  dplyr::left_join(env_sessions, by = "session_id")
+
+# Join with airflow data
+analysis <- analysis %>%
+  dplyr::left_join(airflow_sessions_all_mean, by = "session_id")
+
+# Select correct airflow columns based on workstation and rename to standard names
+analysis <- analysis %>%
+  dplyr::mutate(
+    # Air velocity (m/s)
+    v_air_m_s = dplyr::case_when(
+      workstation == "ws01" ~ high_v_air_s,
+      workstation == "ws02" ~ low_v_air_s,
+      workstation == "ws03" ~ med_v_air_s,
+      TRUE ~ NA_real_
+    ),
+    # Supply air temperature (°C)
+    t_supply_c = dplyr::case_when(
+      workstation == "ws01" ~ high_t_supply_c,
+      workstation == "ws02" ~ low_t_supply_c,
+      workstation == "ws03" ~ med_t_supply_c,
+      TRUE ~ NA_real_
+    ),
+    # Air velocity standard deviation (m/s)
+    v_air_sd_m_s = dplyr::case_when(
+      workstation == "ws01" ~ high_v_air_sd_m_s,
+      workstation == "ws02" ~ low_v_air_sd_m_s,
+      workstation == "ws03" ~ med_v_air_sd_m_s,
+      TRUE ~ NA_real_
+    ),
+    # Turbulence intensity (%)
+    turbulence_pct = dplyr::case_when(
+      workstation == "ws01" ~ high_turbulence_per_cent,
+      workstation == "ws02" ~ low_turbulence_per_cent,
+      workstation == "ws03" ~ med_turbulence_per_cent,
+      TRUE ~ NA_real_
+    ),
+    # Dynamic range (%)
+    dynamic_range_pct = dplyr::case_when(
+      workstation == "ws01" ~ high_dynamic_range_per_cent,
+      workstation == "ws02" ~ low_dynamic_range_per_cent,
+      workstation == "ws03" ~ med_dynamic_range_per_cent,
+      TRUE ~ NA_real_
+    )
+  ) %>%
+  # Remove the prefixed airflow columns
+  dplyr::select(
+    -starts_with("low_"),
+    -starts_with("med_"),
+    -starts_with("high_")
+  ) %>%
+  # Round all measurements to 2 decimal places
+  dplyr::mutate(across(c(t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
+                         v_air_sd_m_s, turbulence_pct, dynamic_range_pct),
+                       \(x) round(x, 2))) %>%
+  # Reorder columns
+  dplyr::select(
+    timestamp, session_id, session_date, subject_id, workstation,
+    t_air_c, rh_percent, co2_ppm,
+    v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_pct, dynamic_range_pct,
+    question, is_open_text, response_value
+  )
+
+# Save analysis dataframe
+write_csv(
+  analysis,
+  here::here("data", "02-export", "df_analysis.csv")
+)
 
 
 
@@ -382,17 +535,10 @@ write_csv(
 # Save analysis data
 write_csv(
   liu_analysis,
-  here::here("data", "02-export", "analysis_liu.csv")
+  here::here("data", "02-export", "df_analysis_liu.csv")
 )
 
-# Print summary
-message("Liu et al. 2017 preprocessing complete:")
-message("  - Subjects: ", n_distinct(liu_subjects$subject_id))
-message("  - Observations: ", nrow(liu_analysis))
-message("  - Questions: ", n_distinct(liu_analysis$question))
-message("  - Output: data/01-processed/metadata/subject_metadata_liu.csv")
-message("
-  - Output: data/02-export/analysis_liu.csv")
+
 
 
 # Combined Subject Metadata -----------------------------------------------
@@ -474,10 +620,4 @@ write_csv(
   subjects_combined,
   here::here("data", "01-processed", "metadata", "subject_metadata_combined.csv")
 )
-
-message("\nCombined metadata created:")
-message("  - Current study subjects: ", sum(subjects_combined$study == "current"))
-message("  - Liu et al. subjects: ", sum(subjects_combined$study == "liu_2017"))
-message("  - Total subjects: ", nrow(subjects_combined))
-message("  - Output: data/01-processed/metadata/subject_metadata_combined.csv")
 
