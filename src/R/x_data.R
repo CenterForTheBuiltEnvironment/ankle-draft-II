@@ -167,8 +167,8 @@ liu_qname_mapping <- c(
   "LabThermalAcceptabilityTorso"  = "thermal_acceptability_torso",
   "LabThermalAcceptabilityHands"  = "thermal_acceptability_hands",
   "LabThermalAcceptabilityHead"   = "thermal_acceptability_head",
-  "LabThermalComfortAcceptability"= "acceptance_current_thermal_environment",
-  "LabComfortableNow"             = "thermal_comfort",
+  "LabThermalComfortAcceptability"= "thermal_comfort",
+  "LabComfortableNow"             = "thermal_comfort_binary",
   "LabAcceptability"              = "acceptance_longterm_thermal_environment",
   "LabAnkleAirMovement"           = "air_movement_acceptability",
   "AirMovementPreference"         = "air_movement_preference",
@@ -295,6 +295,19 @@ liu_raw <- liu_raw %>%
 
 liu_processed <- liu_raw %>%
   dplyr::filter(!is.na(question))  # Drops LabImprovementMeasures (not in mapping)
+
+# --- Recode Response Scales ---
+# thermal_preference: Liu uses 1,2,3 (cooler, no change, warmer)
+#                     Current study uses -1,0,1 (same meaning)
+#                     Transform: 1→-1, 2→0, 3→1
+
+liu_processed <- liu_processed %>%
+  dplyr::mutate(
+    response_value = dplyr::case_when(
+      question == "thermal_preference" ~ response_value - 2,  # 1→-1, 2→0, 3→1
+      TRUE ~ response_value
+    )
+  )
 
 # --- Extract Subject Metadata ---
 # One row per unique subject, matching subject_metadata.csv structure plus new columns
