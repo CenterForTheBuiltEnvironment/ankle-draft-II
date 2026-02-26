@@ -37,7 +37,7 @@ logistic_or_ci <- function(mod, term){
 
 pairedttest_with_anova <- function(data, outcome_var,
                                    p.adjust.method = "BH",
-                                   group_by_var = "session_diffusor_sat",
+                                   group_by_var = "session_sat",
                                    within_var = "workstation",
                                    subject_var = "subject_id",
                                    alpha = 0.05,
@@ -131,8 +131,8 @@ pairedttest_with_anova <- function(data, outcome_var,
 # 2. Because multiple pairwise comparisons are conducted, 
 #    adjust p-values using the Benjamini–Hochberg (BH)
 #    procedure to control the false discovery rate.
-pairedwilcoxtest <- function(data, outcome_var, 
-                             group_by_var = "session_diffusor_sat") {
+pairedwilcoxtest <- function(data, outcome_var,
+                             group_by_var = "session_sat") {
   outcome_sym <- sym(outcome_var)
   group_sym <- sym(group_by_var)
   

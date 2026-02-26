@@ -1,6 +1,6 @@
 # Title: Plotting functions
 # Description: Define functions for plotting different types experimental results
-# Author: Toby Kramer
+# Author: Toby Kramer, Junmeng Lyu
 # Date: 2025-10-29
 
 source(here::here("src", "R", "x_setup.R"))
@@ -120,8 +120,8 @@ plot_lmm <- function(dat, xterm, xlab, model){
 # Plot for Part 2 paired t-test comparisons ----------------------------
 # Annotated with BH-adjusted p-values and effect sizes (Cohen’s d).
 
-plot_pairedttest <- function(data, outcome_var, test_result, 
-                                   y_label = NULL, group_by_var = "session_diffusor_sat",
+plot_pairedttest <- function(data, outcome_var, test_result,
+                                   y_label = NULL, group_by_var = "session_sat",
                                    p.signif = TRUE) {
   outcome_sym <- sym(outcome_var)
   
@@ -145,7 +145,7 @@ plot_pairedttest <- function(data, outcome_var, test_result,
     facet_wrap(
       as.formula(paste("~", group_by_var)),
       nrow = 1,
-      labeller = labeller(session_diffusor_sat = function(x) paste0(x, " °C"))
+      labeller = labeller(session_sat = function(x) paste0(x, " °C"))
     ) +
     stat_pvalue_manual(
       test_result_labeled,
@@ -161,8 +161,8 @@ plot_pairedttest <- function(data, outcome_var, test_result,
 
 # Plot for Part 2 paired wilcox comparisons -------------------------------
 # Annotated with BH-adjusted p-values and effect sizes (r).
-plot_pairedwilcox <- function(data, outcome_var, posthoc_result, 
-                                          group_by_var = "session_diffusor_sat",
+plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
+                                          group_by_var = "session_sat",
                                           fill_label = NULL, fill_palette = thermal_preference_palette) {
   outcome_sym <- sym(outcome_var)
   group_sym <- sym(group_by_var)
@@ -201,7 +201,7 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
     facet_wrap(
       as.formula(paste("~", group_by_var)),
       nrow = 1,
-      labeller = labeller(session_diffusor_sat = function(x) paste0(x, " °C"))
+      labeller = labeller(session_sat = function(x) paste0(x, " °C"))
     ) +
     scale_y_continuous(labels = percent_format()) +
     scale_fill_manual(values = fill_palette, drop = FALSE) +

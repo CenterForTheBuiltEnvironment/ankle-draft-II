@@ -21,7 +21,10 @@ acceptability_levels = c("very unacceptable", "somewhat unacceptable", "neither 
 
 sex_levels = c("female", "male", "third gender / other")
 session_type_levels = c("yosemite", "yellowstone", "sequoia")
-session_diffusor_sat_levels = c("15C", "17C", "19C")
+
+# Session supply air temperature setpoint (session_sat)
+session_sat_levels = c("15C", "17C", "19C")
+session_sat_labels = c("15C", "17C", "19C")  # Can be customized (e.g., "15°C", "Cold", etc.)
 
 col_subjects <- readr::cols(
   subject_id = readr::col_character(),
@@ -31,7 +34,7 @@ col_subjects <- readr::cols(
 col_sessions <- readr::cols(
   session_id = readr::col_character(),
   session_type = readr::col_factor(levels = session_type_levels, ordered = TRUE),
-  session_diffusor_sat = readr::col_factor(levels = session_diffusor_sat_levels, ordered = TRUE),
+  session_diffusor_sat = readr::col_factor(levels = session_sat_levels, ordered = TRUE),
 )
 
 col_survey <- readr::cols(
@@ -54,4 +57,4 @@ acceptability_palette <- c('#bc3e4d','#d99fa8','#f3e8e7','#c1e0b9','#38a257')
 
 session_type_palette <- c("#FFBE0B", "#FB5607", "#FF006E", "#8338EC")
 
-workstation_palette <- c("Low" = "#c9e0b0", "Medium" = "#b8e4f7", "High" = "#6b8dd6")
+workstation_palette <- c("low" = "#c9e0b0", "medium" = "#b8e4f7", "high" = "#6b8dd6")

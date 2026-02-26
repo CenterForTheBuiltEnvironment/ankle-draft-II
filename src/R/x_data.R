@@ -217,6 +217,23 @@ survey <- read_csv(here::here("data", "01-processed", "survey", "survey_combined
 analysis <- survey %>%
   dplyr::left_join(env_sessions, by = "session_id")
 
+# Join with session metadata (session_sat = supply air temperature setpoint)
+# Convert to factor using levels/labels defined in x_setup.R
+analysis <- analysis %>%
+  dplyr::left_join(
+    sessions %>%
+      as.data.frame() %>%
+      dplyr::select(session_id, session_diffusor_sat) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(
+        session_sat = factor(session_diffusor_sat,
+                             levels = session_sat_levels,
+                             labels = session_sat_labels)
+      ) %>%
+      dplyr::select(session_id, session_sat),
+    by = "session_id"
+  )
+
 # Join with airflow data
 analysis <- analysis %>%
   dplyr::left_join(airflow_sessions_all_mean, by = "session_id")
@@ -272,7 +289,7 @@ analysis <- analysis %>%
                        \(x) round(x, 2))) %>%
   # Reorder columns
   dplyr::select(
-    timestamp, session_id, session_date, subject_id, workstation,
+    timestamp, session_id, session_date, session_sat, subject_id, workstation,
     t_air_c, rh_percent, co2_ppm,
     v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     question, is_open_text, response_value
@@ -329,13 +346,13 @@ derived_source_questions <- c(
 # Use mean to aggregate when multiple responses exist for the same combination
 analysis_wide_temp <- analysis %>%
   dplyr::filter(question %in% derived_source_questions) %>%
-  dplyr::select(session_id, session_date, subject_id, workstation,
+  dplyr::select(session_id, session_date, session_sat, subject_id, workstation,
                 t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
                 v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
                 question, response_value) %>%
   dplyr::mutate(response_value = as.numeric(response_value)) %>%
   tidyr::pivot_wider(
-    id_cols = c(session_id, session_date, subject_id, workstation,
+    id_cols = c(session_id, session_date, session_sat, subject_id, workstation,
                 t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
                 v_air_sd_m_s, turbulence_intensity, dynamic_range_pct),
     names_from = question,
@@ -362,7 +379,7 @@ derived_vars <- analysis_wide_temp %>%
     )
   ) %>%
   dplyr::select(
-    session_id, session_date, subject_id, workstation,
+    session_id, session_date, session_sat, subject_id, workstation,
     t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
     v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     dissatisfied_with_draft_ankles,
