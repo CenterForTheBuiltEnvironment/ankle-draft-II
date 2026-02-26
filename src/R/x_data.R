@@ -1,6 +1,6 @@
 # Title: Generate dataframes
 # Description: Imports raw data and create tidy dataframes for all recorded variables
-# Author: Toby Kramer
+# Authors: Toby Kramer, Junmeng Lyu
 # Date: 2026-01-05
 
 source(here::here("src", "R", "x_setup.R"))
@@ -191,6 +191,8 @@ write_csv(
   here::here("data", "01-processed", "air_flow", "airflow_sessions_all_mean.csv")
 )
 
+rm(sessions_for_airflow, airflow_with_sessions)
+
 
 
 # Questionnaire Responses -------------------------------------------------
@@ -206,9 +208,9 @@ survey <- read_csv(here::here("data", "01-processed", "survey", "survey_combined
 # Combines survey responses with environmental and airflow measurements.
 #
 # Airflow workstation mapping:
-# - ws01 → high_* columns (high fan speed position)
-# - ws02 → low_* columns (low fan speed position)
-# - ws03 → med_* columns (medium fan speed position)
+# - ws01 → high_* columns (high air speed position)
+# - ws02 → low_* columns (low air speed position)
+# - ws03 → med_* columns (medium air speed position)
 # - adaptation → NA (no airflow data for adaptation period)
 
 # Join survey with environmental data (session-level means)
@@ -275,6 +277,131 @@ analysis <- analysis %>%
     v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     question, is_open_text, response_value
   )
+
+# --- Handle Duplicate Votes ---
+# NOTE: Subject ip043 submitted duplicate votes for the same workstation in some sessions.
+# This was due to an experimental operating mistake. We detect true duplicates as votes
+# for the same subject-session-workstation-question within 60 seconds of each other.
+# Legitimate repeated measurements (e.g., at different time points during adaptation)
+# are preserved. Only the first response is kept when true duplicates are detected.
+
+analysis <- analysis %>%
+  dplyr::arrange(session_id, subject_id, workstation, question, timestamp) %>%
+  dplyr::group_by(session_id, subject_id, workstation, question) %>%
+  dplyr::mutate(
+    time_since_prev = as.numeric(difftime(timestamp, dplyr::lag(timestamp), units = "secs")),
+    # Flag as duplicate if within 60 seconds of previous vote for same question
+    is_duplicate = !is.na(time_since_prev) & time_since_prev < 60
+  ) %>%
+  dplyr::ungroup()
+
+# Log duplicates found
+n_duplicates <- sum(analysis$is_duplicate)
+if (n_duplicates > 0) {
+  message("  - Duplicate votes detected (within 60s): ", n_duplicates, " (keeping first response only)")
+}
+
+# Remove duplicates, keeping first response
+analysis <- analysis %>%
+  dplyr::filter(!is_duplicate) %>%
+  dplyr::select(-is_duplicate, -time_since_prev)
+
+
+# --- Derived Dissatisfaction Variables ---
+# These variables are computed following Liu et al. methodology for draft discomfort.
+# They are added as new question rows in the long format.
+#
+# Definitions:
+# - dissatisfied_with_draft_ankles: thermal_sensation_ankles < 0 AND
+#     air_movement_acceptability_ankles < 0 AND air_movement_preference_ankles < 0
+# - disacceptability_with_draft_ankles: air_movement_acceptability_ankles < 0
+# - dispreference_with_draft_ankles: air_movement_preference_ankles < 0
+
+# Get the questions needed for derived variables
+derived_source_questions <- c(
+
+"thermal_sensation_ankles",
+  "air_movement_acceptability_ankles",
+  "air_movement_preference_ankles"
+)
+
+# Pivot to wide format temporarily to compute derived variables
+# Use mean to aggregate when multiple responses exist for the same combination
+analysis_wide_temp <- analysis %>%
+  dplyr::filter(question %in% derived_source_questions) %>%
+  dplyr::select(session_id, session_date, subject_id, workstation,
+                t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
+                v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
+                question, response_value) %>%
+  dplyr::mutate(response_value = as.numeric(response_value)) %>%
+  tidyr::pivot_wider(
+    id_cols = c(session_id, session_date, subject_id, workstation,
+                t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
+                v_air_sd_m_s, turbulence_intensity, dynamic_range_pct),
+    names_from = question,
+    values_from = response_value,
+    values_fn = mean
+  )
+
+# Compute derived variables
+derived_vars <- analysis_wide_temp %>%
+  dplyr::mutate(
+    dissatisfied_with_draft_ankles = dplyr::if_else(
+      thermal_sensation_ankles < 0 &
+        air_movement_acceptability_ankles < 0 &
+        air_movement_preference_ankles < 0,
+      1L, 0L
+    ),
+    disacceptability_with_draft_ankles = dplyr::if_else(
+      air_movement_acceptability_ankles < 0,
+      1L, 0L
+    ),
+    dispreference_with_draft_ankles = dplyr::if_else(
+      air_movement_preference_ankles < 0,
+      1L, 0L
+    )
+  ) %>%
+  dplyr::select(
+    session_id, session_date, subject_id, workstation,
+    t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
+    v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
+    dissatisfied_with_draft_ankles,
+    disacceptability_with_draft_ankles,
+    dispreference_with_draft_ankles
+  ) %>%
+  tidyr::pivot_longer(
+    cols = c(dissatisfied_with_draft_ankles,
+             disacceptability_with_draft_ankles,
+             dispreference_with_draft_ankles),
+    names_to = "question",
+    values_to = "response_value"
+  ) %>%
+  dplyr::mutate(
+    timestamp = NA_POSIXct_,
+    is_open_text = FALSE,
+    response_value = as.character(response_value)
+  ) %>%
+  dplyr::select(names(analysis))
+
+# Append derived variables to analysis
+analysis <- dplyr::bind_rows(analysis, derived_vars)
+
+rm(analysis_wide_temp, derived_vars)
+
+
+# --- Workstation Factor Labels ---
+# Convert workstation to factor with descriptive labels for analysis/visualization.
+# Mapping: ws02 → Low, ws03 → Medium, ws01 → High (based on air velocity levels)
+
+analysis <- analysis %>%
+  dplyr::mutate(
+    workstation = factor(
+      workstation,
+      levels = c("adaptation", "ws02", "ws03", "ws01"),
+      labels = c("adaptation", "low", "medium", "high")
+    )
+  )
+
 
 # Save analysis dataframe
 write_csv(
@@ -469,7 +596,7 @@ liu_processed <- liu_processed %>%
 # --- Extract Subject Metadata ---
 # One row per unique subject, matching subject_metadata.csv structure plus new columns
 
-liu_subjects <- liu_processed %>%
+subjects_liu <- liu_processed %>%
   dplyr::select(
     subject_id, gender, birth_year, height_m, weight_kg, bmi,
     sensitivity_cold, cold_exposure, health_routines_caffein
@@ -508,7 +635,7 @@ liu_subjects <- liu_processed %>%
 # --- Create Analysis Dataset ---
 # Combined survey + environmental data in long format
 
-liu_analysis <- liu_processed %>%
+analysis_liu <- liu_processed %>%
   dplyr::select(
     subject_id,
     timestamp,
@@ -527,20 +654,20 @@ liu_analysis <- liu_processed %>%
 
 # --- Save Output Files ---
 
-# Create output directories if they don't exist
-dir.create(here::here("data", "02-export"), showWarnings = FALSE, recursive = TRUE)
-
 # Save subject metadata
 write_csv(
-  liu_subjects,
+  subjects_liu,
   here::here("data", "01-processed", "metadata", "subject_metadata_liu.csv")
 )
 
 # Save analysis data
 write_csv(
-  liu_analysis,
+  analysis_liu,
   here::here("data", "02-export", "df_analysis_liu.csv")
 )
+
+# Cleanup
+rm(liu_raw, liu_processed, liu_qname_mapping)
 
 
 
@@ -589,7 +716,7 @@ current_subjects <- read_csv(
   )
 
 # Prepare liu data with matching columns (NA for columns not available)
-liu_subjects_combined <- liu_subjects %>%
+liu_subjects_combined <- subjects_liu %>%
   dplyr::mutate(
     study = "liu_2017"
   ) %>%
@@ -618,6 +745,8 @@ liu_subjects_combined <- liu_subjects %>%
 # Combine both datasets
 subjects_combined <- dplyr::bind_rows(current_subjects, liu_subjects_combined) %>%
   dplyr::arrange(study, subject_id)
+
+rm(liu_subjects_combined)
 
 # Save combined metadata
 write_csv(

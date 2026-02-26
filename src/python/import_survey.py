@@ -101,6 +101,11 @@ class SurveyProcessor:
                 "subject_no"
             ].astype(str)
 
+            # Standardize subject_id: lowercase and trim whitespace
+            df[MyConstants.COL_USER_ID] = (
+                df[MyConstants.COL_USER_ID].str.lower().str.strip()
+            )
+
             # Create question column by concatenating question_cat and question_num
             df["question"] = (
                 df["question_cat"].astype(str) + "-" + df["question_num"].astype(str)
