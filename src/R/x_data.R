@@ -160,7 +160,11 @@ sessions_for_airflow <- sessions %>%
 airflow_with_sessions <- airflow %>%
   dplyr::inner_join(sessions_for_airflow, by = "date", relationship = "many-to-many") %>%
   dplyr::filter(session_time_start > timestamp) %>%
-  dplyr::select(-date, -session_time_start, -timestamp, -time_elapsed_s)
+  dplyr::select(-date, -session_time_start, -timestamp, -time_elapsed_s) %>%
+  # Convert turbulence from percentage to decimal (to match Liu et al. format)
+  dplyr::mutate(across(contains("turbulence"), \(x) x / 100)) %>%
+  # Rename turbulence columns: turbulence_per_cent -> turbulence_intensity
+  dplyr::rename_with(\(x) gsub("turbulence_per_cent", "turbulence_intensity", x))
 
 # Mean by session_id and measurement_point (dot)
 airflow_sessions_dot_mean <- airflow_with_sessions %>%
@@ -239,11 +243,11 @@ analysis <- analysis %>%
       workstation == "ws03" ~ med_v_air_sd_m_s,
       TRUE ~ NA_real_
     ),
-    # Turbulence intensity (%)
-    turbulence_pct = dplyr::case_when(
-      workstation == "ws01" ~ high_turbulence_per_cent,
-      workstation == "ws02" ~ low_turbulence_per_cent,
-      workstation == "ws03" ~ med_turbulence_per_cent,
+    # Turbulence intensity (decimal, matching Liu et al. format)
+    turbulence_intensity = dplyr::case_when(
+      workstation == "ws01" ~ high_turbulence_intensity,
+      workstation == "ws02" ~ low_turbulence_intensity,
+      workstation == "ws03" ~ med_turbulence_intensity,
       TRUE ~ NA_real_
     ),
     # Dynamic range (%)
@@ -262,13 +266,13 @@ analysis <- analysis %>%
   ) %>%
   # Round all measurements to 2 decimal places
   dplyr::mutate(across(c(t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
-                         v_air_sd_m_s, turbulence_pct, dynamic_range_pct),
+                         v_air_sd_m_s, turbulence_intensity, dynamic_range_pct),
                        \(x) round(x, 2))) %>%
   # Reorder columns
   dplyr::select(
     timestamp, session_id, session_date, subject_id, workstation,
     t_air_c, rh_percent, co2_ppm,
-    v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_pct, dynamic_range_pct,
+    v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     question, is_open_text, response_value
   )
 
