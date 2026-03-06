@@ -1,6 +1,6 @@
 # Title: Plotting functions
 # Description: Define functions for plotting different types experimental results
-# Author: Toby Kramer
+# Author: Toby Kramer, Junmeng Lyu
 # Date: 2025-10-29
 
 source(here::here("src", "R", "x_setup.R"))
@@ -120,10 +120,11 @@ plot_lmm <- function(dat, xterm, xlab, model){
 # Plot for Part 2 paired t-test comparisons ----------------------------
 # Annotated with BH-adjusted p-values and effect sizes (Cohen’s d).
 
-plot_pairedttest <- function(data, outcome_var, test_result, 
-                                   y_label = NULL, group_by_var = "session_diffusor_sat",
+plot_pairedttest <- function(data, outcome_var, test_result,
+                                   y_label = NULL, group_by_var = "session_sat",
                                    p.signif = TRUE) {
   outcome_sym <- sym(outcome_var)
+  data <- data %>% dplyr::mutate(workstation = droplevels(workstation))
   
   if (is.null(y_label)) y_label <- outcome_var
   
@@ -138,31 +139,47 @@ plot_pairedttest <- function(data, outcome_var, test_result,
         ),
         NA_character_
       )
+    ) %>%
+    # Convert group names (low/medium/high) to numeric positions
+    dplyr::mutate(
+      xmin_num = as.numeric(factor(group1, levels = levels(data$workstation))),
+      xmax_num = as.numeric(factor(group2, levels = levels(data$workstation)))
     )
   
-  ggplot(data, aes(x = workstation, y = !!outcome_sym, fill = workstation)) +
+  p <- ggplot(data, aes(x = workstation, y = !!outcome_sym, fill = workstation)) +
     geom_boxplot(outlier.alpha = 0.4) +
     facet_wrap(
       as.formula(paste("~", group_by_var)),
       nrow = 1,
-      labeller = labeller(session_diffusor_sat = function(x) paste0(x, " °C"))
-    ) +
-    stat_pvalue_manual(
-      test_result_labeled,
-      label = "label",
-      hide.ns = TRUE
+      labeller = labeller(session_sat = function(x) paste0(x, " °C"))
     ) +
     scale_fill_manual(values = workstation_palette) +
     labs(x = "Air movement", y = y_label) +
     theme_bw() +
     theme(legend.position = "none")
+  
+  # Add significance brackets for significant comparisons
+  sig_comparisons <- test_result_labeled %>%
+    dplyr::filter(p.adj < 0.05)
+  
+  if (nrow(sig_comparisons) > 0) {
+    p <- p + stat_pvalue_manual(
+      sig_comparisons,
+      label = "label",
+      xmin = "xmin_num",
+      xmax = "xmax_num",
+      hide.ns = TRUE
+    )
+  }
+  
+  p
 }
 
 
 # Plot for Part 2 paired wilcox comparisons -------------------------------
 # Annotated with BH-adjusted p-values and effect sizes (r).
-plot_pairedwilcox <- function(data, outcome_var, posthoc_result, 
-                                          group_by_var = "session_diffusor_sat",
+plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
+                                          group_by_var = "session_sat",
                                           fill_label = NULL, fill_palette = thermal_preference_palette) {
   outcome_sym <- sym(outcome_var)
   group_sym <- sym(group_by_var)
@@ -201,7 +218,7 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
     facet_wrap(
       as.formula(paste("~", group_by_var)),
       nrow = 1,
-      labeller = labeller(session_diffusor_sat = function(x) paste0(x, " °C"))
+      labeller = labeller(session_sat = function(x) paste0(x, " °C"))
     ) +
     scale_y_continuous(labels = percent_format()) +
     scale_fill_manual(values = fill_palette, drop = FALSE) +
