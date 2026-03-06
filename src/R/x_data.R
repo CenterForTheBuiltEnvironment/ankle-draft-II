@@ -19,6 +19,7 @@ subjects <- read_csv(
     weight_kg = round(weight_lbs * 0.45359237, 0),
     age = 2025 - birth_year
   ) %>%
+  dplyr::rename(sex = gender) %>% 
   dplyr::select(-height_ft, -height_in, -weight_lbs, -birth_year) %>%
   dplyr::select(subject_id, age, height_m, weight_kg, everything())
 
@@ -56,6 +57,7 @@ env <- foverlaps(env, sessions, nomatch = 0L) %>%
   dplyr::select("timestamp",
                 "session_id",
                 "session_type",
+                "session_diffusor_sat",
                 "t_air_c",
                 "rh_percent",
                 "co2_ppm",
@@ -65,14 +67,88 @@ env <- foverlaps(env, sessions, nomatch = 0L) %>%
                 "light_lux")
 
 env_sessions <- env %>%
-  group_by(session_id) %>%
+  group_by(session_id, session_type, session_diffusor_sat) %>%  # add to group_by
   summarise(
     across(
       .cols = c(t_air_c, rh_percent, co2_ppm),
       .fns = mean,
       na.rm = TRUE
-    )
+    ) %>% 
+      dplyr::mutate(across(where(is.numeric), \(x) round(x, 2)))
   )
+
+
+
+# Airflow Measurements ----------------------------------------------------
+#
+# Airflow measurements were taken at 6 positions (dot1-dot6) before sessions
+# to characterize the air velocity profile at different supply conditions.
+#
+# Matching logic: Each airflow measurement set is matched to ALL sessions that:
+# 1. Occur on the same date as the measurement
+# 2. Start AFTER the measurement timestamp
+
+airflow <- read_csv(
+  here::here("data", "01-processed", "air_flow", "airflow_combined.csv"),
+  show_col_types = FALSE
+) %>%
+  janitor::clean_names() %>%
+  dplyr::mutate(
+    # Timestamps are labeled UTC but are actually local Pacific time
+    timestamp = lubridate::force_tz(
+      lubridate::as_datetime(timestamp),
+      tzone = "America/Los_Angeles"
+    ),
+    # Extract date for matching
+    date = lubridate::as_date(timestamp)
+  )
+
+# Prepare sessions for matching (get unique session_id rows, since sessions has one row per subject)
+sessions_for_airflow <- sessions %>%
+  as.data.frame() %>%
+  dplyr::select(session_id, session_time_start, session_type, session_diffusor_sat) %>%
+  dplyr::distinct() %>%
+  dplyr::filter(session_id != "CANCEL") %>%
+  dplyr::mutate(
+    date = lubridate::as_date(session_time_start)
+  )
+
+# Join airflow to sessions: match by date where session starts after airflow measurement
+airflow_with_sessions <- airflow %>%
+  dplyr::inner_join(sessions_for_airflow, by = "date", relationship = "many-to-many") %>%
+  dplyr::filter(session_time_start > timestamp) %>%
+  dplyr::select(-date, -session_time_start, -timestamp, -time_elapsed_s) %>%
+  # Convert turbulence from percentage to decimal (to match Liu et al. format)
+  dplyr::mutate(across(contains("turbulence"), \(x) x / 100)) %>%
+  # Rename turbulence columns: turbulence_per_cent -> turbulence_intensity
+  dplyr::rename_with(\(x) gsub("turbulence_per_cent", "turbulence_intensity", x))
+
+# Mean by session_id and measurement_point (dot)
+airflow_sessions_dot_mean <- airflow_with_sessions %>%
+  dplyr::group_by(session_id, measurement_point) %>%
+  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
+  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
+  dplyr::arrange(session_id, measurement_point)
+
+# Mean by session_id only (averaged across all dots)
+airflow_sessions_all_mean <- airflow_with_sessions %>%
+  dplyr::group_by(session_id, session_type, session_diffusor_sat) %>%
+  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
+  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
+  dplyr::arrange(session_id)
+
+# Save summary files
+write_csv(
+  airflow_sessions_dot_mean,
+  here::here("data", "01-processed", "air_flow", "airflow_sessions_dot_mean.csv")
+)
+
+write_csv(
+  airflow_sessions_all_mean,
+  here::here("data", "01-processed", "air_flow", "airflow_sessions_all_mean.csv")
+)
+
+rm(sessions_for_airflow, airflow_with_sessions)
 
 
 
@@ -118,80 +194,6 @@ tsk <- tsk %>%
   dplyr::select(-delta, -running_time) %>%
   dplyr::filter(running_time_s > 0) %>% 
   dplyr::select(timestamp, session_id, session_type, running_time_s, everything())
-
-
-
-
-# Airflow Measurements ----------------------------------------------------
-#
-# Airflow measurements were taken at 6 positions (dot1-dot6) before sessions
-# to characterize the air velocity profile at different supply conditions.
-#
-# Matching logic: Each airflow measurement set is matched to ALL sessions that:
-# 1. Occur on the same date as the measurement
-# 2. Start AFTER the measurement timestamp
-
-airflow <- read_csv(
-  here::here("data", "01-processed", "air_flow", "airflow_combined.csv"),
-  show_col_types = FALSE
-) %>%
-  janitor::clean_names() %>%
-  dplyr::mutate(
-    # Timestamps are labeled UTC but are actually local Pacific time
-    timestamp = lubridate::force_tz(
-      lubridate::as_datetime(timestamp),
-      tzone = "America/Los_Angeles"
-    ),
-    # Extract date for matching
-    date = lubridate::as_date(timestamp)
-  )
-
-# Prepare sessions for matching (get unique session_id rows, since sessions has one row per subject)
-sessions_for_airflow <- sessions %>%
-  as.data.frame() %>%
-  dplyr::select(session_id, session_time_start) %>%
-  dplyr::distinct() %>%
-  dplyr::filter(session_id != "CANCEL") %>%
-  dplyr::mutate(
-    date = lubridate::as_date(session_time_start)
-  )
-
-# Join airflow to sessions: match by date where session starts after airflow measurement
-airflow_with_sessions <- airflow %>%
-  dplyr::inner_join(sessions_for_airflow, by = "date", relationship = "many-to-many") %>%
-  dplyr::filter(session_time_start > timestamp) %>%
-  dplyr::select(-date, -session_time_start, -timestamp, -time_elapsed_s) %>%
-  # Convert turbulence from percentage to decimal (to match Liu et al. format)
-  dplyr::mutate(across(contains("turbulence"), \(x) x / 100)) %>%
-  # Rename turbulence columns: turbulence_per_cent -> turbulence_intensity
-  dplyr::rename_with(\(x) gsub("turbulence_per_cent", "turbulence_intensity", x))
-
-# Mean by session_id and measurement_point (dot)
-airflow_sessions_dot_mean <- airflow_with_sessions %>%
-  dplyr::group_by(session_id, measurement_point) %>%
-  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
-  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
-  dplyr::arrange(session_id, measurement_point)
-
-# Mean by session_id only (averaged across all dots)
-airflow_sessions_all_mean <- airflow_with_sessions %>%
-  dplyr::group_by(session_id) %>%
-  dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
-  dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
-  dplyr::arrange(session_id)
-
-# Save summary files
-write_csv(
-  airflow_sessions_dot_mean,
-  here::here("data", "01-processed", "air_flow", "airflow_sessions_dot_mean.csv")
-)
-
-write_csv(
-  airflow_sessions_all_mean,
-  here::here("data", "01-processed", "air_flow", "airflow_sessions_all_mean.csv")
-)
-
-rm(sessions_for_airflow, airflow_with_sessions)
 
 
 

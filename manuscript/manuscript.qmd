@@ -1,9 +1,34 @@
 ---
-title: "Ankle Draft"
-author:
-  - Tobias Kramer
-  - Junmeng Lyu
-  - Stefano Schiavon
+title: "Thermal comfort responses to ankle-level draft under winter clothing conditions"
+authors:
+  - name: Tobias Kramer
+    affiliations:
+      - ref: cbe
+    corresponding: true
+    email: t.kramer@berkeley.edu
+    orcid: 0000-0000-0000-0000
+  - name: Junmeng Lyu
+    affiliations:
+      - ref: cbe
+    orcid: 0000-0000-0000-0000
+  - name: Stefano Schiavon
+    affiliations:
+      - ref: cbe
+      - ref: arch
+      - ref: eng
+    orcid: 0000-0003-1285-5682 
+
+affiliations:
+  - id: cbe
+    name: Center for the Built Environment, University of California, Berkeley, USA
+  - id: arch
+    name: Department of Architecture, College of Environmental Design, University of California, Berkeley, USA
+  - id: eng
+    name: Department of Civil and Environmental Engineering, College of Engineering, University of California, Berkeley, USA
+
+filters:
+  - authors-block
+
 date: "`r Sys.Date()`"
 format:
   docx:
@@ -20,50 +45,384 @@ execute:
 ---
 
 ```{r load-main-analysis}
-source(here::here("code_r", "main_analysis.R"))
+#| message: false
+#| warning: false
+#| paged-print: false
+source(here::here("src", "R", "x_analysis.R"))
 ```
 
 # Abstract {.unnumbered}
 
+<!-- Draft after results are finalized -->
 
 # Introduction
 
-## Research context
+Cold downdraft near windows is a common source of local thermal
+discomfort in buildings during winter. When outdoor temperatures drop,
+the interior surface of windows—particularly large or poorly insulated
+glazing—becomes significantly cooler than the surrounding air. This
+temperature differential causes nearby air to cool, increase in density,
+and descend, creating a localized airflow pattern that can cause
+discomfort at the lower extremities of seated occupants
+[@heiselbergDraftComfortReview1994
+<!--# Replace reference with BetterBibTex -->]. Building designers
+typically address this issue by installing perimeter heating systems,
+such as radiators or in-floor heating, to counteract the downdraft
+effect and maintain occupant comfort.
 
+The current approach to evaluating ankle draft risk relies on a
+predictive model presented in @liuPredictedPercentageDissatisfied2017,
+which estimates the predicted percentage dissatisfied (PPD) with ankle
+draft as a function of air speed and temperature at ankle level, as well
+as whole-body thermal sensation. This model, now incorporated into
+ASHRAE Standard 55 [@ashraeANSIASHRAEStandard2023], was derived from
+laboratory experiments conducted under cooling conditions typical of
+underfloor air distribution (UFAD) and displacement ventilation systems.
+Importantly, participants in these foundational studies—including an
+earlier investigation by @schiavonSensationDraftUncovered2016—wore
+summer clothing with exposed ankles, resulting in clothing insulation
+levels of approximately 0.5 clo.
+
+However, building occupants in winter typically wear substantially
+different attire. Analysis of the ASHRAE Global Thermal Comfort Database
+II [@foldvarylicinaDevelopmentASHRAEGlobal2018] indicates that median
+clothing insulation in office environments during heating seasons is
+approximately 0.75 clo, with occupants commonly wearing long trousers
+and closed-toe shoes that cover the ankle region. This discrepancy
+raises an important question: does the existing ankle draft model,
+calibrated for summer conditions with exposed skin, accurately predict
+discomfort when ankles are covered by clothing?
+
+If the current model overestimates draft risk under winter clothing
+conditions, the practical implications are significant. Designers may be
+specifying perimeter heating systems that are larger than necessary, or
+installing them in situations where they could be avoided entirely. This
+has consequences for both first costs and operational energy
+consumption, as perimeter heating systems contribute to building energy
+use and associated carbon emissions. Conversely, if the model
+underestimates risk, occupants may experience discomfort that
+compromises satisfaction and productivity.
+
+The objective of this study is to evaluate thermal comfort responses to
+ankle-level draft under winter clothing conditions through controlled
+laboratory experiments. Specifically, we aim to: (1) characterize local
+and whole-body thermal sensation and comfort responses across a range of
+supply air temperatures and air speeds representative of window
+downdraft conditions; (2) compare observed dissatisfaction rates with
+predictions from the existing ankle draft model; and (3) assess whether
+the current ASHRAE 55 criteria require adjustment for winter scenarios.
+The findings are intended to inform guidance on perimeter heating
+requirements and support more energy-efficient building design without
+compromising occupant comfort.
 
 # Methods {#sec-methods}
 
+## Experimental design
+
+We conducted a controlled laboratory experiment using a within-subjects
+repeated-measures design. Each participant was exposed to nine
+experimental conditions in a 3×3 factorial arrangement, varying supply
+air temperature (SAT) at three levels (15°C, 17°C, 19°C) and air speed
+at ankle level at three levels (low, medium, high; approximately 0.2–0.6
+m/s). The SAT levels were selected to represent the range of air
+temperatures associated with window downdraft under typical winter
+conditions, informed by computational fluid dynamics simulations
+conducted as part of a broader research collaboration.
+
+Participants attended four sessions: an introductory session for
+consent, training, and baseline measurements, followed by three
+experimental sessions of approximately two hours each. Each experimental
+session corresponded to one SAT level, with participants experiencing
+all three air speed conditions within that session in a counterbalanced
+order. Sessions were scheduled on separate days to minimize carryover
+effects.
+
+## Climate chamber and apparatus
+
+The experiment was conducted in a climate-controlled chamber at the
+Center for the Built Environment, UC Berkeley. The chamber floor area is
+approximately 25 m², configured with up to three workstations to allow
+simultaneous testing of multiple participants. Ambient room conditions
+were maintained at approximately 22°C operative temperature, 50%
+relative humidity, and background air velocity below 0.1 m/s, targeting
+a whole-body thermal sensation of approximately −0.5 (slightly cool) on
+the ASHRAE seven-point scale.
+
+A custom displacement diffuser was used to deliver conditioned air to
+the ankle region of seated participants. The diffuser was positioned
+approximately 0.7 m behind each workstation, directing airflow toward
+the participants' lower legs from behind—simulating the approach
+direction of window downdraft. The diffuser was connected to an
+independent air handling unit capable of delivering supply air at the
+target temperatures and flow rates. Turbulence intensity at the
+measurement location was approximately 30%, consistent with values
+reported in prior ankle draft studies
+[@liuPredictedPercentageDissatisfied2017].
+
+## Environmental monitoring
+
+Air temperature was measured at head-height at each workstation using
+calibrated sensors positioned within 0.5 m of participants. Air velocity
+at ankle level (0.1 m) was measured using omnidirectional hot-wire
+anemometers. Supply air temperature was monitored continuously at the
+diffuser outlet. Room-level measurements of relative humidity and CO~2~
+concentration were recorded throughout each session.
+
+## Participants
+
+We recruited participants from the university community and local area
+through the Experimental Social Science Laboratory (Xlab) platform and
+email outreach to individuals who had participated in previous studies
+and consented to future contact. Eligible participants were between 21
+and 55 years of age, fluent in English, and free from chronic
+cardiorespiratory conditions or recent major surgery. Pregnant
+individuals were excluded.
+
+<!-- Add: final sample size, demographics summary from analysis -->
+
+## Clothing protocol
+
+To simulate typical winter office attire, participants were instructed
+to wear a long-sleeve top, long trousers (ending just above the ankle),
+thin socks, and closed-toe shoes. This ensemble targets a clothing
+insulation of approximately 0.75 clo, consistent with the median value
+observed in office buildings during heating seasons
+[@foldvarylicinaDevelopmentASHRAEGlobal2018]. Participants were
+permitted to make minor clothing adjustments during sessions (e.g.,
+rolling sleeves), and any changes were recorded.
+
+## Experimental protocol
+
+Upon arrival for each experimental session, participants were checked
+for elevated temperature and fitted with iButton skin temperature
+sensors at standardized locations (lower leg, feet). Participants then
+entered the climate chamber and completed a 20-minute adaptation period
+at their assigned workstation under baseline conditions.
+
+Following adaptation, participants were exposed to three consecutive
+20-minute conditions at different air speed levels, with 20-minute rest
+periods between conditions. The sequence of air speed conditions was
+counterbalanced across participants and sessions. During each exposure
+period, participants completed standardized questionnaires at the end of
+each interval.
+
+## Subjective measurements
+
+Thermal comfort was assessed using validated scales consistent with
+prior ankle draft research and ASHRAE Standard 55 requirements. Survey
+instruments included:
+
+-   **Whole-body thermal sensation**: 7-point ASHRAE scale (−3 cold to
+    +3 hot)
+-   **Whole-body thermal comfort**: continuous scale
+-   **Whole-body thermal preference**: 3-point scale (cooler / no change
+    / warmer)
+-   **Local thermal sensation at ankles**: 7-point scale
+-   **Local thermal preference at ankles**: 3-point scale
+-   **Air movement acceptability at ankles**: 5-point scale (very
+    unacceptable to very acceptable)
+-   **Air movement preference at ankles**: 3-point scale (lower / no
+    change / higher)
+
+Surveys were administered electronically via Qualtrics. Participants
+were not required to respond to any individual question, though
+completion rates were monitored.
+
+## Physiological measurements
+
+Skin temperature was recorded continuously using iButton sensors
+(Thermochron, Maxim Integrated) attached with medical-grade
+hypoallergenic tape. Sensors were placed on the lateral lower leg
+(mid-calf) and feet. Skin temperature data were used to assess local
+cooling responses and as physiological correlates of subjective thermal
+sensation.
+
+## Statistical analysis and data processing
+
+<!-- Describe analysis approach after methods are finalized -->
 
 # Results
 
+## Participants and environmental conditions
+
+```{r demographics, echo=FALSE}
+#| label: tbl-demographics
+#| tbl-cap: "Summary of demographic information (mean ± SD) on study participants."
+
+knitr::kable(demographic_d,
+             col.names = c('Sex', 'No. Subjects', 'Age [a]', 'Height [m]', 'Weight [kg]', 'Body Mass Index (BMI)')
+)
+
+```
+
+```{=html}
+<!--
+- Final sample size, completion rate, demographics (age, sex distribution)
+- Table: Achieved environmental conditions by SAT level and air speed condition
+  (mean ± SD for air temp, supply temp, air velocity at ankle, RH)
+- Brief statement confirming conditions were achieved as designed
+-->
+```
+
+```{r env, echo=FALSE}
+#| label: tbl-env
+#| tbl-cap: "Summary of environmental measurements."
+
+knitr::kable(env_airflow_t)
+```
+
+## Thermal sensation and comfort responses
+
+```{=html}
+<!--
+- Descriptive: Distribution of whole-body and ankle thermal sensation by condition
+- Figure: Boxplots or violin plots of thermal sensation (whole-body and ankle) across conditions
+- Statistical: Effect of SAT and air speed on ankle thermal sensation (mixed model or repeated measures)
+- Key finding: Did ankle sensation decrease (cooler) with lower SAT and higher air speed?
+-->
+```
+
+## Air movement acceptability at ankles
+
+```{=html}
+<!--
+- Descriptive: Distribution of ankle air movement acceptability by condition
+- Figure: Stacked bar chart showing acceptability distribution across conditions
+- Statistical: Effect of SAT and air speed on acceptability (ordinal mixed model or Friedman)
+- Proportion reporting unacceptable air movement by condition
+-->
+```
+
+## Dissatisfaction with ankle draft
+
+```{=html}
+<!--
+- Define binary outcome (matching Liu et al. definition)
+- Observed dissatisfaction rates by condition (table or figure)
+- Comparison with Liu et al. model predictions:
+  - Apply Liu et al. model to observed conditions → predicted PPD
+  - Compare predicted vs. observed dissatisfaction rates
+  - Figure: Predicted vs. observed, or overlay on Liu et al. PPD contour plot
+- Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing?
+-->
+```
+
+## Updated model for winter conditions
+
+```{=html}
+<!--
+- Fit logistic mixed model for dissatisfaction (predictors: air speed, supply temp, possibly whole-body sensation)
+- Present model coefficients and interpretation
+- Figure: PPD contour plot for winter clothing conditions
+- Compare model form/coefficients with Liu et al.
+- Identify "acceptable" operating zone under winter conditions
+-->
+```
 
 # Discussion
 
+The primary finding of this study is \[summary of main result regarding
+winter clothing effect on ankle draft sensitivity\].
+
+## Comparison with prior research
+
+```{=html}
+<!--
+- How do results compare to Liu et al. (2017) and Schiavon et al. (2016)?
+- Quantify the difference: e.g., "Observed dissatisfaction was X% lower than predicted by the current model"
+- Discuss whether this difference is practically meaningful
+-->
+```
+
+## Mechanisms
+
+```{=html}
+<!--
+- Why might covered ankles respond differently?
+- Thermal insulation of clothing reducing convective heat loss
+- Reduced skin exposure → less direct air contact
+- Possible psychological factors (feeling "protected")
+- Relate to skin temperature findings if included
+-->
+```
+
+## Implications for building design
+
+```{=html}
+<!--
+- What does this mean for perimeter heating requirements?
+- Under what conditions might perimeter heating be reduced or eliminated?
+- Energy and cost implications
+- Guidance for practitioners: when to apply winter vs. summer criteria
+-->
+```
+
+## Relationship to standards
+
+```{=html}
+<!--
+- How do findings relate to current ASHRAE 55 ankle draft criteria?
+- Should the standard include clothing-specific adjustments?
+- Recommendations for standards committees
+-->
+```
 
 ## Limitations
 
+```{=html}
+<!--
+- Laboratory vs. field conditions
+- Controlled clothing vs. real occupant clothing variability
+- Sample demographics (age range, student population)
+- Single body posture (seated)
+- Radiant asymmetry from cold windows not simulated
+- Air flow direction (from behind only)
+-->
+```
 
 # Conclusions
 
+## Limitations
+
+# Conclusions
 
 # CRediT authorship contribution statement {.unnumbered}
 
-**Tobias Kramer**: Conceptualization, Data curation, Formal analysis, Methodology, Investigation, Project administration, Software, Writing - original draft, Writing - review & editing. **Stefano Schiavon**: Conceptualization, Funding acquisition, Methodology, Project administration, Supervision, Writing - review & editing.
+**Tobias Kramer**: Conceptualization, Data curation, Formal analysis,
+Methodology, Investigation, Project administration, Software, Writing -
+original draft, Writing - review & editing. **Stefano Schiavon**:
+Conceptualization, Funding acquisition, Methodology, Project
+administration, Supervision, Writing - review & editing.
 
 # Declaration of competing interest {.unnumbered}
 
-All authors declare XYZ competing interest. The Center for the Built Environment (CBE) at the University of California, Berkeley, with which the authors are affiliated, is advised and funded in part by approximately 50 partners that represent a diversity of organizations from the building industry, including manufacturers, building owners, facility managers, contractors, architects, engineers, government agencies, and utilities.
+All authors declare XYZ competing interest. The Center for the Built
+Environment (CBE) at the University of California, Berkeley, with which
+the authors are affiliated, is advised and funded in part by
+approximately 50 partners that represent a diversity of organizations
+from the building industry, including manufacturers, building owners,
+facility managers, contractors, architects, engineers, government
+agencies, and utilities.
 
 # Data availability
 
-The datasets generated and analyzed during the current study as well as the full source code of the data analysis workflow are available in the following GitHub repository: XXX.
+The datasets generated and analyzed during the current study as well as
+the full source code of the data analysis workflow are available in the
+following GitHub repository: XXX.
 
 # Declaration of Generative AI and AI-assisted technologies in the writing process
 
-During the preparation of this work, the authors utilized the chatbot ChatGPT to enhance the language and readability of the content. Subsequently, they reviewed and edited the material as required, while maintaining full accountability for the publication’s content.
+During the preparation of this work, the authors utilized the chatbot
+ChatGPT to enhance the language and readability of the content.
+Subsequently, they reviewed and edited the material as required, while
+maintaining full accountability for the publication’s content.
 
 # Acknowledgements {.unnumbered}
 
-The Center for the Built Environment at the University of California, Berkeley supported this research. The authors also want to thank dedicated undergraduate students Heijin Hong, Lana Fiona Lilienstein, Kevin Kim and Gayle Boyd for their voluntary support throughout the experimental phase.
+The Center for the Built Environment at the University of California,
+Berkeley supported this research. The authors also want to thank
+dedicated undergraduate students Heijin Hong, Lana Fiona Lilienstein,
+Kevin Kim and Gayle Boyd for their voluntary support throughout the
+experimental phase.
 
 # References {.unnumbered}
