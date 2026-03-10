@@ -26,6 +26,7 @@ subjects <- read_csv(
 
 sessions <- read_csv(here::here("data", "00-raw", "metadata", "session_metadata.csv"), col_types = col_sessions) %>%
   janitor::clean_names() %>%
+  dplyr::rename(session_sat = session_diffusor_sat) %>% 
   dplyr::mutate(
     session_time_start = lubridate::mdy_hm(session_time_start, tz = "America/Los_Angeles"),
     session_time_end   = lubridate::mdy_hm(session_time_end, tz = "America/Los_Angeles")
@@ -57,7 +58,7 @@ env <- foverlaps(env, sessions, nomatch = 0L) %>%
   dplyr::select("timestamp",
                 "session_id",
                 "session_type",
-                "session_diffusor_sat",
+                "session_sat",
                 "t_air_c",
                 "rh_percent",
                 "co2_ppm",
@@ -67,7 +68,7 @@ env <- foverlaps(env, sessions, nomatch = 0L) %>%
                 "light_lux")
 
 env_sessions <- env %>%
-  group_by(session_id, session_type, session_diffusor_sat) %>%  # add to group_by
+  group_by(session_id, session_type, session_sat) %>%  # add to group_by
   summarise(
     across(
       .cols = c(t_air_c, rh_percent, co2_ppm),
@@ -106,7 +107,7 @@ airflow <- read_csv(
 # Prepare sessions for matching (get unique session_id rows, since sessions has one row per subject)
 sessions_for_airflow <- sessions %>%
   as.data.frame() %>%
-  dplyr::select(session_id, session_time_start, session_type, session_diffusor_sat) %>%
+  dplyr::select(session_id, session_time_start, session_type, session_sat) %>%
   dplyr::distinct() %>%
   dplyr::filter(session_id != "CANCEL") %>%
   dplyr::mutate(
@@ -132,7 +133,7 @@ airflow_sessions_dot_mean <- airflow_with_sessions %>%
 
 # Mean by session_id only (averaged across all dots)
 airflow_sessions_all_mean <- airflow_with_sessions %>%
-  dplyr::group_by(session_id, session_type, session_diffusor_sat) %>%
+  dplyr::group_by(session_id, session_type, session_sat) %>%
   dplyr::summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)), .groups = "drop") %>%
   dplyr::mutate(across(where(is.numeric), \(x) round(x, 2))) %>%
   dplyr::arrange(session_id)
@@ -202,6 +203,29 @@ tsk <- tsk %>%
 # Read raw survey data
 survey <- read_csv(here::here("data", "01-processed", "survey", "survey_combined.csv"), col_types = col_survey) %>%
   janitor::clean_names() %>%
+  # adjust workstation levels/labels
+  dplyr::mutate(
+    workstation = factor(
+      workstation,
+      levels = workstation_levels,
+      labels = workstation_labels,
+    )
+  ) %>% 
+  # add in session_sat
+  dplyr::left_join(
+    sessions %>%
+      as.data.frame() %>%
+      dplyr::select(session_id, session_sat) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(
+        session_sat = factor(session_sat,
+                             levels = session_sat_levels,
+                             labels = session_sat_labels)
+      ) %>%
+      dplyr::select(session_id, session_sat),
+    by = "session_id"
+  ) %>% 
+  dplyr::select(session_id, session_date, session_sat, workstation, everything()) %>% 
   dplyr::mutate(timestamp = lubridate::as_datetime(timestamp, tz = "America/Los_Angeles"))
 
 
@@ -219,23 +243,6 @@ survey <- read_csv(here::here("data", "01-processed", "survey", "survey_combined
 analysis <- survey %>%
   dplyr::left_join(env_sessions, by = "session_id")
 
-# Join with session metadata (session_sat = supply air temperature setpoint)
-# Convert to factor using levels/labels defined in x_setup.R
-analysis <- analysis %>%
-  dplyr::left_join(
-    sessions %>%
-      as.data.frame() %>%
-      dplyr::select(session_id, session_diffusor_sat) %>%
-      dplyr::distinct() %>%
-      dplyr::mutate(
-        session_sat = factor(session_diffusor_sat,
-                             levels = session_sat_levels,
-                             labels = session_sat_labels)
-      ) %>%
-      dplyr::select(session_id, session_sat),
-    by = "session_id"
-  )
-
 # Join with airflow data
 analysis <- analysis %>%
   dplyr::left_join(airflow_sessions_all_mean, by = "session_id")
@@ -245,37 +252,37 @@ analysis <- analysis %>%
   dplyr::mutate(
     # Air velocity (m/s)
     v_air_m_s = dplyr::case_when(
-      workstation == "ws01" ~ high_v_air_s,
-      workstation == "ws02" ~ low_v_air_s,
-      workstation == "ws03" ~ med_v_air_s,
+      workstation == "high" ~ high_v_air_s,
+      workstation == "low" ~ low_v_air_s,
+      workstation == "med" ~ med_v_air_s,
       TRUE ~ NA_real_
     ),
     # Supply air temperature (°C)
     t_supply_c = dplyr::case_when(
-      workstation == "ws01" ~ high_t_supply_c,
-      workstation == "ws02" ~ low_t_supply_c,
-      workstation == "ws03" ~ med_t_supply_c,
+      workstation == "high" ~ high_t_supply_c,
+      workstation == "low" ~ low_t_supply_c,
+      workstation == "med" ~ med_t_supply_c,
       TRUE ~ NA_real_
     ),
     # Air velocity standard deviation (m/s)
     v_air_sd_m_s = dplyr::case_when(
-      workstation == "ws01" ~ high_v_air_sd_m_s,
-      workstation == "ws02" ~ low_v_air_sd_m_s,
-      workstation == "ws03" ~ med_v_air_sd_m_s,
+      workstation == "high" ~ high_v_air_sd_m_s,
+      workstation == "low" ~ low_v_air_sd_m_s,
+      workstation == "med" ~ med_v_air_sd_m_s,
       TRUE ~ NA_real_
     ),
     # Turbulence intensity (decimal, matching Liu et al. format)
     turbulence_intensity = dplyr::case_when(
-      workstation == "ws01" ~ high_turbulence_intensity,
-      workstation == "ws02" ~ low_turbulence_intensity,
-      workstation == "ws03" ~ med_turbulence_intensity,
+      workstation == "high" ~ high_turbulence_intensity,
+      workstation == "low" ~ low_turbulence_intensity,
+      workstation == "med" ~ med_turbulence_intensity,
       TRUE ~ NA_real_
     ),
     # Dynamic range (%)
     dynamic_range_pct = dplyr::case_when(
-      workstation == "ws01" ~ high_dynamic_range_per_cent,
-      workstation == "ws02" ~ low_dynamic_range_per_cent,
-      workstation == "ws03" ~ med_dynamic_range_per_cent,
+      workstation == "high" ~ high_dynamic_range_per_cent,
+      workstation == "low" ~ low_dynamic_range_per_cent,
+      workstation == "med" ~ med_dynamic_range_per_cent,
       TRUE ~ NA_real_
     )
   ) %>%
@@ -406,20 +413,6 @@ derived_vars <- analysis_wide_temp %>%
 analysis <- dplyr::bind_rows(analysis, derived_vars)
 
 rm(analysis_wide_temp, derived_vars)
-
-
-# --- Workstation Factor Labels ---
-# Convert workstation to factor with descriptive labels for analysis/visualization.
-# Mapping: ws02 → Low, ws03 → Medium, ws01 → High (based on air velocity levels)
-
-analysis <- analysis %>%
-  dplyr::mutate(
-    workstation = factor(
-      workstation,
-      levels = c("adaptation", "ws02", "ws03", "ws01"),
-      labels = c("adaptation", "low", "medium", "high")
-    )
-  )
 
 
 # Save analysis dataframe

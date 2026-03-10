@@ -282,6 +282,9 @@ knitr::kable(env_airflow_t)
 -->
 ```
 
+![(a) Thermal sensation; and (b) thermal
+acceptability.](figs/thermal_perception.png){#fig-thermal-perception}
+
 ## Air movement acceptability at ankles
 
 ```{=html}
@@ -292,6 +295,9 @@ knitr::kable(env_airflow_t)
 - Proportion reporting unacceptable air movement by condition
 -->
 ```
+
+![(a) Air movement acceptability; and (b) air movement
+preference.](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref}
 
 ## Dissatisfaction with ankle draft
 
