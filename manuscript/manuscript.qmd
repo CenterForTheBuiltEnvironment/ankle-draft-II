@@ -309,7 +309,7 @@ preference.](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref}
   - Apply Liu et al. model to observed conditions → predicted PPD
   - Compare predicted vs. observed dissatisfaction rates
   - Figure: Predicted vs. observed, or overlay on Liu et al. PPD contour plot
-- Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing?
+- Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing? Hypothesis: Yes, it doesn't work well and should be updated using the entire dataset
 -->
 ```
 
@@ -317,11 +317,11 @@ preference.](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref}
 
 ```{=html}
 <!--
-- Fit logistic mixed model for dissatisfaction (predictors: air speed, supply temp, possibly whole-body sensation)
+- Fit model for dissatisfaction with ankle draft (predictors: air speed, supply temp, room air temperature, possibly whole-body sensation and vertical temperature gradient)
 - Present model coefficients and interpretation
-- Figure: PPD contour plot for winter clothing conditions
-- Compare model form/coefficients with Liu et al.
-- Identify "acceptable" operating zone under winter conditions
+- Figure, e.g. updated PPD contour plot for both winter and summer conditions
+- Compare model form/coefficients with Liu et al. and highlight improvements
+- Identify "acceptable" operating zone under summer/winter conditions
 -->
 ```
 

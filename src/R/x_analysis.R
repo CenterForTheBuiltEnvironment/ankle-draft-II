@@ -435,6 +435,9 @@ ggsave(
 #
 # TODO: Integrate analysis from analysis_old.R
 #
-# - Statistical tests (paired t-tests, Wilcoxon tests for group comparisons)
-# - Updated PPD model with Monte Carlo integration
-# - Export statistical summaries as dataframes
+# - Develop new or adjusted model using combined dataset (Liu + new)
+# - Interesting variables might be: air speed, SAT, room air temperature,
+# thermal perception variables, clothing levels, vertical temperature gradient
+# - Important to keep it simple (so it remains usable by non-experts)
+# - might be worth to start with a short Exploratory Data Analysis before
+# proposing new model
