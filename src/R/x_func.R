@@ -263,3 +263,54 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
 
   return(p)
 }
+
+plot_draft_model <- function(data, label, subtitle_text){
+  
+  ppd_levels <- c(10,20,40,60,80)
+  
+  ggplot(data, aes(TS, V)) +
+    
+    geom_raster(
+      data = dplyr::filter(data, abs(TS) < 0.5 & PPD < 20),
+      fill = "#0077b6",
+      alpha = 0.75
+    ) +
+    
+    geom_contour(
+      aes(z = PPD),
+      breaks = ppd_levels,
+      color = "#99d98c",
+      linewidth = 1
+    ) +
+    
+    scale_y_continuous(
+      name = "Ankle air speed (m/s)",
+      sec.axis = sec_axis(~ . * 196.85, name = "Ankle air speed (fpm)")
+    ) +
+    
+    scale_x_continuous(
+      name = paste0("Whole-body thermal sensation (~PMV)\n\n", subtitle_text),
+      breaks = -3:3,
+      labels = c("Cold","Cool","Slightly\ncool","Neutral",
+                 "Slightly\nwarm","Warm","Hot")
+    ) +
+    
+    coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE) +
+    
+    annotate(
+      "text",
+      x = 0,
+      y = -0.12,
+      label = subtitle_text,
+      size = 4
+    ) +
+    
+    theme_classic(base_size = 13) +
+    
+    theme(
+      plot.tag = element_text(size = 16, face = "bold"),
+      plot.margin = margin(10,10,15,10)
+    ) +
+    
+    labs(tag = label)
+}

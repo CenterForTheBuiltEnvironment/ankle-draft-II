@@ -30,154 +30,258 @@ logistic_or_ci <- function(mod, term) {
 
 # Paired Comparisons ===========================================================
 
-#' Repeated-measures ANOVA with paired t-tests for continuous variables
+#' Pairwise paired t-tests with BH adjustment. Computes Cohen's d effect sizes.
 #'
-#' Performs repeated-measures ANOVA within each group level, followed by
-#' pairwise paired t-tests with BH adjustment. Computes Cohen's d effect sizes.
-#'
-#' @param data Wide-format data frame with one row per subject-workstation
-#' @param outcome_var Outcome variable name (string)
-#' @param p.adjust.method P-value adjustment method (default: "BH")
-#' @param group_by_var Grouping variable (default: "session_sat")
-#' @param within_var Within-subject factor (default: "workstation")
-#' @param subject_var Subject identifier (default: "subject_id")
-#' @param alpha Significance threshold for ANOVA (default: 0.05)
-#' @param pairwise_only_if_sig If TRUE, only run pairwise tests for significant
-#'   ANOVA groups (default: FALSE)
-#' @return List with 'anova' (ANOVA results) and 'pairwise' (pairwise tests)
-pairedttest_with_anova <- function(data, outcome_var,
-                                   p.adjust.method = "BH",
-                                   group_by_var = "session_sat",
-                                   within_var = "workstation",
-                                   subject_var = "subject_id",
-                                   alpha = 0.05,
-                                   pairwise_only_if_sig = FALSE) {
-  group_sym <- rlang::sym(group_by_var)
-  within_sym <- rlang::sym(within_var)
-  subject_sym <- rlang::sym(subject_var)
-
-  # Repeated-measures ANOVA within each group level
-  aov_res <- data %>%
-    dplyr::group_by(!!group_sym) %>%
-    rstatix::anova_test(
-      dv = !!rlang::sym(outcome_var),
-      wid = !!subject_sym,
-      within = !!within_sym
+#' @param data Long-format data frame containing survey observations
+#' @param group_by_var Higher-level grouping variable
+#' @param within_var Optional additional grouping variable for nested grouping (default: NULL)
+#' @param subject_var Subject identifier for pairing observations.
+#' @param question_var Variable defining the within-subject conditions to be compared
+#' @param value_var Numeric outcome variable to be compared
+#' @param order_var Optional ordering variable used to determine the first observation (for double check)
+#' @return A tibble containing pairwise paired t-test results
+paired_t_test <- function(data,
+                          group_by_var,
+                          within_var = NULL,
+                          subject_var,
+                          question_var,
+                          value_var,
+                          order_var = NULL) {
+  
+  group_vars <- unique(Filter(Negate(is.null), c(group_by_var, within_var)))
+  
+  data %>%
+    dplyr::group_by(dplyr::across(all_of(group_vars))) %>%
+    dplyr::group_modify(~{
+      
+      dat_long <- .x
+      
+      if (!is.null(order_var)) {
+        dat_long <- dat_long %>%
+          dplyr::arrange(
+            dplyr::across(all_of(c(subject_var, question_var, order_var)))
+          )
+      }
+      
+      dat <- dat_long %>%
+        dplyr::group_by(dplyr::across(all_of(c(subject_var, question_var)))) %>%
+        dplyr::summarise(
+          value = dplyr::first(.data[[value_var]]),
+          .groups = "drop"
+        ) %>%
+        tidyr::pivot_wider(
+          names_from = all_of(question_var),
+          values_from = value
+        )
+      
+      grp_names <- setdiff(names(dat), subject_var)
+      
+      if (length(grp_names) < 2) {
+        return(tibble::tibble(
+          group1 = NA_character_,
+          group2 = NA_character_,
+          n = NA_integer_,
+          mean1 = NA_real_,
+          mean2 = NA_real_,
+          statistic = NA_real_,
+          df = NA_real_,
+          p = NA_real_,
+          cohen_d = NA_real_
+        ))
+      }
+      
+      combs <- combn(grp_names, 2, simplify = FALSE)
+      
+      purrr::map_dfr(combs, function(pair){
+        
+        g1 <- as.character(pair[1])
+        g2 <- as.character(pair[2])
+        
+        paired_dat <- dat %>%
+          dplyr::select(all_of(c(subject_var, g1, g2))) %>%
+          tidyr::drop_na(all_of(c(g1, g2)))
+        
+        if (nrow(paired_dat) < 2) {
+          return(tibble::tibble(
+            group1 = g1,
+            group2 = g2,
+            n = nrow(paired_dat),
+            mean1 = mean(paired_dat[[g1]], na.rm = TRUE),
+            mean2 = mean(paired_dat[[g2]], na.rm = TRUE),
+            statistic = NA_real_,
+            df = NA_real_,
+            p = NA_real_,
+            cohen_d = NA_real_
+          ))
+        }
+        
+        tt <- stats::t.test(paired_dat[[g1]], paired_dat[[g2]], paired = TRUE)
+        
+        diff_val <- paired_dat[[g1]] - paired_dat[[g2]]
+        sd_diff <- stats::sd(diff_val, na.rm = TRUE)
+        
+        d_val <- if (is.na(sd_diff) || sd_diff == 0) {
+          NA_real_
+        } else {
+          mean(diff_val, na.rm = TRUE) / sd_diff
+        }
+        
+        tibble::tibble(
+          group1 = g1,
+          group2 = g2,
+          n = nrow(paired_dat),
+          mean1 = mean(paired_dat[[g1]], na.rm = TRUE),
+          mean2 = mean(paired_dat[[g2]], na.rm = TRUE),
+          statistic = unname(tt$statistic),
+          df = unname(tt$parameter),
+          p = tt$p.value,
+          cohen_d = d_val
+        )
+      })
+      
+    }) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(dplyr::across(all_of(group_by_var))) %>%
+    dplyr::mutate(
+      p.adj = stats::p.adjust(p, method = "BH")
     ) %>%
-    rstatix::get_anova_table() %>%
     dplyr::ungroup()
-
-  # Identify groups with significant main effect
-  p_col <- "p"
-  sig_groups <- aov_res %>%
-    dplyr::filter(.data[[p_col]] < alpha) %>%
-    dplyr::pull(!!group_sym) %>%
-    unique()
-
-  # Filter data for pairwise tests if requested
-  data_for_pairwise <- if (pairwise_only_if_sig) {
-    data %>% dplyr::filter(!!group_sym %in% sig_groups)
-  } else {
-    data
-  }
-
-  # Return early if no data for pairwise tests
- if (nrow(data_for_pairwise) == 0) {
-    return(list(
-      anova = aov_res,
-      pairwise = dplyr::tibble()
-    ))
-  }
-
-  # Pairwise paired t-tests
-  test_result <- data_for_pairwise %>%
-    dplyr::group_by(!!group_sym) %>%
-    rstatix::pairwise_t_test(
-      as.formula(paste(outcome_var, "~", within_var)),
-      paired = TRUE,
-      p.adjust.method = p.adjust.method
-    )
-
-  # Compute paired Cohen's d
-  effect_result <- data_for_pairwise %>%
-    dplyr::group_by(!!group_sym) %>%
-    rstatix::cohens_d(
-      as.formula(paste(outcome_var, "~", within_var)),
-      paired = TRUE
-    )
-
-  # Compute group means for annotation
-  mean_df <- data_for_pairwise %>%
-    dplyr::group_by(!!group_sym, !!within_sym) %>%
-    dplyr::summarise(
-      mean_value = mean(.data[[outcome_var]], na.rm = TRUE),
-      .groups = "drop"
-    )
-
-  # Attach means to group1/group2
-  test_result <- test_result %>%
-    dplyr::left_join(mean_df, by = c(group_by_var, "group1" = within_var)) %>%
-    dplyr::rename(mean_group1 = mean_value) %>%
-    dplyr::left_join(mean_df, by = c(group_by_var, "group2" = within_var)) %>%
-    dplyr::rename(mean_group2 = mean_value)
-
-  # Merge effect sizes and add plotting positions
-  by_cols <- c(group_by_var, "group1", "group2")
-  pairwise_res <- test_result %>%
-    dplyr::left_join(effect_result, by = by_cols) %>%
-    rstatix::add_xy_position(x = within_var)
-
-  list(
-    anova = aov_res,
-    pairwise = pairwise_res
-  )
 }
 
 
-#' Friedman test with paired Wilcoxon post-hoc for ordinal variables
+#' paired Wilcoxon test for ordinal variables
+#' Performs pairwise Wilcoxon signed-rank tests with BH adjustment. Computes effect size r.
 #'
-#' Performs Friedman test within each group level, followed by pairwise
-#' Wilcoxon signed-rank tests with BH adjustment. Computes effect size r.
-#'
-#' @param data Wide-format data frame with one row per subject-workstation
-#' @param outcome_var Outcome variable name (string)
-#' @param group_by_var Grouping variable (default: "session_sat")
-#' @return List with 'friedman' (Friedman test results) and 'posthoc' (pairwise)
-pairedwilcoxtest <- function(data, outcome_var, group_by_var = "session_sat") {
-  outcome_sym <- sym(outcome_var)
-  group_sym <- sym(group_by_var)
-
-  # Friedman test within each group
-  friedman_result <- data %>%
-    group_by(!!group_sym) %>%
-    friedman_test(as.formula(paste(outcome_var, "~ workstation | subject_id")))
-
-  # Post-hoc pairwise Wilcoxon tests with effect sizes
-  posthoc_result <- data %>%
-    group_by(!!group_sym) %>%
-    pairwise_wilcox_test(
-      as.formula(paste(outcome_var, "~ workstation")),
-      paired = TRUE,
-      p.adjust.method = "BH"
+#' @param data Long-format data frame containing survey observations
+#' @param group_by_var Higher-level grouping variable
+#' @param within_var Optional additional grouping variable for nested grouping (default: NULL)
+#' @param subject_var Subject identifier for pairing observations.
+#' @param question_var Variable defining the within-subject conditions to be compared
+#' @param value_var Numeric outcome variable to be compared
+#' @param order_var Optional ordering variable used to determine the first observation (for double check)
+#' @return A tibble containing pairwise paired t-test results
+paired_wilcox_test <- function(data,
+                               group_by_var,
+                               within_var = NULL,
+                               subject_var,
+                               question_var,
+                               value_var,
+                               order_var = NULL) {
+  
+  group_vars <- unique(Filter(Negate(is.null), c(group_by_var, within_var)))
+  
+  data %>%
+    dplyr::group_by(dplyr::across(all_of(group_vars))) %>%
+    dplyr::group_modify(~{
+      
+      dat_long <- .x
+      
+      if (!is.null(order_var)) {
+        dat_long <- dat_long %>%
+          dplyr::arrange(
+            dplyr::across(all_of(c(subject_var, question_var, order_var)))
+          )
+      }
+      
+      dat <- dat_long %>%
+        dplyr::group_by(dplyr::across(all_of(c(subject_var, question_var)))) %>%
+        dplyr::summarise(
+          value = dplyr::first(.data[[value_var]]),
+          .groups = "drop"
+        ) %>%
+        tidyr::pivot_wider(
+          names_from = all_of(question_var),
+          values_from = value
+        )
+      
+      grp_names <- setdiff(names(dat), subject_var)
+      
+      if (length(grp_names) < 2) {
+        return(tibble::tibble(
+          group1 = NA_character_,
+          group2 = NA_character_,
+          n = NA_integer_,
+          mean1 = NA_real_,
+          mean2 = NA_real_,
+          median1 = NA_real_,
+          median2 = NA_real_,
+          statistic = NA_real_,
+          p = NA_real_,
+          r = NA_real_
+        ))
+      }
+      
+      combs <- combn(grp_names, 2, simplify = FALSE)
+      
+      purrr::map_dfr(combs, function(pair) {
+        
+        g1 <- as.character(pair[1])
+        g2 <- as.character(pair[2])
+        
+        paired_dat <- dat %>%
+          dplyr::select(all_of(c(subject_var, g1, g2))) %>%
+          tidyr::drop_na(all_of(c(g1, g2)))
+        
+        if (nrow(paired_dat) < 2) {
+          return(tibble::tibble(
+            group1 = g1,
+            group2 = g2,
+            n = nrow(paired_dat),
+            mean1 = mean(paired_dat[[g1]], na.rm = TRUE),
+            mean2 = mean(paired_dat[[g2]], na.rm = TRUE),
+            median1 = stats::median(paired_dat[[g1]], na.rm = TRUE),
+            median2 = stats::median(paired_dat[[g2]], na.rm = TRUE),
+            statistic = NA_real_,
+            p = NA_real_,
+            r = NA_real_
+          ))
+        }
+        
+        long_dat <- paired_dat %>%
+          tidyr::pivot_longer(
+            cols = all_of(c(g1, g2)),
+            names_to = "group",
+            values_to = "value"
+          ) %>%
+          dplyr::mutate(
+            group = factor(group, levels = c(g1, g2))
+          )
+        
+        wt <- stats::wilcox.test(
+          paired_dat[[g1]],
+          paired_dat[[g2]],
+          paired = TRUE,
+          exact = FALSE
+        )
+        
+        eff <- tryCatch(
+          rstatix::wilcox_effsize(
+            data = long_dat,
+            value ~ group,
+            paired = TRUE
+          ),
+          error = function(e) NULL
+        )
+        
+        tibble::tibble(
+          group1 = g1,
+          group2 = g2,
+          n = nrow(paired_dat),
+          mean1 = mean(paired_dat[[g1]], na.rm = TRUE),
+          mean2 = mean(paired_dat[[g2]], na.rm = TRUE),
+          median1 = stats::median(paired_dat[[g1]], na.rm = TRUE),
+          median2 = stats::median(paired_dat[[g2]], na.rm = TRUE),
+          statistic = unname(wt$statistic),
+          p = wt$p.value,
+          r = if (is.null(eff)) NA_real_ else eff$effsize[1]
+        )
+      })
+      
+    }) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(dplyr::across(all_of(group_by_var))) %>%
+    dplyr::mutate(
+      p.adj = stats::p.adjust(p, method = "BH")
     ) %>%
-    left_join(
-      data %>%
-        group_by(!!group_sym) %>%
-        wilcox_effsize(
-          as.formula(paste(outcome_var, "~ workstation")),
-          paired = TRUE
-        ),
-      by = c(group_by_var, "group1", "group2")
-    ) %>%
-    mutate(
-      label = paste0(
-        "p.adj=", format(round(p.adj, 4), nsmall = 4),
-        ", r=", round(effsize, 2)
-      )
-    )
-
-  list(
-    friedman = friedman_result,
-    posthoc = posthoc_result
-  )
+    dplyr::ungroup()
 }

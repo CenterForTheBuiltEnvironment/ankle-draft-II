@@ -11,7 +11,7 @@
 pacman::p_load(
   here, dplyr, ggplot2, readr, tidyr, purrr, stringr, lubridate, arrow,
   ggeffects, janitor, scales, glue, yaml, data.table, rstatix, patchwork,
-  pwr, broom, lme4, ggpubr, openxlsx, gt
+  pwr, broom, lme4, ggpubr, openxlsx, gt, CalibrationCurves,tidyr
 )
 
 
@@ -98,3 +98,5 @@ workstation_palette <- c(
   "medium" = "#b8e4f7",
   "high" = "#6b8dd6"
 )
+
+model_comparison <- c("#82c6ed", "#eb6b58")
