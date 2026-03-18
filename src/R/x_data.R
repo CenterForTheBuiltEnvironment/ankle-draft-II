@@ -282,35 +282,35 @@ analysis <- analysis %>%
     v_air_m_s = dplyr::case_when(
       workstation == "high" ~ high_v_air_s,
       workstation == "low" ~ low_v_air_s,
-      workstation == "med" ~ med_v_air_s,
+      workstation == "medium" ~ med_v_air_s,
       TRUE ~ NA_real_
     ),
     # Supply air temperature (C)
     t_supply_c = dplyr::case_when(
       workstation == "high" ~ high_t_supply_c,
       workstation == "low" ~ low_t_supply_c,
-      workstation == "med" ~ med_t_supply_c,
+      workstation == "medium" ~ med_t_supply_c,
       TRUE ~ NA_real_
     ),
     # Air velocity standard deviation (m/s)
     v_air_sd_m_s = dplyr::case_when(
       workstation == "high" ~ high_v_air_sd_m_s,
       workstation == "low" ~ low_v_air_sd_m_s,
-      workstation == "med" ~ med_v_air_sd_m_s,
+      workstation == "medium" ~ med_v_air_sd_m_s,
       TRUE ~ NA_real_
     ),
     # Turbulence intensity (decimal)
     turbulence_intensity = dplyr::case_when(
       workstation == "high" ~ high_turbulence_intensity,
       workstation == "low" ~ low_turbulence_intensity,
-      workstation == "med" ~ med_turbulence_intensity,
+      workstation == "medium" ~ med_turbulence_intensity,
       TRUE ~ NA_real_
     ),
     # Dynamic range (%)
     dynamic_range_pct = dplyr::case_when(
       workstation == "high" ~ high_dynamic_range_per_cent,
       workstation == "low" ~ low_dynamic_range_per_cent,
-      workstation == "med" ~ med_dynamic_range_per_cent,
+      workstation == "medium" ~ med_dynamic_range_per_cent,
       TRUE ~ NA_real_
     )
   ) %>%
@@ -340,31 +340,30 @@ analysis <- analysis %>%
 # Handle Duplicate Votes -------------------------------------------------------
 # Subject ip043 submitted duplicate votes for the same workstation in some
 # sessions due to an experimental operating mistake. We detect true duplicates
-# as votes for the same subject-session-workstation-question within 60 seconds.
-# Legitimate repeated measurements are preserved; only duplicates are removed.
+# as votes for the same subject-session-workstation-question.
+# Kept the first observation and removed the second one.
 
 analysis <- analysis %>%
   dplyr::arrange(session_id, subject_id, workstation, question, timestamp) %>%
   dplyr::group_by(session_id, subject_id, workstation, question) %>%
-  dplyr::mutate(
-    time_since_prev = as.numeric(
-      difftime(timestamp, dplyr::lag(timestamp), units = "secs")
-    ),
-    is_duplicate = !is.na(time_since_prev) & time_since_prev < 60
-  ) %>%
-  dplyr::ungroup()
+  dplyr::mutate(row_in_group = dplyr::row_number()) %>%
+  dplyr::ungroup() 
 
-n_duplicates <- sum(analysis$is_duplicate)
+n_duplicates <- sum(
+  analysis$row_in_group > 1 & analysis$workstation != "adaptation",
+  na.rm = TRUE
+)
+
 if (n_duplicates > 0) {
   message(
-    "  - Duplicate votes detected (within 60s): ", n_duplicates,
+    "  - Duplicate votes detected: ", n_duplicates,
     " (keeping first response only)"
   )
 }
 
 analysis <- analysis %>%
-  dplyr::filter(!is_duplicate) %>%
-  dplyr::select(-is_duplicate, -time_since_prev)
+  dplyr::filter(workstation == "adaptation" | row_in_group == 1) %>%
+  dplyr::select(-row_in_group)
 
 rm(n_duplicates)
 
@@ -374,9 +373,7 @@ rm(n_duplicates)
 #
 # Definitions:
 # - dissatisfied_with_draft_ankles: thermal_sensation_ankles < 0 AND
-#     air_movement_acceptability_ankles < 0 AND air_movement_preference_ankles < 0
-# - disacceptability_with_draft_ankles: air_movement_acceptability_ankles < 0
-# - dispreference_with_draft_ankles: air_movement_preference_ankles < 0
+#     air_movement_acceptability_ankles
 
 derived_source_questions <- c(
   "thermal_sensation_ankles",
@@ -410,16 +407,7 @@ derived_vars <- analysis_wide_temp %>%
   dplyr::mutate(
     dissatisfied_with_draft_ankles = dplyr::if_else(
       thermal_sensation_ankles < 0 &
-        air_movement_acceptability_ankles < 0 &
-        air_movement_preference_ankles < 0,
-      1L, 0L
-    ),
-    disacceptability_with_draft_ankles = dplyr::if_else(
-      air_movement_acceptability_ankles < 0,
-      1L, 0L
-    ),
-    dispreference_with_draft_ankles = dplyr::if_else(
-      air_movement_preference_ankles < 0,
+        air_movement_acceptability_ankles < 0,
       1L, 0L
     )
   ) %>%
@@ -427,15 +415,11 @@ derived_vars <- analysis_wide_temp %>%
     session_id, session_date, session_sat, subject_id, workstation,
     t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
     v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
-    dissatisfied_with_draft_ankles,
-    disacceptability_with_draft_ankles,
-    dispreference_with_draft_ankles
+    dissatisfied_with_draft_ankles
   ) %>%
   tidyr::pivot_longer(
     cols = c(
-      dissatisfied_with_draft_ankles,
-      disacceptability_with_draft_ankles,
-      dispreference_with_draft_ankles
+      dissatisfied_with_draft_ankles
     ),
     names_to = "question",
     values_to = "response_value"
