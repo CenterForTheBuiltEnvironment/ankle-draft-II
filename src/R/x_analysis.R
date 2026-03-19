@@ -528,7 +528,6 @@ dissatisfied_with_draft_ankles <- dissatisfied_with_draft_ankles %>%
 # - Observed dissatisfaction rates by condition & Compare predicted -------
 
 Liumodel_performance <- dissatisfied_with_draft_ankles %>%
-  dplyr::mutate(session_sat = gsub("C", "", session_sat)) %>%
   dplyr::group_by(session_sat, workstation) %>%
   dplyr::summarise(
     ppd_liu_mean = mean(ppd_liu, na.rm = TRUE),
@@ -537,51 +536,114 @@ Liumodel_performance <- dissatisfied_with_draft_ankles %>%
     n = dplyr::n(),
     .groups = "drop"
   ) %>%
+  dplyr::mutate(
+    diff = ppd_liu_mean - dissatisfied_rate,
+    diff_label = sprintf("%.2f", diff),
+    x_mid = (ppd_liu_mean + dissatisfied_rate) / 2
+  ) %>%
   {dissatisfied_with_draft_ankles_rate <<- . ; .} %>%
-  ggplot() +
-  geom_segment(
-    aes(
-      x = dissatisfied_rate+0.02,
-      xend = ppd_liu_mean-0.02,
-      y = workstation,
-      yend = workstation
-    ),
-    arrow = arrow(length = unit(0.15, "cm")),
-    colour = "grey40"
-  ) +
-  geom_point(
-    aes(x = ppd_liu_mean, y = workstation, color = "Liu's model calculated"),
-    size = 3.5
-  ) +
-  geom_point(
-    aes(x = dissatisfied_rate, y = workstation, color = "Observed dissatisfied"),
-    size = 3.5
-  ) +
-  facet_grid(session_sat ~ .) +
-  scale_color_manual(values = model_comparison) +
-  scale_y_discrete(
-    name = "Air speed level",
-    sec.axis = dup_axis(
-      name = "Supply air temperature (°C)",
-      breaks = NULL
-    )
-  ) +
-  labs(
-    x = "Probability",
-    color = NULL
-  ) +
-  theme_bw()+
-  theme(
-    legend.position = "bottom",
-    legend.direction = "horizontal"
-  )
+  {
+    label_df <- dplyr::distinct(., session_sat) %>%
+      dplyr::mutate(
+        x = -Inf,
+        y = Inf,
+        label = session_sat
+      )
+    
+    ggplot(.) +
+      geom_segment(
+        aes(
+          x = dissatisfied_rate+0.02,
+          xend = ppd_liu_mean-0.02,
+          y = workstation,
+          yend = workstation,
+          color = workstation
+        ),
+        arrow = arrow(length = unit(0.15, "cm")),
+        colour = "grey40"
+      ) +
+      geom_text(
+        aes(
+          x = x_mid,
+          y = workstation,
+          label = diff_label
+        ),
+        colour = "grey30",
+        size = 2.5,
+        vjust = -0.7
+      ) +
+      geom_point(
+        aes(x = ppd_liu_mean, y = workstation, color = workstation,
+            shape = "Liu's model output"),
+        size = 2.5,
+      ) +
+      geom_point(
+        aes(x = dissatisfied_rate, y = workstation, color = workstation,
+            shape = "Observed"),
+        size = 2.5,
+      ) +
+      geom_text(
+        data = label_df,
+        aes(x = x, y = y, label = label),
+        inherit.aes = FALSE,
+        hjust = -0.3,
+        vjust = 2,
+        size = 3
+      ) +
+      ggh4x::facet_wrap2(
+        ~ session_sat,
+        ncol = 1,
+        axes = "x",
+        remove_labels = "x"
+      )+
+      scale_color_manual(values = rev(air_movement_preference_palette)) +
+      scale_shape_manual(
+        values = c(
+          "Observed" = 17,
+          "Liu's model output"   = 16
+        ),
+        breaks = c(
+          "Observed",
+          "Liu's model output"
+        ),
+        name = NULL
+      ) +
+      scale_x_continuous(
+        limits = c(0, 0.6),
+        breaks = seq(0, 0.6, by = 0.2),
+        expand = c(0, 0)
+      )+
+      scale_y_discrete(
+        name = "Air speed level",
+      ) +
+      labs(
+        x = "Probability",
+        color = NULL
+      ) +
+      guides(
+        color = "none",
+        shape = guide_legend(
+          override.aes = list(color = "grey80")
+        )
+      )+
+      theme_classic(base_size = 9) +
+      theme(
+        plot.margin = margin(r = 2, unit = "mm"),
+        panel.spacing.y = unit(1, "lines"),
+        panel.grid = element_blank(),
+        legend.position = "top",
+        legend.direction = "horizontal",
+        strip.background = element_blank(),
+        strip.text = element_blank()
+      )
+}
 
 ggsave(
     here::here("manuscript", "figs", "Liumodel_performance.png"),
     plot = Liumodel_performance,
     dpi = 500,
-    width = 120,
-    height = 120,
+    width = single_col_width,
+    height = 110,
     units = "mm",
     bg = "transparent"
 )
@@ -599,25 +661,44 @@ Liumodel_calibrationcurve <- valProbggplot(
   lwd.ideal = 1,
   xlab = "Predicted probability",
   ylab = "Observed proportion",
-  xlim = c(-0.02, 1),
-  ylim = c(-0.15, 1),
-  statloc = c(0.02, 0.92),
+  xlim = c(0, 1),
+  ylim = c(-0.1, 1),
+  statloc = c(0.02, 0.85),
   dostats = c("Intercept", "Slope", "C (ROC)", "Brier"),
   roundstats = 2,
   d0lab = "Satisfied",
   d1lab = "Disatisfied",
-  size.d01 = 4,
-  dist.label = 0.01,
-  line.bins = -0.05,
-  dist.label2 = 0.04,
-  allowPerfectPredictions = FALSE
+  size.d01 = 2.6,
+  size = 2.8,
+  dist.label = 0.000,
+  line.bins = -0.02,
+  dist.label2 = 0.03,
+  allowPerfectPredictions = FALSE,
+  legendloc = c(0.1, 0.95)
 )
+Liumodel_calibrationcurve <- Liumodel_calibrationcurve$ggPlot +
+  theme_classic(base_size = 9)+
+  coord_cartesian(xlim = c(-0.12, 1), ylim = c(-0.12, 1)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(
+    axis.title.x = element_text(margin = margin(t = 6)),
+    axis.title.y = element_text(margin = margin(r = 6)),
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.margin = margin(b = -6),
+    legend.box.margin = margin(b = -3),
+    legend.spacing.x = unit(0.2, "lines"),
+    plot.margin = margin(r = 10),
+  )
+
 
 #ggsave() could not be used here, so the figure was saved using a graphics device instead. 
 png(
   filename = here::here("manuscript", "figs", "Liumodel_calibrationcurve.png"),
-  width = 126,
-  height = 154,
+  width = single_col_width,
+  height = 100,
   units = "mm",
   res = 500,
   bg = "transparent"
@@ -798,13 +879,13 @@ p_liu  <- plot_draft_model(plot_grid_liu,"a.","Ankle Uncovered")
 p_toby <- plot_draft_model(plot_grid_toby,"b.","Ankle Covered")
 
 model_final <- p_liu + p_toby +
-  plot_layout(ncol = 2)
+  plot_layout(ncol = 1)
 ggsave(
   here::here("manuscript", "figs", "Model.png"),
   plot = model_final,
   dpi = 500,
-  width = 240,
-  height = 110,
+  width = single_col_width,
+  height = 160,
   units = "mm",
   bg = "transparent"
 )
