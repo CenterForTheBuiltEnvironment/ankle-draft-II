@@ -59,8 +59,8 @@ source(here::here("src", "R", "x_analysis.R"))
 
 Cold downdraft near windows is a common source of local thermal
 discomfort in buildings during winter. When outdoor temperatures drop,
-the interior surface of windows—particularly large or poorly insulated
-glazing—becomes significantly cooler than the surrounding air. This
+the interior surface of windows, particularly large or poorly insulated
+glazing, becomes significantly cooler than the surrounding air. This
 temperature differential causes nearby air to cool, increase in density,
 and descend, creating a localized airflow pattern that can cause
 discomfort at the lower extremities of seated occupants
@@ -78,8 +78,8 @@ as whole-body thermal sensation. This model, now incorporated into
 ASHRAE Standard 55 [@ashraeANSIASHRAEStandard2023], was derived from
 laboratory experiments conducted under cooling conditions typical of
 underfloor air distribution (UFAD) and displacement ventilation systems.
-Importantly, participants in these foundational studies—including an
-earlier investigation by @schiavonSensationDraftUncovered2016—wore
+Importantly, participants in these foundational studies, including an
+earlier investigation by @schiavonSensationDraftUncovered2016, wore
 summer clothing with exposed ankles, resulting in clothing insulation
 levels of approximately 0.5 clo.
 
@@ -87,8 +87,8 @@ However, building occupants in winter typically wear substantially
 different attire. Analysis of the ASHRAE Global Thermal Comfort Database
 II [@foldvarylicinaDevelopmentASHRAEGlobal2018] indicates that median
 clothing insulation in office environments during heating seasons is
-approximately 0.75 clo, with occupants commonly wearing long trousers
-and closed-toe shoes that cover the ankle region. This discrepancy
+approximately 0.75 clo, with occupants commonly wearing long trousers,
+closed-toe shoes and socks that cover the ankle region. This discrepancy
 raises an important question: does the existing ankle draft model,
 calibrated for summer conditions with exposed skin, accurately predict
 discomfort when ankles are covered by clothing?
