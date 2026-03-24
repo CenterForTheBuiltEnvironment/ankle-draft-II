@@ -220,19 +220,17 @@ each interval.
 The perception of the thermal environment was assessed using validated
 scales consistent with prior ankle draft research and ASHRAE Standard 55
 requirements. Constructs and their scales used in the questionnaires are
-summarized in Table XX below.
+summarized in @tbl-scales below.
 
--   **Whole-body thermal sensation**: 7-point ASHRAE scale (−3 cold to
-    +3 hot)
--   **Whole-body thermal comfort**: continuous scale
--   **Whole-body thermal preference**: 3-point scale (cooler / no change
-    / warmer)
--   **Local thermal sensation at ankles**: 7-point scale
--   **Local thermal preference at ankles**: 3-point scale
--   **Air movement acceptability at ankles**: 5-point scale (very
-    unacceptable to very acceptable)
--   **Air movement preference at ankles**: 3-point scale (lower / no
-    change / higher)
+```{r}
+#| label: tbl-scales
+#| tbl-cap: "Survey constructs and measurement scales"
+#| tbl-colwidths: [15,25,15,45]
+#| echo: false
+
+readr::read_csv("tables/survey_scales.csv") |>
+  knitr::kable()
+```
 
 Surveys were administered electronically via Qualtrics. Participants
 were not required to respond to any individual question, though

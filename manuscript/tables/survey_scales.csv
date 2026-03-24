@@ -1,0 +1,11 @@
+Construct,Question,Scale type,Levels
+Thermal sensation,How do you feel right now?,7-point continuous,−3 (cold) −2 (cool) −1 (slightly cool) 0 (neutral) +1 (slightly warm) +2 (warm) +3 (hot)
+Thermal comfort,Right now do you find this environment...?,6-point continuous,−3 (very uncomfortable) −2 (uncomfortable) −1 (just uncomfortable) +1 (just comfortable) +2 (comfortable) +3 (very comfortable)
+Thermal preference,Right now would you prefer to be...?,3-point ordinal,−1 (warmer) | 0 (no change) | +1 (cooler)
+Thermal acceptability,Please rate your acceptance of the current thermal environment,4-point continuous,−2 (clearly unacceptable) −1 (just unacceptable) +1 (just acceptable) +2 (clearly acceptable)
+Thermal satisfaction,How satisfied are you with the thermal environment right now?,7-point continuous,−3 (very dissatisfied) −2 (dissatisfied) −1 (slightly dissatisfied) 0 (neither nor) +1 (slightly satisfied) +2 (satisfied) +3 (very satisfied)
+Thermal pleasantness,Right now do you find this thermal environment...?,7-point continuous,−3 (very unpleasant) −2 (unpleasant) −1 (slightly unpleasant) 0 (neutral) +1 (slightly pleasant) +2 (pleasant) +3 (very pleasant)
+Air movement acceptability at ankles,Please rate your acceptance of air movement at your ankles,4-point continuous,−2 (clearly unacceptable) −1 (just unacceptable) +1 (just acceptable) +2 (clearly acceptable)
+Air movement preference at ankles,Right now around my ankles I would prefer...?,3-point ordinal,−1 (less air movement) | 0 (no change) | +1 (more air movement)
+Air quality preference,Please rate your acceptance of the current air quality in the room,4-point continuous,−2 (clearly unacceptable) −1 (just unacceptable) +1 (just acceptable) +2 (clearly acceptable)
+Clothing change,Did you adjust your upper body clothing?,binary,—
