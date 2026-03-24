@@ -289,7 +289,7 @@ plot_draft_model <- function(data, label, subtitle_text){
     ) +
     
     scale_x_continuous(
-      name = paste0("Whole-body thermal sensation (~PMV)\n\n", subtitle_text),
+      name = "Whole-body thermal sensation (~PMV)",
       breaks = -3:3,
       labels = c("Cold","Cool","Slightly\ncool","Neutral",
                  "Slightly\nwarm","Warm","Hot")
@@ -297,20 +297,23 @@ plot_draft_model <- function(data, label, subtitle_text){
     
     coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE) +
     
-    annotate(
-      "text",
-      x = 0,
-      y = -0.12,
-      label = subtitle_text,
-      size = 4
-    ) +
     
-    theme_classic(base_size = 13) +
+    theme_classic(base_size = 9) +
     
     theme(
-      plot.tag = element_text(size = 16, face = "bold"),
-      plot.margin = margin(10,10,15,10)
+      plot.tag = element_text(size = 9, face = "bold"),
+      plot.subtitle = element_text(
+        hjust = 0.05,
+        margin = margin(b = 3, unit = "mm"),
+        size=9
+      ),
+      axis.title.x = element_text(margin = margin(t= 3, unit = "mm")),
+      plot.margin = margin(b = 5, unit = "mm")
     ) +
     
-    labs(tag = label)
+    
+    labs(
+      tag = label,
+      subtitle = subtitle_text
+    )
 }

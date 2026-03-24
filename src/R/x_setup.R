@@ -11,7 +11,7 @@
 pacman::p_load(
   here, dplyr, ggplot2, readr, tidyr, purrr, stringr, lubridate, arrow,
   ggeffects, janitor, scales, glue, yaml, data.table, rstatix, patchwork,
-  pwr, broom, lme4, ggpubr, openxlsx, gt, CalibrationCurves,tidyr
+  pwr, broom, lme4, ggpubr, openxlsx, gt, CalibrationCurves, tidyr,ggh4x
 )
 
 
