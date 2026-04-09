@@ -36,6 +36,13 @@ format:
     reference-doc: template.docx
     toc: false
     number-sections: true
+  html:
+    toc: true
+    number-sections: true
+    theme: cosmo
+    comments:
+      hypothesis: true
+    output-dir: docs
 bibliography: refs.bib
 csl: apa.csl
 execute:
@@ -150,6 +157,8 @@ relative humidity, and background air velocity below 0.1 m/s, targeting
 a whole-body thermal sensation of approximately −0.5 (slightly cool) on
 the ASHRAE seven-point scale.
 
+PLACEHOLDER GRAPHIC
+
 A custom displacement diffuser was used to deliver conditioned air to
 the ankle region of seated participants. The diffuser was positioned 0.7
 m behind each workstation, directing airflow toward the participants'
@@ -262,6 +271,11 @@ knitr::kable(demographic_d,
 
 ```
 
+@tbl-demographics summarizes the demographic information of the study subjects. A total of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(n)` subjects 
+participated in the study (`r demographic_d %>% dplyr::filter(sex == "Female") %>% dplyr::pull(n)` 
+female, `r demographic_d %>% dplyr::filter(sex == "Male") %>% dplyr::pull(n)` male, 
+`r demographic_d %>% dplyr::filter(sex == "Third Gender / Other") %>% dplyr::pull(n)` other), with a mean age of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(age)` years.
+
 ```{=html}
 <!--
 - Final sample size, completion rate, demographics (age, sex distribution)
@@ -275,8 +289,25 @@ knitr::kable(demographic_d,
 #| label: tbl-env
 #| tbl-cap: "Summary of environmental measurements."
 
-knitr::kable(env_airflow_t)
+knitr::kable(env_airflow_t,
+             col.names = c('Measurement', '15C', '17C', '19C')
+)
 ```
+
+@tbl-env provides an overview of the measured environmental conditions. Across all three sessions, 
+head-level air temperature remained stable at
+`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("15C")` °C,
+`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("17C")` °C, and
+`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("19C")` °C,
+and relative humidity was comparable across sessions, confirming stable background thermal conditions.
+
+As the primary experimental manipulation, we set supply air temperatures to 15°C, 17°C, and 19°C 
+to simulate the effect of window downdraft. Ankle-level temperatures were slightly higher than the 
+supply temperature due to mixing with the warmer ambient air, but 
+remained stable across all sessions. Within each session, we exposed subjects to three airspeed 
+levels at separate workstations. We measured consistent air speeds across all three workstations and 
+sessions, confirming reliable reproduction of the low, medium, and high airspeed conditions. 
+Turbulence intensities remained low throughout, indicating stable and controlled airflow.
 
 ## Thermal sensation and comfort responses
 
@@ -417,13 +448,13 @@ from the building industry, including manufacturers, building owners,
 facility managers, contractors, architects, engineers, government
 agencies, and utilities.
 
-# Data availability
+# Data availability {.unnumbered}
 
 The datasets generated and analyzed during the current study as well as
 the full source code of the data analysis workflow are available in the
 following GitHub repository: XXX.
 
-# Declaration of Generative AI and AI-assisted technologies in the writing process
+# Declaration of Generative AI and AI-assisted technologies in the writing process {.unnumbered}
 
 During the preparation of this work, the authors utilized the chatbot
 Claude to enhance the language and readability of the content.
