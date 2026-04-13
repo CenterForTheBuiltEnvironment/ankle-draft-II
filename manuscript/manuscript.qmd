@@ -309,33 +309,146 @@ levels at separate workstations. We measured consistent air speeds across all th
 sessions, confirming reliable reproduction of the low, medium, and high airspeed conditions. 
 Turbulence intensities remained low throughout, indicating stable and controlled airflow.
 
-## Thermal sensation and comfort responses
+## Whole body thermal perception
 
-```{=html}
-<!--
-- Descriptive: Distribution of whole-body and ankle thermal sensation by condition
-- Figure: Boxplots or violin plots of thermal sensation (whole-body and ankle) across conditions
-- Statistical: Effect of SAT and air speed on ankle thermal sensation (mixed model or repeated measures)
-- Key finding: Did ankle sensation decrease (cooler) with lower SAT and higher air speed?
--->
+```{r}
+#| label: whole-body-helpers
+#| echo: false
+
+# Helper functions for inline text
+get_sensation_pct <- function(sat, ws, response) {
+  thermal_sensation_overall_summary %>%
+    dplyr::filter(session_sat == sat, workstation == ws, response_value == response) %>%
+    dplyr::pull(pct_label)
+}
+
+get_preference_pct <- function(sat, ws, response) {
+  thermal_preference_overall_summary %>%
+    dplyr::filter(session_sat == sat, workstation == ws, response_value == response) %>%
+    dplyr::pull(pct_label)
+}
+
+# Aggregated summaries for text
+sensation_neutral_cool <- thermal_sensation_overall_summary %>%
+  dplyr::filter(response_value %in% c("Neutral", "Slightly cool", "Cool")) %>%
+  dplyr::group_by(session_sat, workstation) %>%
+  dplyr::summarise(pct = sum(pct), .groups = "drop")
+
+preference_no_change <- thermal_preference_overall_summary %>%
+  dplyr::filter(response_value == "No change")
+
+preference_warmer <- thermal_preference_overall_summary %>%
+  dplyr::filter(response_value == "Warmer")
 ```
 
-![(a) Thermal sensation; and (b) thermal
-acceptability.](figs/thermal_perception.png){#fig-thermal-perception}
+@fig-thermal-perception-overall presents whole-body thermal sensation and preference responses across all experimental conditions. Thermal sensation votes were predominantly in the neutral to slightly cool range, with `r sensation_neutral_cool %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants reporting sensations between "Cool" and "Neutral" across conditions. At the lowest supply air temperature (15°C), `r get_sensation_pct("15C", "high", "Slightly cool")` of participants reported feeling slightly cool at the highest air speed, compared to `r get_sensation_pct("15C", "low", "Slightly cool")` at the lowest air speed. This pattern was less pronounced at warmer supply temperatures.
 
-## Air movement acceptability at ankles
+Thermal preference responses indicated that participants were generally satisfied with the thermal conditions. Across all conditions, `r preference_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants preferred "No change" to the thermal environment. The proportion preferring warmer conditions ranged from `r preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`, with the highest values observed during the 15°C supply air temperature sessions.
 
-```{=html}
-<!--
-- Descriptive: Distribution of ankle air movement acceptability by condition
-- Figure: Stacked bar chart showing acceptability distribution across conditions
-- Statistical: Effect of SAT and air speed on acceptability (ordinal mixed model or Friedman)
-- Proportion reporting unacceptable air movement by condition
--->
+![Thermal sensation (a) and thermal preference (b) for whole body.](figs/thermal_perception_overall.png){#fig-thermal-perception-overall width=75%}
+
+```{r}
+#| label: acceptability-helpers
+#| echo: false
+
+# Thermal acceptability summary
+thermal_acceptability_summary <- thermal_acceptability_d %>%
+  dplyr::mutate(acceptable = response_value > 0) %>%
+  dplyr::group_by(session_sat, workstation) %>%
+  dplyr::summarise(
+    n = dplyr::n(),
+    pct_acceptable = mean(acceptable),
+    mean_value = mean(response_value),
+    .groups = "drop"
+  )
+
+acceptability_range <- thermal_acceptability_summary %>%
+  dplyr::summarise(
+    min = scales::percent(min(pct_acceptable), accuracy = 1),
+    max = scales::percent(max(pct_acceptable), accuracy = 1)
+  )
+
+acceptability_by_sat <- thermal_acceptability_summary %>%
+  dplyr::group_by(session_sat) %>%
+  dplyr::summarise(
+    min = scales::percent(min(pct_acceptable), accuracy = 1),
+    max = scales::percent(max(pct_acceptable), accuracy = 1),
+    .groups = "drop"
+  )
 ```
 
-![(a) Air movement acceptability; and (b) air movement
-preference.](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref}
+@fig-thermal-acceptability-overall shows thermal acceptability responses for whole-body conditions. Overall, acceptability was high across all conditions, ranging from `r acceptability_range$min` to `r acceptability_range$max`. Acceptability rates were highest during the 19°C supply air temperature sessions (`r acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`) and lowest at 15°C (`r acceptability_by_sat %>% dplyr::filter(session_sat == "15C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`). Within each supply air temperature condition, air speed had minimal effect on whole-body thermal acceptability.
+
+![Thermal acceptability for whole body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall width=100%}
+
+
+## Ankle level thermal perception
+
+```{r}
+#| label: ankle-helpers
+#| echo: false
+
+# Helper functions for ankle-level inline text
+get_ankle_sensation_pct <- function(sat, ws, response) {
+  thermal_sensation_ankle_summary %>%
+    dplyr::filter(session_sat == sat, workstation == ws, response_value == response) %>%
+    dplyr::pull(pct_label)
+}
+
+get_ankle_preference_pct <- function(sat, ws, response) {
+  thermal_preference_ankle_summary %>%
+    dplyr::filter(session_sat == sat, workstation == ws, response_value == response) %>%
+    dplyr::pull(pct_label)
+}
+
+# Aggregated ankle sensation on cool side (cold + cool + slightly cool)
+ankle_sensation_cool_side <- thermal_sensation_ankle_summary %>%
+  dplyr::filter(response_value %in% c("Cold", "Cool", "Slightly cool")) %>%
+  dplyr::group_by(session_sat, workstation) %>%
+  dplyr::summarise(pct = sum(pct), .groups = "drop")
+
+# Ankle preference for warmer
+ankle_preference_warmer <- thermal_preference_ankle_summary %>%
+  dplyr::filter(response_value == "Warmer")
+```
+
+@fig-thermal-perception-ankle presents thermal sensation and preference responses at the ankle level. Compared to whole-body responses, participants reported cooler sensations at the ankles. The proportion reporting sensations on the cool side of neutral (cold, cool, or slightly cool) ranged from `r ankle_sensation_cool_side %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)` across conditions. At the coldest supply air temperature (15°C) with high air speed, `r ankle_sensation_cool_side %>% dplyr::filter(session_sat == "15C", workstation == "high") %>% dplyr::mutate(pct = scales::percent(pct)) %>% dplyr::pull(pct)` of participants reported cool sensations at the ankles, compared to `r ankle_sensation_cool_side %>% dplyr::filter(session_sat == "19C", workstation == "low") %>% dplyr::mutate(pct = scales::percent(pct)) %>% dplyr::pull(pct)` at 19°C with low air speed.
+
+Thermal preference at the ankle level reflected this cooling effect. The proportion of participants preferring warmer ankles ranged from `r ankle_preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`. At the most demanding condition (15°C, high air speed), `r get_ankle_preference_pct("15C", "high", "Warmer")` preferred warmer ankles, while at the mildest condition (19°C, low air speed), this proportion decreased to `r get_ankle_preference_pct("19C", "low", "Warmer")`.
+
+![Thermal sensation (a) and thermal preference (b) at ankle level.](figs/thermal_perception_ankle.png){#fig-thermal-perception-ankle width=75%}
+
+```{r}
+#| label: air-movement-helpers
+#| echo: false
+
+# Air movement acceptability summary
+air_acceptability_acceptable <- air_movement_acceptability_summary %>%
+  dplyr::filter(acceptability == "Acceptable")
+
+air_acceptability_by_sat <- air_acceptability_acceptable %>%
+  dplyr::group_by(session_sat) %>%
+  dplyr::summarise(
+    min = scales::percent(min(pct), accuracy = 1),
+    max = scales::percent(max(pct), accuracy = 1),
+    .groups = "drop"
+  )
+
+# Air movement preference for less
+air_pref_less <- air_movement_preference_summary %>%
+  dplyr::filter(acceptability == "Less")
+
+air_pref_no_change <- air_movement_preference_summary %>%
+  dplyr::filter(acceptability == "No change")
+```
+
+@fig-air-move-acc-pref shows air movement acceptability and preference at the ankle level. Despite the localized cooling, air movement at the ankles was rated acceptable by `r air_acceptability_acceptable %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants across all conditions. Acceptability was highest at 19°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`) and lowest at 17°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "17C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`). Within each supply air temperature, acceptability tended to decrease slightly with increasing air speed.
+
+Air movement preference responses indicated that a substantial proportion of participants would prefer less air movement at the ankles, particularly at higher air speeds. The proportion preferring less air movement ranged from `r air_pref_less %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`. At 17°C with high air speed, `r air_pref_less %>% dplyr::filter(session_sat == "17C", workstation == "high") %>% dplyr::pull(pct_label)` preferred less air movement, compared to only `r air_pref_less %>% dplyr::filter(session_sat == "19C", workstation == "low") %>% dplyr::pull(pct_label)` at 19°C with low air speed. The majority of participants (`r air_pref_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`) preferred no change to the air movement across conditions.
+
+![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width=75%}
+
+
 
 ## Dissatisfaction with ankle draft
 
