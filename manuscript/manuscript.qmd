@@ -255,69 +255,7 @@ of subjective thermal sensation.
 
 ## Statistical analysis and data processing
 
-All statistical analyses were based on subjective questionnaire data. Subjective response 
-variables were handled according to the properties of their respective scales. Thermal 
-sensation and thermal acceptability were treated as continuous variables, whereas thermal 
-preference, ankle thermal preference, and ankle airflow preference were treated as ordinal 
-variables. Ankle airflow acceptability was dichotomized as acceptable or unacceptable for 
-following analyses. According to exsiting study @liuPredictedPercentageDissatisfied2017, 
-ankle draft dissatisfaction was defined as an ankle thermal sensation vote of less than 
-0 together with an ankle airflow acceptability vote of less than 0.
-
-
-Because this study used a within-subject repeated-measures design, within-subject 
-comparisons between experimental conditions were conducted using paired-samples 
-t-tests for continuous variables, with paired Cohen’s d reported as the effect size. 
-Ordinal variables were analyzed using the paired Wilcoxon signed-rank test, with 
-the test statistic calculated using the normal approximation, and effect size r 
-was reported. For multiple pairwise comparisons within each family of comparisons, 
-P values were adjusted using the Benjamini-Hochberg method @benjaminiHighberg1995。
-
-To evaluate the performance of the existing ankle draft model under the conditions 
-of this study, the exsiting model was applied to the experimental data to 
-calculate the predicted percentage of dissatisfaction with ankle draft at each observation 
-point, and these predictions were compared with the observed dissatisfaction percentages. 
-In addition, calibration curves were used to quantitatively assess the predictive 
-performance of the existing model in this study's dataset @vancalster2016. The calibration 
-intercept and slope, AUC, and Brier score were reported. All analyses were implemented using 
-the R package `CalibrationCurves` @deCockCalibrationCurves2023.
-
-Because ankle draft dissatisfaction was a binary outcome and repeated observations were 
-correlated within subjects, a generalized linear mixed model with a binomial distribution 
-and logit link was used to develop the new ankle draft risk model. Subject was included 
-as a random intercept to account for between-subject heterogeneity and within-subject 
-dependence arising from repeated measurements. To enable an integrated analysis of the 
-effects of different clothing conditions on ankle draft dissatisfaction, data from Liu et al. 
-@liuPredictedPercentageDissatisfied2017 were also included in the modeling dataset. 
-Continuous predictors were mean-centered using the overall means of the combined dataset 
-before model fitting. 
-
-Because the inverse-logit transformation in a logistic mixed-effects model is nonlinear, 
-direct back-transformation of the fixed-effects linear predictor yields a conditional 
-probability, representing an individual-level prediction when the random effect is set 
-to zero, rather than a population-averaged probability. Therefore, to characterize the 
-average risk of dissatisfaction at the population level, population-averaged probabilities 
-were used instead of conditional probabilities @neuhausKalbfleischHauck1991. Specifically, 
-fixed-effect estimates and the variance of the random intercept were extracted from the 
-fitted model, assuming that the random intercept followed a normal distribution with mean 
-zero. Integration over the random effects was then approximated using Monte Carlo 
-simulation (K = 10,000, with a fixed random seed “1” for reproducibility), and the 
-population-averaged predicted probability was calculated for each combination of predictor values.
-
-Because population-averaged probabilities generally do not have a simple closed-form analytical 
-solution, after approximating the marginal probability for each combination of predictors using 
-the Monte Carlo method, an approximate linear equation for logit(P) as a function of the 
-predictors was fitted on the logit scale using the simulated marginal probabilities as 
-the target values. an approximate linear equation for logit(P) was then fitted as a function of 
-the predictors on the logit scale. Inverse-logit transformation of the fitted equation yielded 
-a closed-form prediction equation. The accuracy of the approximation was evaluated using the 
-root mean square error (RMSE), mean absolute error (MAE), and coefficient of determination (R^2^).
-
-
-All data processing, statistical analyses, and model fitting were performed in R (version 4.4.1). 
-The main packages used were lme4 (version 2.0.1), rstatix (version 0.7.3), and CalibrationCurves 
-(version 3.0.0).
-
+<!-- Describe analysis approach after methods are finalized -->
 
 # Results
 

@@ -496,6 +496,9 @@ ggsave(
 
 
 # 4. Dissatisfaction with Ankle Draft - Model Comparison =======================
+#
+# TODO: Integrate analysis from analysis_old.R
+#
 # - Define binary outcome (matching Liu et al. definition) ----------------
 
 dissatisfied_with_draft_ankles <- analysis %>%
@@ -704,8 +707,9 @@ print(Liumodel_calibrationcurve)
 dev.off()
 
 
-# 5. Updated Model for Ankle exposed/unexposed Conditions ======================================
-# combine dataset -------------------------------------------------------
+# 5. Updated Model inc. Winter Conditions ======================================
+# TODO: Integrate analysis from analysis_old.R
+# - combine dataset -------------------------------------------------------
 
 analysis_all <- bind_rows(
   analysis %>%
@@ -714,13 +718,13 @@ analysis_all <- bind_rows(
     ) %>%
     dplyr::filter(workstation != "adaptation") %>%
     dplyr::mutate(response_value = as.numeric(response_value)) %>%
-    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value, turbulence_intensity) %>%
-    dplyr::mutate(source = "toby",clothing_type = "long"),
+    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value) %>%
+    dplyr::mutate(source = "toby"),
   
   analysis_liu %>%
     dplyr::filter(workstation != "adaptation") %>%
     dplyr::mutate(response_value = as.numeric(response_value)) %>%
-    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value, clothing_type, turbulence_intensity) %>%
+    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value) %>%
     mutate(source = "liu")
 )
 
@@ -730,7 +734,7 @@ new_model <- analysis_all %>%
   dplyr::mutate(rep_id = dplyr::row_number()) %>%
   dplyr::ungroup() %>%
   tidyr::pivot_wider(
-    id_cols = c(t_supply_c, v_air_m_s, t_air_c, subject_id, workstation, rep_id, source, clothing_type, turbulence_intensity),
+    id_cols = c(t_supply_c, v_air_m_s, t_air_c, subject_id, workstation, rep_id, source),
     names_from = question,
     values_from = response_value
   ) %>%
@@ -744,56 +748,39 @@ new_model <- analysis_all %>%
   dplyr::filter(!is.na(dissatisfied_with_draft_ankles),
                 !is.na(thermal_sensation))
 
-# Center continuous predictors on the full-dataset mean -------------------
-# Centering reference is computed once from new_model.
-ctr_vars <- c("v_air_m_s", "thermal_sensation", "t_air_c", "t_supply_c", "turbulence_intensity")
-ctr_means <- colMeans(new_model[ctr_vars], na.rm = TRUE)
-new_model_c <- new_model %>%
-  dplyr::mutate(across(all_of(ctr_vars), \(x) x- mean(x, na.rm = TRUE)))
-# Print centering reference for reproducibility
-tibble::enframe(ctr_means, name = "variable", value = "mean (centering reference)")
 
-# Full model for predictor screening (not the final model) ----------------
-model_input <- glmer(
-  dissatisfied_with_draft_ankles~ v_air_m_s + t_air_c + t_supply_c + thermal_sensation + turbulence_intensity + clothing_type + source + (1 |subject_id),
-  data = new_model_c,
-  family = binomial(link = "logit"),
-  control = glmerControl(optimizer = "bobyqa")
-)
-summary(model_input)
-
-# Fit separate mixed-effects models for "Ankle exposed" and "Ankle unexposed" --------
+# Fit separate mixed-effects models using Liu's dataset and Toby's --------
 
 # 1. fit models
-m_glmm_exposed <- glmer(
+m_glmm_liu <- glmer(
   dissatisfied_with_draft_ankles ~ v_air_m_s + thermal_sensation + (1 | subject_id),
-  data = new_model_c %>% filter(clothing_type == "short"),
+  data = new_model %>% filter(source == "liu"),
   family = binomial(link = "logit"),
   control = glmerControl(optimizer = "bobyqa")
 )
 
-m_glmm_unexposed <- glmer(
+m_glmm_toby <- glmer(
   dissatisfied_with_draft_ankles ~ v_air_m_s + thermal_sensation + (1 | subject_id),
-  data = new_model_c %>% filter(clothing_type == "long"),
+  data = new_model %>% filter(source == "toby"),
   family = binomial(link = "logit"),
   control = glmerControl(optimizer = "bobyqa")
 )
 
-summary(m_glmm_exposed)
-summary(m_glmm_unexposed)
+summary(m_glmm_liu)
+summary(m_glmm_toby)
 
 # 2. extract coefficients
-fe_exposed <- fixef(m_glmm_exposed)
-a_exposed <- unname(fe_exposed["(Intercept)"])
-b_exposed <- unname(fe_exposed["v_air_m_s"])
-c_exposed <- unname(fe_exposed["thermal_sensation"])
-sd_b0_exposed <- sqrt(as.numeric(VarCorr(m_glmm_exposed)$subject_id[1, 1]))
+fe_liu <- fixef(m_glmm_liu)
+a_liu <- unname(fe_liu["(Intercept)"])
+b_liu <- unname(fe_liu["v_air_m_s"])
+c_liu <- unname(fe_liu["thermal_sensation"])
+sd_b0_liu <- sqrt(as.numeric(VarCorr(m_glmm_liu)$subject_id[1, 1]))
 
-fe_unexposed <- fixef(m_glmm_unexposed)
-a_unexposed <- unname(fe_unexposed["(Intercept)"])
-b_unexposed <- unname(fe_unexposed["v_air_m_s"])
-c_unexposed <- unname(fe_unexposed["thermal_sensation"])
-sd_b0_unexposed <- sqrt(as.numeric(VarCorr(m_glmm_unexposed)$subject_id[1, 1]))
+fe_toby <- fixef(m_glmm_toby)
+a_toby <- unname(fe_toby["(Intercept)"])
+b_toby <- unname(fe_toby["v_air_m_s"])
+c_toby <- unname(fe_toby["thermal_sensation"])
+sd_b0_toby <- sqrt(as.numeric(VarCorr(m_glmm_toby)$subject_id[1, 1]))
 
 # 3. common V-TS grid
 grid_base <- expand_grid(
@@ -804,87 +791,94 @@ grid_base <- expand_grid(
 # 4. Monte Carlo marginal probs
 set.seed(1)
 K <- 10000
-b0_draw_exposed  <- rnorm(K, mean = 0, sd = sd_b0_exposed)
-b0_draw_unexposed <- rnorm(K, mean = 0, sd = sd_b0_unexposed)
+b0_draw_liu  <- rnorm(K, mean = 0, sd = sd_b0_liu)
+b0_draw_toby <- rnorm(K, mean = 0, sd = sd_b0_toby)
 
-grid_exposed <- grid_base %>%
+grid_liu <- grid_base %>%
   mutate(
-    eta = a_exposed + b_exposed * (V - ctr_means["v_air_m_s"]) + c_exposed * (TS - ctr_means["thermal_sensation"]),
+    eta = a_liu + b_liu * V + c_liu * TS,
     p_marg = vapply(
       eta,
-      function(e) mean(plogis(e + b0_draw_exposed)),
+      function(e) mean(plogis(e + b0_draw_liu)),
       numeric(1)
     ),
     p_marg_clip = pmin(pmax(p_marg, 1e-8), 1 - 1e-8),
     logit_p = qlogis(p_marg_clip)
   )
 
-grid_unexposed <- grid_base %>%
+grid_toby <- grid_base %>%
   mutate(
-    eta = a_unexposed + b_unexposed * (V - ctr_means["v_air_m_s"]) + c_unexposed * (TS - ctr_means["thermal_sensation"]),
+    eta = a_toby + b_toby * V + c_toby * TS,
     p_marg = vapply(
       eta,
-      function(e) mean(plogis(e + b0_draw_unexposed)),
+      function(e) mean(plogis(e + b0_draw_toby)),
       numeric(1)
     ),
     p_marg_clip = pmin(pmax(p_marg, 1e-8), 1 - 1e-8),
     logit_p = qlogis(p_marg_clip)
   )
 
-# 5. Approximate closed-form equations
-m_approx_exposed  <- lm(logit_p ~ V + TS, data = grid_exposed)
-m_approx_unexposed <- lm(logit_p ~ V + TS, data = grid_unexposed)
+# Approximate closed-form equations ------------------------------------------
 
-# 6. approximation accuracy output
+m_approx_liu  <- lm(logit_p ~ V + TS, data = grid_liu)
+m_approx_toby <- lm(logit_p ~ V + TS, data = grid_toby)
 
-grid_exposed <- grid_exposed %>%
-  mutate(p_hat = plogis(predict(m_approx_exposed, newdata = grid_exposed)))
+summary(m_approx_liu)
+summary(m_approx_toby)
 
-rmse_exposed <- sqrt(mean((grid_exposed$p_hat - grid_exposed$p_marg)^2))
-mae_exposed  <- mean(abs(grid_exposed$p_hat - grid_exposed$p_marg))
-r2_exposed   <- cor(grid_exposed$p_hat, grid_exposed$p_marg)^2
+coef(m_approx_liu)
+coef(m_approx_toby)
 
-c(RMSE_exposed = rmse_exposed, MAE_exposed = mae_exposed, R2_exposed = r2_exposed)
+# approximation accuracy
 
-grid_unexposed <- grid_unexposed %>%
-  mutate(p_hat = plogis(predict(m_approx_unexposed, newdata = grid_unexposed)))
+grid_liu <- grid_liu %>%
+  mutate(p_hat = plogis(predict(m_approx_liu, newdata = grid_liu)))
 
-rmse_unexposed <- sqrt(mean((grid_unexposed$p_hat - grid_unexposed$p_marg)^2))
-mae_unexposed  <- mean(abs(grid_unexposed$p_hat - grid_unexposed$p_marg))
-r2_unexposed   <- cor(grid_unexposed$p_hat, grid_unexposed$p_marg)^2
+rmse_liu <- sqrt(mean((grid_liu$p_hat - grid_liu$p_marg)^2))
+mae_liu  <- mean(abs(grid_liu$p_hat - grid_liu$p_marg))
+r2_liu   <- cor(grid_liu$p_hat, grid_liu$p_marg)^2
 
-c(RMSE_unexposed = rmse_unexposed, MAE_unexposed = mae_unexposed, R2_unexposed = r2_unexposed)
+c(RMSE_liu = rmse_liu, MAE_liu = mae_liu, R2_liu = r2_liu)
+
+grid_toby <- grid_toby %>%
+  mutate(p_hat = plogis(predict(m_approx_toby, newdata = grid_toby)))
+
+rmse_toby <- sqrt(mean((grid_toby$p_hat - grid_toby$p_marg)^2))
+mae_toby  <- mean(abs(grid_toby$p_hat - grid_toby$p_marg))
+r2_toby   <- cor(grid_toby$p_hat, grid_toby$p_marg)^2
+
+c(RMSE_toby = rmse_toby, MAE_toby = mae_toby, R2_toby = r2_toby)
 
 
 # Visualization for two models--------------------------------------------------
 # 1. grids for plotting closed-form equations
 
-cf_exposed <- coef(m_approx_exposed)
-cf_unexposed <- coef(m_approx_unexposed)
+cf_liu <- coef(m_approx_liu)
+cf_toby <- coef(m_approx_toby)
 
-plot_grid_exposed <- expand_grid(
+plot_grid_liu <- expand_grid(
   TS = seq(-3, 3, length.out = 300),
   V  = seq(0, 1, length.out = 300)
 ) %>%
   mutate(
-    eta = cf_exposed[1] + cf_exposed[2] * V + cf_exposed[3] * TS,
+    eta = cf_liu[1] + cf_liu[2] * V + cf_liu[3] * TS,
     PPD = 100 * plogis(eta)
   )
 
-plot_grid_unexposed <- expand_grid(
+plot_grid_toby <- expand_grid(
   TS = seq(-3, 3, length.out = 300),
   V  = seq(0, 1, length.out = 300)
 ) %>%
   mutate(
-    eta = cf_unexposed[1] + cf_unexposed[2] * V + cf_unexposed[3] * TS,
+    eta = cf_toby[1] + cf_toby[2] * V + cf_toby[3] * TS,
     PPD = 100 * plogis(eta)
   )
 
-p_exposed  <- plot_draft_model(plot_grid_exposed,"a.","Ankle Uncovered")
+p_liu  <- plot_draft_model(plot_grid_liu,"a.","Ankle Uncovered")
 
-p_unexposed <- plot_draft_model(plot_grid_unexposed,"b.","Ankle Covered")
+p_toby <- plot_draft_model(plot_grid_toby,"b.","Ankle Covered")
 
-model_final <- p_exposed + p_unexposed +
+model_final <- p_liu + p_toby +
   plot_layout(ncol = 1)
 ggsave(
   here::here("manuscript", "figs", "Model.png"),
@@ -897,17 +891,18 @@ ggsave(
 )
 
 
-# 2. Save closed-form equations
+# Save closed-form equations -----------------------------------------------
+
 model_formula <- tibble(
-  Model = c("exposed","unexposed"),
+  Model = c("Liu","Toby"),
   
-  Intercept = c(cf_exposed[1], cf_unexposed[1]),
-  V_coef    = c(cf_exposed[2], cf_unexposed[2]),
-  TS_coef   = c(cf_exposed[3], cf_unexposed[3]),
+  Intercept = c(cf_liu[1], cf_toby[1]),
+  V_coef    = c(cf_liu[2], cf_toby[2]),
+  TS_coef   = c(cf_liu[3], cf_toby[3]),
   
-  RMSE = c(rmse_exposed, rmse_unexposed),
-  MAE  = c(mae_exposed,  mae_unexposed),
-  R2   = c(r2_exposed,   r2_unexposed)
+  RMSE = c(rmse_liu, rmse_toby),
+  MAE  = c(mae_liu,  mae_toby),
+  R2   = c(r2_liu,   r2_toby)
 ) %>%
   mutate(
     eta = sprintf("%.4f + %.4f*V + %.4f*TS",Intercept, V_coef, TS_coef),
@@ -916,5 +911,5 @@ model_formula <- tibble(
     )
   )
 
-rm(grid_base,grid_exposed,grid_unexposed,Liumodel_calibrationcurve,m_approx_exposed,m_approx_unexposed,
-   m_glmm_exposed,m_glmm_unexposed,plot_grid_exposed,plot_grid_unexposed)
+rm(grid_base,grid_liu,grid_toby,Liumodel_calibrationcurve,m_approx_liu,m_approx_toby,
+   m_glmm_liu,m_glmm_toby,plot_grid_liu,plot_grid_toby)
