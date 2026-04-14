@@ -181,17 +181,17 @@ setDT(sessions)
 
 tsk[, timestamp := as.POSIXct(timestamp)]
 sessions[, c("session_time_start", "session_time_end") :=
-  lapply(.SD, as.POSIXct),
-  .SDcols = c("session_time_start", "session_time_end")
+           lapply(.SD, as.POSIXct),
+         .SDcols = c("session_time_start", "session_time_end")
 ]
 
 tsk[, session_id := NA_character_]
 tsk[sessions,
-  on = .(
-    timestamp >= session_time_start,
-    timestamp <= session_time_end
-  ),
-  session_id := i.session_id
+    on = .(
+      timestamp >= session_time_start,
+      timestamp <= session_time_end
+    ),
+    session_id := i.session_id
 ]
 
 tsk <- tsk %>%
@@ -275,6 +275,10 @@ analysis <- survey %>%
 analysis <- analysis %>%
   dplyr::left_join(airflow_sessions_all_mean, by = "session_id")
 
+# Join with subject metadata (sex)
+analysis <- analysis %>%
+  dplyr::left_join(subjects %>% dplyr::select(subject_id, sex), by = "subject_id")
+
 # Select correct airflow columns based on workstation
 analysis <- analysis %>%
   dplyr::mutate(
@@ -330,7 +334,7 @@ analysis <- analysis %>%
   ) %>%
   # Reorder columns
   dplyr::select(
-    timestamp, session_id, session_date, session_sat, subject_id, workstation,
+    timestamp, session_id, session_date, session_sat, subject_id, sex, workstation,
     t_air_c, rh_percent, co2_ppm,
     v_air_m_s, t_supply_c, v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     question, is_open_text, response_value
@@ -385,7 +389,7 @@ derived_source_questions <- c(
 analysis_wide_temp <- analysis %>%
   dplyr::filter(question %in% derived_source_questions) %>%
   dplyr::select(
-    session_id, session_date, session_sat, subject_id, workstation,
+    session_id, session_date, session_sat, subject_id, sex, workstation,
     t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
     v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     question, response_value
@@ -393,7 +397,7 @@ analysis_wide_temp <- analysis %>%
   dplyr::mutate(response_value = as.numeric(response_value)) %>%
   tidyr::pivot_wider(
     id_cols = c(
-      session_id, session_date, session_sat, subject_id, workstation,
+      session_id, session_date, session_sat, subject_id, sex, workstation,
       t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
       v_air_sd_m_s, turbulence_intensity, dynamic_range_pct
     ),
@@ -412,7 +416,7 @@ derived_vars <- analysis_wide_temp %>%
     )
   ) %>%
   dplyr::select(
-    session_id, session_date, session_sat, subject_id, workstation,
+    session_id, session_date, session_sat, subject_id, sex, workstation,
     t_air_c, rh_percent, co2_ppm, v_air_m_s, t_supply_c,
     v_air_sd_m_s, turbulence_intensity, dynamic_range_pct,
     dissatisfied_with_draft_ankles
@@ -545,7 +549,7 @@ liu_raw <- liu_raw %>%
 # Apply factor conversions
 liu_raw <- liu_raw %>%
   dplyr::mutate(
-    gender = tolower(Sex),
+    sex = tolower(Sex),
     clothing_type = tolower(Dress),
     # Caffeine: numeric to categorical
     health_routines_caffein = dplyr::case_when(
@@ -593,7 +597,7 @@ liu_processed <- liu_processed %>%
 
 subjects_liu <- liu_processed %>%
   dplyr::select(
-    subject_id, gender, birth_year, height_m, weight_kg, bmi,
+    subject_id, sex, birth_year, height_m, weight_kg, bmi,
     sensitivity_cold, cold_exposure, health_routines_caffein
   ) %>%
   dplyr::distinct(subject_id, .keep_all = TRUE) %>%
@@ -617,7 +621,7 @@ subjects_liu <- liu_processed %>%
     sensitivity_feet = NA_character_
   ) %>%
   dplyr::select(
-    timestamp, subject_id, gender, birth_year, ethnicity, ethnicity_other_text,
+    timestamp, subject_id, sex, birth_year, ethnicity, ethnicity_other_text,
     height_ft, height_in, weight_lbs, living_location, living_location_past,
     health_routines_exercise, health_routines_caffein, health_routines_alcohol,
     health_routines_smoking, health_problems, health_problems_other_text,
@@ -630,7 +634,7 @@ subjects_liu <- liu_processed %>%
 
 analysis_liu <- liu_processed %>%
   dplyr::select(
-    subject_id, timestamp, workstation, clothing_type,
+    subject_id, timestamp, workstation, clothing_type,sex,
     t_supply_c, t_air_c, v_air_m_s, turbulence_intensity,
     question, response_value
   ) %>%
@@ -681,7 +685,7 @@ current_subjects <- read_csv(
 liu_subjects_combined <- subjects_liu %>%
   dplyr::mutate(study = "liu_2017") %>%
   dplyr::select(
-    subject_id, gender, birth_year, height_m, weight_kg,
+    subject_id, sex, birth_year, height_m, weight_kg,
     ethnicity, ethnicity_other_text, living_location, living_location_past,
     health_routines_exercise, health_routines_caffein, health_routines_alcohol,
     health_routines_smoking, health_problems, health_problems_other_text,

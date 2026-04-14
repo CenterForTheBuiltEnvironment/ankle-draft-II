@@ -86,7 +86,7 @@ plot_stacked_pct_ws <- function(data, var, palette) {
 #' @return ggplot object showing predicted probability with confidence band
 plot_prob <- function(model, xterm, xlab) {
   pred <- as.data.frame(ggpredict(model, terms = xterm))
-
+  
   ggplot(pred, aes(x = x, y = predicted)) +
     geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
     geom_line(linewidth = 1.2) +
@@ -105,7 +105,7 @@ plot_prob <- function(model, xterm, xlab) {
 #' @return ggplot object showing data points with model prediction line
 plot_lmm <- function(dat, xterm, xlab, model) {
   pred <- as.data.frame(ggpredict(model, terms = xterm))
-
+  
   ggplot(dat, aes(x = .data[[xterm]], y = air_movement_acceptability_ankles)) +
     geom_point(alpha = 0.25, size = 1.5) +
     geom_ribbon(
@@ -142,9 +142,9 @@ plot_pairedttest <- function(data, outcome_var, test_result,
                              y_label = NULL, group_by_var = "session_sat",
                              p.signif = TRUE) {
   outcome_sym <- sym(outcome_var)
-
+  
   if (is.null(y_label)) y_label <- outcome_var
-
+  
   # Format label with p-value and effect size for significant comparisons
   test_result_labeled <- test_result %>%
     mutate(
@@ -155,7 +155,7 @@ plot_pairedttest <- function(data, outcome_var, test_result,
         NA_character_
       )
     )
-
+  
   ggplot(data, aes(x = workstation, y = !!outcome_sym, fill = workstation)) +
     geom_boxplot(outlier.alpha = 0.4) +
     facet_wrap(
@@ -192,9 +192,9 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
                               fill_palette = thermal_preference_palette) {
   outcome_sym <- sym(outcome_var)
   group_sym <- sym(group_by_var)
-
+  
   if (is.null(fill_label)) fill_label <- outcome_var
-
+  
   # Factor level configurations for common outcome variables
   factor_config <- list(
     thermal_preference = list(
@@ -218,9 +218,9 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
       labels = c("Lower", "No change", "Higher")
     )
   )
-
+  
   config <- factor_config[[outcome_var]]
-
+  
   if (!is.null(config)) {
     data_plot <- data %>%
       mutate(!!outcome_sym := factor(
@@ -231,12 +231,12 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
   } else {
     data_plot <- data
   }
-
+  
   # Filter significant comparisons and set y position for annotations
   sig_data <- posthoc_result %>%
     filter(p.adj < 0.05) %>%
     mutate(y.position = 1.05)
-
+  
   p <- ggplot(data_plot, aes(x = workstation, fill = !!outcome_sym)) +
     geom_bar(position = "fill", color = "grey30", linewidth = 0.2) +
     facet_wrap(
@@ -252,7 +252,7 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
       panel.grid.major.x = element_blank(),
       strip.background = element_rect(fill = "grey90", color = NA)
     )
-
+  
   # Add significance annotations if any exist
   if (nrow(sig_data) > 0) {
     p <- p +
@@ -272,13 +272,61 @@ plot_pairedwilcox <- function(data, outcome_var, posthoc_result,
         vjust = 2
       )
   }
-
+  
   return(p)
 }
 
 plot_draft_model <- function(data, label, subtitle_text){
   
   ppd_levels <- c(10,20,40,60,80)
+  
+  z_mat <- xtabs(PPD ~ TS + V, data = data)
+  contour_lines <- grDevices::contourLines(
+    x = as.numeric(rownames(z_mat)),
+    y = as.numeric(colnames(z_mat)),
+    z = as.matrix(z_mat),
+    levels = ppd_levels
+  )
+  
+  contour_length <- function(line) {
+    sum(sqrt(diff(line$x)^2 + diff(line$y)^2))
+  }
+  
+  label_y <- 1.055
+  tick_y_top <- 1.018
+  tick_y_bottom <- 1.002
+  
+  contour_labels <- purrr::map_dfr(seq_along(ppd_levels), function(i) {
+    level <- ppd_levels[i]
+    level_lines <- contour_lines[
+      vapply(contour_lines, function(line) line$level == level, logical(1))
+    ]
+    
+    if (length(level_lines) == 0) {
+      return(tibble::tibble())
+    }
+    
+    line_scores <- purrr::map_dbl(level_lines, function(line) {
+      max(line$y) + contour_length(line) * 1e-6
+    })
+    target_line <- level_lines[[which.max(line_scores)]]
+    idx_top <- which.max(target_line$y)
+    tick_x <- target_line$x[idx_top]
+    
+    tibble::tibble(
+      tick_x = tick_x,
+      text_x = tick_x,
+      V = label_y,
+      tick_y_top = tick_y_top,
+      tick_y_bottom = tick_y_bottom,
+      prefix_label = if (level == max(ppd_levels)) {
+        "PPD[AD]~\"=\""
+      } else {
+        NA_character_
+      },
+      value_label = paste0(level, "*\"%\"")
+    )
+  })
   
   ggplot(data, aes(TS, V)) +
     
@@ -295,6 +343,26 @@ plot_draft_model <- function(data, label, subtitle_text){
       linewidth = 1
     ) +
     
+    geom_text(
+      data = dplyr::filter(contour_labels, !is.na(prefix_label)),
+      aes(x = text_x - 0.02, y = V, label = prefix_label),
+      inherit.aes = FALSE,
+      parse = TRUE,
+      hjust = 1,
+      size = 2,
+      color = "#2d6a4f"
+    ) +
+    
+    geom_text(
+      data = contour_labels,
+      aes(x = text_x, y = V, label = value_label),
+      inherit.aes = FALSE,
+      parse = TRUE,
+      hjust = 0,
+      size = 2,
+      color = "#2d6a4f"
+    ) +
+    
     scale_y_continuous(
       name = "Ankle air speed (m/s)",
       sec.axis = sec_axis(~ . * 196.85, name = "Ankle air speed (fpm)")
@@ -307,7 +375,7 @@ plot_draft_model <- function(data, label, subtitle_text){
                  "Slightly\nwarm","Warm","Hot")
     ) +
     
-    coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE) +
+    coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE, clip = "off") +
     
     
     theme_classic(base_size = 9) +
@@ -315,12 +383,12 @@ plot_draft_model <- function(data, label, subtitle_text){
     theme(
       plot.tag = element_text(size = 9, face = "bold"),
       plot.subtitle = element_text(
-        hjust = 0.05,
-        margin = margin(b = 3, unit = "mm"),
+        hjust = 0.02,
+        margin = margin(b = 5, unit = "mm"),
         size=9
       ),
       axis.title.x = element_text(margin = margin(t= 3, unit = "mm")),
-      plot.margin = margin(b = 5, unit = "mm")
+      plot.margin = margin(t = 8, r = 3, b = 2, l = 6, unit = "mm")
     ) +
     
     
