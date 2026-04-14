@@ -41,13 +41,13 @@ plot_stacked_pct_ws <- function(data, var, palette) {
     drop_na({{ var }})
 
   ggplot(df, aes(x = workstation, fill = {{ var }})) +
-    geom_bar(position = position_fill(reverse = TRUE), show.legend = TRUE) +
+    geom_bar(position = "fill") +
     facet_wrap(~ session_sat) +
     scale_y_continuous(
       labels = percent,
       expand = expansion(mult = c(0, 0.01))
     ) +
-    scale_fill_manual(values = palette, labels = label_wrap_gen(width = 9), drop = FALSE) +
+    scale_fill_manual(values = palette, labels = label_wrap_gen(width = 9)) +
     labs(x = "Workstation", y = "No. of Subjects (%)") +
     theme_minimal(base_size = 7) +
     theme(
@@ -60,18 +60,6 @@ plot_stacked_pct_ws <- function(data, var, palette) {
       axis.ticks.y = element_line(color = "grey", linewidth = 0.25),
       axis.ticks.x = element_blank(),
       axis.ticks.length = unit(1, "mm")
-    ) +
-    guides(
-      fill = guide_legend(
-        reverse = TRUE,
-        ncol = 1,
-        byrow = TRUE,
-        label.position = "right",
-        keywidth = unit(7.5, "mm"),
-        keyheight = unit(5, "mm"),
-        label.hjust = 0,
-        label.vjust = 0.5
-      )
     )
 }
 
@@ -280,6 +268,54 @@ plot_draft_model <- function(data, label, subtitle_text){
   
   ppd_levels <- c(10,20,40,60,80)
   
+  z_mat <- xtabs(PPD ~ TS + V, data = data)
+  contour_lines <- grDevices::contourLines(
+    x = as.numeric(rownames(z_mat)),
+    y = as.numeric(colnames(z_mat)),
+    z = as.matrix(z_mat),
+    levels = ppd_levels
+  )
+  
+  contour_length <- function(line) {
+    sum(sqrt(diff(line$x)^2 + diff(line$y)^2))
+  }
+  
+  label_y <- 1.055
+  tick_y_top <- 1.018
+  tick_y_bottom <- 1.002
+  
+  contour_labels <- purrr::map_dfr(seq_along(ppd_levels), function(i) {
+    level <- ppd_levels[i]
+    level_lines <- contour_lines[
+      vapply(contour_lines, function(line) line$level == level, logical(1))
+    ]
+    
+    if (length(level_lines) == 0) {
+      return(tibble::tibble())
+    }
+    
+    line_scores <- purrr::map_dbl(level_lines, function(line) {
+      max(line$y) + contour_length(line) * 1e-6
+    })
+    target_line <- level_lines[[which.max(line_scores)]]
+    idx_top <- which.max(target_line$y)
+    tick_x <- target_line$x[idx_top]
+    
+    tibble::tibble(
+      tick_x = tick_x,
+      text_x = tick_x,
+      V = label_y,
+      tick_y_top = tick_y_top,
+      tick_y_bottom = tick_y_bottom,
+      prefix_label = if (level == max(ppd_levels)) {
+        "PPD[AD]~\"=\""
+      } else {
+        NA_character_
+      },
+      value_label = paste0(level, "*\"%\"")
+    )
+  })
+  
   ggplot(data, aes(TS, V)) +
     
     geom_raster(
@@ -295,6 +331,26 @@ plot_draft_model <- function(data, label, subtitle_text){
       linewidth = 1
     ) +
     
+    geom_text(
+      data = dplyr::filter(contour_labels, !is.na(prefix_label)),
+      aes(x = text_x - 0.02, y = V, label = prefix_label),
+      inherit.aes = FALSE,
+      parse = TRUE,
+      hjust = 1,
+      size = 2,
+      color = "#2d6a4f"
+    ) +
+    
+    geom_text(
+      data = contour_labels,
+      aes(x = text_x, y = V, label = value_label),
+      inherit.aes = FALSE,
+      parse = TRUE,
+      hjust = 0,
+      size = 2,
+      color = "#2d6a4f"
+    ) +
+    
     scale_y_continuous(
       name = "Ankle air speed (m/s)",
       sec.axis = sec_axis(~ . * 196.85, name = "Ankle air speed (fpm)")
@@ -307,7 +363,7 @@ plot_draft_model <- function(data, label, subtitle_text){
                  "Slightly\nwarm","Warm","Hot")
     ) +
     
-    coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE) +
+    coord_cartesian(xlim = c(-3,3), ylim = c(0,1), expand = FALSE, clip = "off") +
     
     
     theme_classic(base_size = 9) +
@@ -315,12 +371,12 @@ plot_draft_model <- function(data, label, subtitle_text){
     theme(
       plot.tag = element_text(size = 9, face = "bold"),
       plot.subtitle = element_text(
-        hjust = 0.05,
-        margin = margin(b = 3, unit = "mm"),
+        hjust = 0.02,
+        margin = margin(b = 5, unit = "mm"),
         size=9
       ),
       axis.title.x = element_text(margin = margin(t= 3, unit = "mm")),
-      plot.margin = margin(b = 5, unit = "mm")
+      plot.margin = margin(t = 8, r = 3, b = 2, l = 6, unit = "mm")
     ) +
     
     

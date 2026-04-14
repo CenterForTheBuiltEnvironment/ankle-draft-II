@@ -11,21 +11,19 @@ source(here::here("src", "R", "x_data.R"))
 source(here::here("src", "R", "x_stat.R"))
 
 
-# ==============================================================================
-# 1. Demographics & Environmental Conditions
-# ==============================================================================
+# 1. Demographics & Environmental Conditions ==================================
 
-# 1.1 Subject Demographics -----------------------------------------------------
+# Subject demographics table ---------------------------------------------------
 
 demographic_d <- subjects %>%
   dplyr::mutate(bmi = weight_kg / (height_m^2)) %>%
   group_by(sex) %>%
   summarise(
     n = n(),
-    age = sprintf("%.1f (+/- %.1f)", mean(age, na.rm = TRUE), sd(age, na.rm = TRUE)),
-    height = sprintf("%.2f (+/- %.2f)", mean(height_m, na.rm = TRUE), sd(height_m, na.rm = TRUE)),
-    weight = sprintf("%.1f (+/- %.1f)", mean(weight_kg, na.rm = TRUE), sd(weight_kg, na.rm = TRUE)),
-    bmi = sprintf("%.1f (+/- %.1f)", mean(bmi, na.rm = TRUE), sd(bmi, na.rm = TRUE))
+    age = sprintf("%.1f +/- %.1f", mean(age, na.rm = TRUE), sd(age, na.rm = TRUE)),
+    height = sprintf("%.2f +/- %.2f", mean(height_m, na.rm = TRUE), sd(height_m, na.rm = TRUE)),
+    weight = sprintf("%.1f +/- %.1f", mean(weight_kg, na.rm = TRUE), sd(weight_kg, na.rm = TRUE)),
+    bmi = sprintf("%.1f +/- %.1f", mean(bmi, na.rm = TRUE), sd(bmi, na.rm = TRUE))
   ) %>%
   bind_rows(
     subjects %>%
@@ -33,66 +31,46 @@ demographic_d <- subjects %>%
       summarise(
         sex = "all",
         n = n(),
-        age = sprintf("%.1f (+/- %.1f)", mean(age, na.rm = TRUE), sd(age, na.rm = TRUE)),
-        height = sprintf("%.2f (+/- %.2f)", mean(height_m, na.rm = TRUE), sd(height_m, na.rm = TRUE)),
-        weight = sprintf("%.1f (+/- %.1f)", mean(weight_kg, na.rm = TRUE), sd(weight_kg, na.rm = TRUE)),
-        bmi = sprintf("%.1f (+/- %.1f)", mean(bmi, na.rm = TRUE), sd(bmi, na.rm = TRUE))
+        age = sprintf("%.1f +/- %.1f", mean(age, na.rm = TRUE), sd(age, na.rm = TRUE)),
+        height = sprintf("%.2f +/- %.2f", mean(height_m, na.rm = TRUE), sd(height_m, na.rm = TRUE)),
+        weight = sprintf("%.1f +/- %.1f", mean(weight_kg, na.rm = TRUE), sd(weight_kg, na.rm = TRUE)),
+        bmi = sprintf("%.1f +/- %.1f", mean(bmi, na.rm = TRUE), sd(bmi, na.rm = TRUE))
       ),
     .
-  ) %>%
-  mutate(sex = stringr::str_to_title(sex))  # capitalize for table rendering
+  )
 
-# 1.2 Environmental Conditions -------------------------------------------------
+
+# Environmental conditions table -----------------------------------------------
 
 env_airflow <- env_sessions %>%
   dplyr::left_join(
     airflow_sessions_all_mean,
     by = c("session_id", "session_sat")
   ) %>%
-  dplyr::mutate(
-    t_supply_c = rowMeans(cbind(low_t_supply_c, med_t_supply_c, high_t_supply_c), na.rm = TRUE)
-  ) %>%
   dplyr::group_by(session_sat) %>%
   dplyr::summarise(
-    # Two decimal places
     across(
       .cols = c(
+        t_air_c, rh_percent,
         low_v_air_s, med_v_air_s, high_v_air_s,
+        low_t_supply_c, med_t_supply_c, high_t_supply_c,
         low_turbulence_intensity, med_turbulence_intensity, high_turbulence_intensity
       ),
-      .fns = \(x) paste0(round(mean(x, na.rm = TRUE), 2), " ( +/- ", round(sd(x, na.rm = TRUE), 2), ")")
-    ),
-    # One decimal place
-    across(
-      .cols = c(t_air_c, rh_percent, t_supply_c),
-      .fns = \(x) paste0(round(mean(x, na.rm = TRUE), 1), " ( +/- ", round(sd(x, na.rm = TRUE), 1), ")")
+      .fns = \(x) paste0(
+        round(mean(x, na.rm = TRUE), 2), " +/- ",
+        round(sd(x, na.rm = TRUE), 2)
+      )
     )
-  ) %>%
-  dplyr::select(t_air_c, rh_percent, t_supply_c, everything())
+  )
 
-# 1.2.1 Transposed table (for manuscript) ----
-
-label_map <- c(
-  t_air_c                    = "Air temperature, head level (°C)",
-  rh_percent                 = "Relative humidity (%)",
-  t_supply_c                 = "Air temperature, ankle level (°C)",
-  low_v_air_s                = "Air speed, low (m/s)",
-  med_v_air_s                = "Air speed, medium (m/s)",
-  high_v_air_s               = "Air speed, high (m/s)",
-  low_turbulence_intensity   = "Turbulence, low (%)",
-  med_turbulence_intensity   = "Turbulence, medium (%)",
-  high_turbulence_intensity  = "Turbulence, high (%)"
-)
-
+# Transposed table
 env_airflow_t <- env_airflow %>%
   tibble::column_to_rownames("session_sat") %>%
   t() %>%
   as.data.frame() %>%
-  tibble::rownames_to_column("measurement") %>%
-  dplyr::mutate(measurement = dplyr::recode(measurement, !!!label_map))
+  tibble::rownames_to_column("measurement")
 
-# 1.2.2 Stratified table (SAT x air speed) ----
-
+# Stratified table (SAT x air speed)
 env_airflow_stratified <- env_sessions %>%
   dplyr::left_join(
     airflow_sessions_all_mean,
@@ -126,75 +104,88 @@ env_airflow_stratified <- env_sessions %>%
   )
 
 
+# 2. Thermal Sensation / Comfort / Preference ==================================
 
+# Thermal sensation (overall vs ankles) ----------------------------------------
 
-
-# ==============================================================================
-# 2. Overall Thermal Perception (Whole Body)
-# ==============================================================================
-
-# 2.1 Data Preparation ---------------------------------------------------------
-
-# 2.1.1 Thermal sensation ----
-
-thermal_sensation_d <- analysis %>%
+thermal_sensation_p <- analysis %>%
   dplyr::filter(
     question %in% c("thermal_sensation", "thermal_sensation_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
   dplyr::mutate(
-    response_value_num = as.numeric(response_value),
-    response_value = factor(
-      dplyr::case_when(
-        response_value_num < -2.5  ~ "Cold",
-        response_value_num < -1.5  ~ "Cool",
-        response_value_num < -0.5  ~ "Slightly cool",
-        response_value_num <= 0.5  ~ "Neutral",
-        response_value_num <= 1.5  ~ "Slightly warm",
-        response_value_num <= 2.5  ~ "Warm",
-        response_value_num > 2.5   ~ "Hot"
-      ),
-      levels = thermal_sensation_levels
-    ),
+    response_value = as.numeric(response_value),
     question = factor(
       dplyr::recode(
         question,
-        "thermal_sensation"        = "Overall",
+        "thermal_sensation" = "Overall",
         "thermal_sensation_ankles" = "Ankles"
       ),
       levels = c("Overall", "Ankles")
     )
   ) %>%
-  tidyr::drop_na(response_value)
+  {
+    thermal_sensation_stats <<- paired_t_test(
+      data = .,
+      group_by_var = "session_sat",
+      within_var = "workstation",
+      subject_var = "subject_id",
+      question_var = "question",
+      value_var = "response_value",
+      order_var = "timestamp"
+    )
+    .
+  } %>%
+  ggplot(aes(
+    x = workstation,
+    y = response_value,
+    group = interaction(workstation, question)
+  )) +
+  geom_boxplot(
+    aes(fill = question),
+    color = "grey70",
+    outlier.shape = NA,
+    alpha = 0.5,
+    position = position_dodge(width = 0.8)
+  ) +
+  geom_jitter(
+    aes(color = response_value, group = question),
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8),
+    alpha = 0.7,
+    size = 1.5
+  ) +
+  scale_fill_manual(values = c("Overall" = "grey70", "Ankles" = "grey90")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.3) +
+  facet_wrap(~ session_sat) +
+  scale_color_gradientn(
+    colors = thermal_sensation_palette,
+    limits = c(-3, 3)
+  ) +
+  scale_y_continuous(
+    breaks = c(-3, 0, 3),
+    labels = c("Cold", "Neutral", "Hot"),
+    limits = c(-3, 3)
+  ) +
+  labs(x = "Air speed (m/s)", y = "Thermal sensation") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.spacing.x = unit(10, "mm"),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    axis.ticks.y = element_line(color = "grey", linewidth = 0.25),
+    axis.ticks.x = element_blank(),
+    legend.position = "none"
+  )
 
-thermal_sensation_overall_summary <- thermal_sensation_d %>%
-  dplyr::filter(question == "Overall") %>%
-  dplyr::count(session_sat, workstation, response_value, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, response_value, n, pct, pct_label)
 
-thermal_sensation_ankle_summary <- thermal_sensation_d %>%
-  dplyr::filter(question == "Ankles") %>%
-  dplyr::count(session_sat, workstation, response_value, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, response_value, n, pct, pct_label)
+# Thermal preference (overall) -------------------------------------------------
 
-# 2.1.2 Thermal preference ----
-
-thermal_preference_d <- analysis %>%
+thermal_preference_overall_p <- analysis %>%
   dplyr::filter(
-    question %in% c("thermal_preference", "thermal_preference_ankles"),
+    question %in% c("thermal_preference"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
@@ -202,109 +193,65 @@ thermal_preference_d <- analysis %>%
     response_value_num = as.numeric(response_value),
     response_value = factor(
       dplyr::case_when(
-        response_value_num > 0  ~ "Warmer",
-        response_value_num < 0  ~ "Cooler",
-        response_value_num == 0 ~ "No change"
+        response_value_num < 0.0 ~ "Cooler",
+        response_value_num > 0.0 ~ "Warmer",
+        response_value_num == 0.0 ~ "No change"
       ),
-      levels = thermal_preference_levels
-    ),
-    question = factor(
-      dplyr::recode(
-        question,
-        "thermal_preference"        = "Overall",
-        "thermal_preference_ankles" = "Ankles"
-      ),
-      levels = c("Overall", "Ankles")
+      levels = c("Cooler", "No change", "Warmer")
     )
   ) %>%
-  tidyr::drop_na(response_value)
+  {
+    thermal_preference_overall_stats <<- paired_wilcox_test(
+      data = dplyr::mutate(., response_value = response_value_num),
+      group_by_var = "session_sat",
+      subject_var = "subject_id",
+      question_var = "workstation",
+      value_var = "response_value",
+      order_var = "timestamp"
+    )
+    .
+  } %>%
+  plot_stacked_pct_ws(response_value, thermal_preference_palette) +
+  labs(subtitle = "Thermal preference  |  Overall", x = NULL)
 
-thermal_preference_overall_summary <- thermal_preference_d %>%
-  dplyr::filter(question == "Overall") %>%
-  dplyr::count(session_sat, workstation, response_value, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, response_value, n, pct, pct_label)
 
-thermal_preference_ankle_summary <- thermal_preference_d %>%
-  dplyr::filter(question == "Ankles") %>%
-  dplyr::count(session_sat, workstation, response_value, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, response_value, n, pct, pct_label)
+# Thermal preference (ankles) --------------------------------------------------
 
-# 2.1.3 Thermal acceptability ----
-
-vertical_gap <- 0.2  # visual gap between acceptable/unacceptable regions
-
-thermal_acceptability_d <- analysis %>%
+thermal_preference_ankles_p <- analysis %>%
   dplyr::filter(
-    question == "thermal_acceptability",
+    question %in% c("thermal_preference_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
   dplyr::mutate(
-    response_value = as.numeric(response_value),
-    response_plot = ifelse(
-      response_value > 0,
-      response_value + vertical_gap,
-      response_value
+    response_value_num = as.numeric(response_value),
+    response_value = factor(
+      dplyr::case_when(
+        response_value_num < 0.0 ~ "Cooler",
+        response_value_num > 0.0 ~ "Warmer",
+        response_value_num == 0.0 ~ "No change"
+      ),
+      levels = c("Cooler", "No change", "Warmer")
     )
-  )
-
-# 2.2 Thermal Sensation (Overall) ----------------------------------------------
-
-thermal_sensation_overall_d_raw <- dplyr::filter(thermal_sensation_d, question == "Overall")
-
-thermal_sensation_overall_stats <- paired_wilcox_test(
-  data         = thermal_sensation_overall_d_raw,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value_num",
-  order_var    = "timestamp"
-)
-
-thermal_sensation_overall_d <- stacked_pct_data_ws(
-  thermal_sensation_overall_d_raw, response_value
-)
-
-thermal_sensation_overall_p <- thermal_sensation_overall_d_raw %>%
-  plot_stacked_pct_ws(response_value, thermal_sensation_palette) +
-  labs(subtitle = "Thermal sensation, whole body", x = NULL)
-
-# 2.3 Thermal Preference (Overall) ---------------------------------------------
-
-thermal_preference_overall_d_raw <- dplyr::filter(thermal_preference_d, question == "Overall")
-
-thermal_preference_overall_stats <- paired_wilcox_test(
-  data         = thermal_preference_overall_d_raw,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value_num",
-  order_var    = "timestamp"
-)
-
-thermal_preference_overall_d <- stacked_pct_data_ws(
-  thermal_preference_overall_d_raw, response_value
-)
-
-thermal_preference_overall_p <- thermal_preference_overall_d_raw %>%
+  ) %>%
+  {
+    thermal_preference_ankle_stats <<- paired_wilcox_test(
+      data = dplyr::mutate(., response_value = response_value_num),
+      group_by_var = "session_sat",
+      subject_var = "subject_id",
+      question_var = "workstation",
+      value_var = "response_value",
+      order_var = "timestamp"
+    )
+    .
+  } %>%
   plot_stacked_pct_ws(response_value, thermal_preference_palette) +
-  labs(subtitle = "Thermal preference, whole body", x = NULL)
+  labs(subtitle = "Thermal preference  |  Ankles", x = "Air speed (m/s)")
 
-# 2.4 Combined Sensation/Preference Figure -------------------------------------
 
-thermal_perception_overall_p <- (thermal_sensation_overall_p / thermal_preference_overall_p) +
+# Combined thermal preference figure -------------------------------------------
+
+thermal_preference_p <- (thermal_preference_overall_p / thermal_preference_ankles_p) +
   plot_layout(axes = "collect_x") +
   plot_annotation(tag_levels = "a", tag_suffix = ".") &
   theme(
@@ -317,8 +264,8 @@ thermal_perception_overall_p <- (thermal_sensation_overall_p / thermal_preferenc
   )
 
 ggsave(
-  here::here("manuscript", "figs", "thermal_perception_overall.png"),
-  plot = thermal_perception_overall_p,
+  here::here("manuscript", "figs", "thermal_preference.png"),
+  plot = thermal_preference_p,
   dpi = 500,
   width = single_col_width,
   height = 120,
@@ -326,18 +273,36 @@ ggsave(
   bg = "transparent"
 )
 
-# 2.5 Thermal Acceptability ----------------------------------------------------
 
-thermal_acceptability_stats <- paired_t_test(
-  data         = thermal_acceptability_d,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value",
-  order_var    = "timestamp"
-)
+# Thermal acceptability --------------------------------------------------------
 
-thermal_acceptability_p <- thermal_acceptability_d %>%
+vertical_gap <- 0.2
+
+thermal_acceptability_p <- analysis %>%
+  dplyr::filter(
+    question %in% c("thermal_acceptability"),
+    is_open_text == FALSE
+  ) %>%
+  dplyr::filter(workstation != "adaptation") %>%
+  dplyr::mutate(
+    response_value = as.numeric(response_value),
+    response_plot = ifelse(
+      response_value > 0,
+      response_value + vertical_gap,
+      response_value
+    )
+  ) %>%
+  {
+    thermal_acceptability_stats <<- paired_t_test(
+      data = .,
+      group_by_var = "session_sat",
+      subject_var = "subject_id",
+      question_var = "workstation",
+      value_var = "response_value",
+      order_var = "timestamp"
+    )
+    .
+  } %>%
   ggplot(aes(x = workstation, y = response_plot)) +
   annotate(
     "rect",
@@ -395,71 +360,15 @@ thermal_acceptability_p <- thermal_acceptability_d %>%
     legend.position = "none"
   )
 
-ggsave(
-  here::here("manuscript", "figs", "thermal_acceptability_overall.png"),
-  plot = thermal_acceptability_p,
-  dpi = 500,
-  width = double_col_width,
-  height = 80,
-  units = "mm",
-  bg = "transparent"
-)
 
+# Combined thermal perception figure -------------------------------------------
 
-# ==============================================================================
-# 3. Ankle-Level Thermal Perception
-# ==============================================================================
-
-# 3.1 Thermal Sensation (Ankles) -----------------------------------------------
-
-thermal_sensation_ankles_d_raw <- dplyr::filter(thermal_sensation_d, question == "Ankles")
-
-thermal_sensation_ankles_stats <- paired_wilcox_test(
-  data         = thermal_sensation_ankles_d_raw,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value_num",
-  order_var    = "timestamp"
-)
-
-thermal_sensation_ankles_d <- stacked_pct_data_ws(
-  thermal_sensation_ankles_d_raw, response_value
-)
-
-thermal_sensation_ankles_p <- thermal_sensation_ankles_d_raw %>%
-  plot_stacked_pct_ws(response_value, thermal_sensation_palette) +
-  labs(subtitle = "Thermal sensation, ankles", x = "Air speed (m/s)")
-
-# 3.2 Thermal Preference (Ankles) ----------------------------------------------
-
-thermal_preference_ankles_d_raw <- dplyr::filter(thermal_preference_d, question == "Ankles")
-
-thermal_preference_ankles_stats <- paired_wilcox_test(
-  data         = thermal_preference_ankles_d_raw,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value_num",
-  order_var    = "timestamp"
-)
-
-thermal_preference_ankles_d <- stacked_pct_data_ws(
-  thermal_preference_ankles_d_raw, response_value
-)
-
-thermal_preference_ankles_p <- thermal_preference_ankles_d_raw %>%
-  plot_stacked_pct_ws(response_value, thermal_preference_palette) +
-  labs(subtitle = "Thermal preference, ankles", x = "Air speed (m/s)")
-
-# 3.3 Combined Ankle Sensation/Preference Figure ------------------------------
-
-thermal_perception_ankle_p <- (thermal_sensation_ankles_p / thermal_preference_ankles_p) +
+thermal_perception_p <- (thermal_sensation_p / thermal_acceptability_p) +
   plot_layout(axes = "collect_x") +
   plot_annotation(tag_levels = "a", tag_suffix = ".") &
   theme(
     plot.subtitle = element_text(hjust = 0.05, margin = margin(b = 3, unit = "mm")),
-    plot.tag = element_text(size = 7, face = "bold"),
+    plot.tag = element_text(size = 10, face = "bold"),
     plot.margin = margin(b = 5, unit = "mm"),
     axis.title = element_text(margin = margin(r = 2, unit = "mm")),
     legend.margin = margin(l = 3, unit = "mm"),
@@ -467,20 +376,23 @@ thermal_perception_ankle_p <- (thermal_sensation_ankles_p / thermal_preference_a
   )
 
 ggsave(
-  here::here("manuscript", "figs", "thermal_perception_ankle.png"),
-  plot = thermal_perception_ankle_p,
+  here::here("manuscript", "figs", "thermal_perception.png"),
+  plot = thermal_perception_p,
   dpi = 500,
-  width = single_col_width,
-  height = 120,
+  width = double_col_width,
+  height = 180,
   units = "mm",
   bg = "transparent"
 )
 
-# 3.4 Air Movement Acceptability (Ankles) --------------------------------------
 
-air_movement_acceptability_d <- analysis %>%
+# 3. Air Movement Acceptability at Ankles ======================================
+
+# Air movement acceptability ---------------------------------------------------
+
+air_movement_acceptability_p <- analysis %>%
   dplyr::filter(
-    question == "air_movement_acceptability_ankles",
+    question %in% c("air_movement_acceptability_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
@@ -488,53 +400,44 @@ air_movement_acceptability_d <- analysis %>%
     response_value_num = as.numeric(response_value),
     acceptability = factor(
       dplyr::case_when(
-        response_value_num > 0  ~ "Acceptable",
-        response_value_num < 0  ~ "Unacceptable",
+        response_value_num > 0 ~ "Acceptable",
+        response_value_num < 0 ~ "Unacceptable",
         response_value_num == 0 ~ NA
       ),
-      levels = c("Acceptable", "Unacceptable"),
+      levels = c("Unacceptable", "Acceptable"),
       ordered = TRUE
     )
-  )
-
-air_movement_acceptability_summary <- air_movement_acceptability_d %>%
-  dplyr::count(session_sat, workstation, acceptability, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
   ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, acceptability, n, pct, pct_label)
-
-air_movement_acceptability_stats <- paired_wilcox_test(
-  data = dplyr::mutate(
-    air_movement_acceptability_d,
-    acceptability_num = dplyr::case_when(
-      acceptability == "Unacceptable" ~ 0,
-      acceptability == "Acceptable"   ~ 1,
-      TRUE                            ~ NA_real_
+  {
+    air_movement_acceptability_stats <<- paired_wilcox_test(
+      data = dplyr::mutate(
+        .,
+        acceptability_num = dplyr::case_when(
+          acceptability == "Unacceptable" ~ 0,
+          acceptability == "Acceptable" ~ 1,
+          TRUE ~ NA_real_
+        )
+      ),
+      group_by_var = "session_sat",
+      subject_var = "subject_id",
+      question_var = "workstation",
+      value_var = "acceptability_num",
+      order_var = "timestamp"
     )
-  ),
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "acceptability_num",
-  order_var    = "timestamp"
-)
-
-air_movement_acceptability_p <- air_movement_acceptability_d %>%
+    .
+  } %>%
   plot_stacked_pct_ws(
     acceptability,
     palette = c("Unacceptable" = "#d99fa8", "Acceptable" = "#c1e0b9")
   ) +
-  labs(subtitle = "Air movement acceptability, ankles", x = NULL)
+  labs(subtitle = "Ankle air movement acceptability", x = NULL)
 
-# 3.5 Air Movement Preference (Ankles) -----------------------------------------
 
-air_movement_preference_d <- analysis %>%
+# Air movement preference ------------------------------------------------------
+
+air_movement_preference_p <- analysis %>%
   dplyr::filter(
-    question == "air_movement_preference_ankles",
+    question %in% c("air_movement_preference_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
@@ -542,52 +445,43 @@ air_movement_preference_d <- analysis %>%
     response_value_num = as.numeric(response_value),
     acceptability = factor(
       dplyr::case_when(
-        response_value_num > 0  ~ "More",
-        response_value_num < 0  ~ "Less",
+        response_value_num > 0 ~ "More",
+        response_value_num < 0 ~ "Less",
         response_value_num == 0 ~ "No change"
       ),
-      levels = c("Less", "No change", "More")
+      levels = c("More", "No change", "Less")
     )
-  )
-
-air_movement_preference_summary <- air_movement_preference_d %>%
-  dplyr::count(session_sat, workstation, acceptability, name = "n") %>%
-  dplyr::group_by(session_sat, workstation) %>%
-  dplyr::mutate(
-    pct       = round(n / sum(n), 2),
-    pct_label = scales::percent(pct, accuracy = 1)
   ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(session_sat, workstation, acceptability, n, pct, pct_label)
-
-air_movement_preference_stats <- paired_wilcox_test(
-  data         = air_movement_preference_d,
-  group_by_var = "session_sat",
-  subject_var  = "subject_id",
-  question_var = "workstation",
-  value_var    = "response_value_num",
-  order_var    = "timestamp"
-)
-
-air_movement_preference_p <- air_movement_preference_d %>%
+  {
+    air_movement_preference_stats <<- paired_wilcox_test(
+      data = dplyr::mutate(., response_value = response_value_num),
+      group_by_var = "session_sat",
+      subject_var = "subject_id",
+      question_var = "workstation",
+      value_var = "response_value",
+      order_var = "timestamp"
+    )
+    .
+  } %>%
   plot_stacked_pct_ws(acceptability, palette = air_movement_preference_palette) +
-  labs(subtitle = "Air movement preference, ankles", x = "Air speed (m/s)")
+  labs(subtitle = "Ankle air movement preference", x = "Air speed (m/s)")
 
-# 3.6 Combined Air Movement Figure ---------------------------------------------
+
+# Combined air movement figure -------------------------------------------------
 
 air_movement_p <- (air_movement_acceptability_p / air_movement_preference_p) +
   plot_layout(axes = "collect_x") +
   plot_annotation(tag_levels = "a", tag_suffix = ".") &
   theme(
-    plot.subtitle    = element_text(hjust = 0.05, margin = margin(b = 3, unit = "mm")),
-    plot.tag         = element_text(size = 7, face = "bold"),
-    plot.margin      = margin(b = 5, unit = "mm"),
-    axis.title       = element_text(margin = margin(r = 2, unit = "mm")),
-    legend.position  = "right",
+    plot.subtitle = element_text(hjust = 0.05, margin = margin(b = 3, unit = "mm")),
+    plot.tag = element_text(size = 7, face = "bold"),
+    plot.margin = margin(b = 5, unit = "mm"),
+    axis.title = element_text(margin = margin(r = 2, unit = "mm")),
+    legend.position = "right",
     legend.direction = "vertical",
     legend.justification = "left",
-    legend.margin    = margin(l = 3, unit = "mm"),
-    axis.text.x      = element_text(angle = 45, hjust = 1)
+    legend.margin = margin(l = 3, unit = "mm"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
 ggsave(
@@ -602,9 +496,6 @@ ggsave(
 
 
 # 4. Dissatisfaction with Ankle Draft - Model Comparison =======================
-#
-# TODO: Integrate analysis from analysis_old.R
-#
 # - Define binary outcome (matching Liu et al. definition) ----------------
 
 dissatisfied_with_draft_ankles <- analysis %>%
@@ -813,9 +704,8 @@ print(Liumodel_calibrationcurve)
 dev.off()
 
 
-# 5. Updated Model inc. Winter Conditions ======================================
-# TODO: Integrate analysis from analysis_old.R
-# - combine dataset -------------------------------------------------------
+# 5. Updated Model for Ankle exposed/unexposed Conditions ======================================
+# combine dataset -------------------------------------------------------
 
 analysis_all <- bind_rows(
   analysis %>%
@@ -824,13 +714,13 @@ analysis_all <- bind_rows(
     ) %>%
     dplyr::filter(workstation != "adaptation") %>%
     dplyr::mutate(response_value = as.numeric(response_value)) %>%
-    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value) %>%
-    dplyr::mutate(source = "toby"),
+    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value, turbulence_intensity) %>%
+    dplyr::mutate(source = "toby",clothing_type = "long"),
   
   analysis_liu %>%
     dplyr::filter(workstation != "adaptation") %>%
     dplyr::mutate(response_value = as.numeric(response_value)) %>%
-    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value) %>%
+    dplyr::select(timestamp,subject_id,workstation,t_supply_c, t_air_c, v_air_m_s,question,response_value, clothing_type, turbulence_intensity) %>%
     mutate(source = "liu")
 )
 
@@ -840,7 +730,7 @@ new_model <- analysis_all %>%
   dplyr::mutate(rep_id = dplyr::row_number()) %>%
   dplyr::ungroup() %>%
   tidyr::pivot_wider(
-    id_cols = c(t_supply_c, v_air_m_s, t_air_c, subject_id, workstation, rep_id, source),
+    id_cols = c(t_supply_c, v_air_m_s, t_air_c, subject_id, workstation, rep_id, source, clothing_type, turbulence_intensity),
     names_from = question,
     values_from = response_value
   ) %>%
@@ -854,39 +744,56 @@ new_model <- analysis_all %>%
   dplyr::filter(!is.na(dissatisfied_with_draft_ankles),
                 !is.na(thermal_sensation))
 
+# Center continuous predictors on the full-dataset mean -------------------
+# Centering reference is computed once from new_model.
+ctr_vars <- c("v_air_m_s", "thermal_sensation", "t_air_c", "t_supply_c", "turbulence_intensity")
+ctr_means <- colMeans(new_model[ctr_vars], na.rm = TRUE)
+new_model_c <- new_model %>%
+  dplyr::mutate(across(all_of(ctr_vars), \(x) x- mean(x, na.rm = TRUE)))
+# Print centering reference for reproducibility
+tibble::enframe(ctr_means, name = "variable", value = "mean (centering reference)")
 
-# Fit separate mixed-effects models using Liu's dataset and Toby's --------
+# Full model for predictor screening (not the final model) ----------------
+model_input <- glmer(
+  dissatisfied_with_draft_ankles~ v_air_m_s + t_air_c + t_supply_c + thermal_sensation + turbulence_intensity + clothing_type + source + (1 |subject_id),
+  data = new_model_c,
+  family = binomial(link = "logit"),
+  control = glmerControl(optimizer = "bobyqa")
+)
+summary(model_input)
+
+# Fit separate mixed-effects models for "Ankle exposed" and "Ankle unexposed" --------
 
 # 1. fit models
-m_glmm_liu <- glmer(
+m_glmm_exposed <- glmer(
   dissatisfied_with_draft_ankles ~ v_air_m_s + thermal_sensation + (1 | subject_id),
-  data = new_model %>% filter(source == "liu"),
+  data = new_model_c %>% filter(clothing_type == "short"),
   family = binomial(link = "logit"),
   control = glmerControl(optimizer = "bobyqa")
 )
 
-m_glmm_toby <- glmer(
+m_glmm_unexposed <- glmer(
   dissatisfied_with_draft_ankles ~ v_air_m_s + thermal_sensation + (1 | subject_id),
-  data = new_model %>% filter(source == "toby"),
+  data = new_model_c %>% filter(clothing_type == "long"),
   family = binomial(link = "logit"),
   control = glmerControl(optimizer = "bobyqa")
 )
 
-summary(m_glmm_liu)
-summary(m_glmm_toby)
+summary(m_glmm_exposed)
+summary(m_glmm_unexposed)
 
 # 2. extract coefficients
-fe_liu <- fixef(m_glmm_liu)
-a_liu <- unname(fe_liu["(Intercept)"])
-b_liu <- unname(fe_liu["v_air_m_s"])
-c_liu <- unname(fe_liu["thermal_sensation"])
-sd_b0_liu <- sqrt(as.numeric(VarCorr(m_glmm_liu)$subject_id[1, 1]))
+fe_exposed <- fixef(m_glmm_exposed)
+a_exposed <- unname(fe_exposed["(Intercept)"])
+b_exposed <- unname(fe_exposed["v_air_m_s"])
+c_exposed <- unname(fe_exposed["thermal_sensation"])
+sd_b0_exposed <- sqrt(as.numeric(VarCorr(m_glmm_exposed)$subject_id[1, 1]))
 
-fe_toby <- fixef(m_glmm_toby)
-a_toby <- unname(fe_toby["(Intercept)"])
-b_toby <- unname(fe_toby["v_air_m_s"])
-c_toby <- unname(fe_toby["thermal_sensation"])
-sd_b0_toby <- sqrt(as.numeric(VarCorr(m_glmm_toby)$subject_id[1, 1]))
+fe_unexposed <- fixef(m_glmm_unexposed)
+a_unexposed <- unname(fe_unexposed["(Intercept)"])
+b_unexposed <- unname(fe_unexposed["v_air_m_s"])
+c_unexposed <- unname(fe_unexposed["thermal_sensation"])
+sd_b0_unexposed <- sqrt(as.numeric(VarCorr(m_glmm_unexposed)$subject_id[1, 1]))
 
 # 3. common V-TS grid
 grid_base <- expand_grid(
@@ -897,94 +804,87 @@ grid_base <- expand_grid(
 # 4. Monte Carlo marginal probs
 set.seed(1)
 K <- 10000
-b0_draw_liu  <- rnorm(K, mean = 0, sd = sd_b0_liu)
-b0_draw_toby <- rnorm(K, mean = 0, sd = sd_b0_toby)
+b0_draw_exposed  <- rnorm(K, mean = 0, sd = sd_b0_exposed)
+b0_draw_unexposed <- rnorm(K, mean = 0, sd = sd_b0_unexposed)
 
-grid_liu <- grid_base %>%
+grid_exposed <- grid_base %>%
   mutate(
-    eta = a_liu + b_liu * V + c_liu * TS,
+    eta = a_exposed + b_exposed * (V - ctr_means["v_air_m_s"]) + c_exposed * (TS - ctr_means["thermal_sensation"]),
     p_marg = vapply(
       eta,
-      function(e) mean(plogis(e + b0_draw_liu)),
+      function(e) mean(plogis(e + b0_draw_exposed)),
       numeric(1)
     ),
     p_marg_clip = pmin(pmax(p_marg, 1e-8), 1 - 1e-8),
     logit_p = qlogis(p_marg_clip)
   )
 
-grid_toby <- grid_base %>%
+grid_unexposed <- grid_base %>%
   mutate(
-    eta = a_toby + b_toby * V + c_toby * TS,
+    eta = a_unexposed + b_unexposed * (V - ctr_means["v_air_m_s"]) + c_unexposed * (TS - ctr_means["thermal_sensation"]),
     p_marg = vapply(
       eta,
-      function(e) mean(plogis(e + b0_draw_toby)),
+      function(e) mean(plogis(e + b0_draw_unexposed)),
       numeric(1)
     ),
     p_marg_clip = pmin(pmax(p_marg, 1e-8), 1 - 1e-8),
     logit_p = qlogis(p_marg_clip)
   )
 
-# Approximate closed-form equations ------------------------------------------
+# 5. Approximate closed-form equations
+m_approx_exposed  <- lm(logit_p ~ V + TS, data = grid_exposed)
+m_approx_unexposed <- lm(logit_p ~ V + TS, data = grid_unexposed)
 
-m_approx_liu  <- lm(logit_p ~ V + TS, data = grid_liu)
-m_approx_toby <- lm(logit_p ~ V + TS, data = grid_toby)
+# 6. approximation accuracy output
 
-summary(m_approx_liu)
-summary(m_approx_toby)
+grid_exposed <- grid_exposed %>%
+  mutate(p_hat = plogis(predict(m_approx_exposed, newdata = grid_exposed)))
 
-coef(m_approx_liu)
-coef(m_approx_toby)
+rmse_exposed <- sqrt(mean((grid_exposed$p_hat - grid_exposed$p_marg)^2))
+mae_exposed  <- mean(abs(grid_exposed$p_hat - grid_exposed$p_marg))
+r2_exposed   <- cor(grid_exposed$p_hat, grid_exposed$p_marg)^2
 
-# approximation accuracy
+c(RMSE_exposed = rmse_exposed, MAE_exposed = mae_exposed, R2_exposed = r2_exposed)
 
-grid_liu <- grid_liu %>%
-  mutate(p_hat = plogis(predict(m_approx_liu, newdata = grid_liu)))
+grid_unexposed <- grid_unexposed %>%
+  mutate(p_hat = plogis(predict(m_approx_unexposed, newdata = grid_unexposed)))
 
-rmse_liu <- sqrt(mean((grid_liu$p_hat - grid_liu$p_marg)^2))
-mae_liu  <- mean(abs(grid_liu$p_hat - grid_liu$p_marg))
-r2_liu   <- cor(grid_liu$p_hat, grid_liu$p_marg)^2
+rmse_unexposed <- sqrt(mean((grid_unexposed$p_hat - grid_unexposed$p_marg)^2))
+mae_unexposed  <- mean(abs(grid_unexposed$p_hat - grid_unexposed$p_marg))
+r2_unexposed   <- cor(grid_unexposed$p_hat, grid_unexposed$p_marg)^2
 
-c(RMSE_liu = rmse_liu, MAE_liu = mae_liu, R2_liu = r2_liu)
-
-grid_toby <- grid_toby %>%
-  mutate(p_hat = plogis(predict(m_approx_toby, newdata = grid_toby)))
-
-rmse_toby <- sqrt(mean((grid_toby$p_hat - grid_toby$p_marg)^2))
-mae_toby  <- mean(abs(grid_toby$p_hat - grid_toby$p_marg))
-r2_toby   <- cor(grid_toby$p_hat, grid_toby$p_marg)^2
-
-c(RMSE_toby = rmse_toby, MAE_toby = mae_toby, R2_toby = r2_toby)
+c(RMSE_unexposed = rmse_unexposed, MAE_unexposed = mae_unexposed, R2_unexposed = r2_unexposed)
 
 
 # Visualization for two models--------------------------------------------------
 # 1. grids for plotting closed-form equations
 
-cf_liu <- coef(m_approx_liu)
-cf_toby <- coef(m_approx_toby)
+cf_exposed <- coef(m_approx_exposed)
+cf_unexposed <- coef(m_approx_unexposed)
 
-plot_grid_liu <- expand_grid(
+plot_grid_exposed <- expand_grid(
   TS = seq(-3, 3, length.out = 300),
   V  = seq(0, 1, length.out = 300)
 ) %>%
   mutate(
-    eta = cf_liu[1] + cf_liu[2] * V + cf_liu[3] * TS,
+    eta = cf_exposed[1] + cf_exposed[2] * V + cf_exposed[3] * TS,
     PPD = 100 * plogis(eta)
   )
 
-plot_grid_toby <- expand_grid(
+plot_grid_unexposed <- expand_grid(
   TS = seq(-3, 3, length.out = 300),
   V  = seq(0, 1, length.out = 300)
 ) %>%
   mutate(
-    eta = cf_toby[1] + cf_toby[2] * V + cf_toby[3] * TS,
+    eta = cf_unexposed[1] + cf_unexposed[2] * V + cf_unexposed[3] * TS,
     PPD = 100 * plogis(eta)
   )
 
-p_liu  <- plot_draft_model(plot_grid_liu,"a.","Ankle Uncovered")
+p_exposed  <- plot_draft_model(plot_grid_exposed,"a.","Ankle Uncovered")
 
-p_toby <- plot_draft_model(plot_grid_toby,"b.","Ankle Covered")
+p_unexposed <- plot_draft_model(plot_grid_unexposed,"b.","Ankle Covered")
 
-model_final <- p_liu + p_toby +
+model_final <- p_exposed + p_unexposed +
   plot_layout(ncol = 1)
 ggsave(
   here::here("manuscript", "figs", "Model.png"),
@@ -997,18 +897,17 @@ ggsave(
 )
 
 
-# Save closed-form equations -----------------------------------------------
-
+# 2. Save closed-form equations
 model_formula <- tibble(
-  Model = c("Liu","Toby"),
+  Model = c("exposed","unexposed"),
   
-  Intercept = c(cf_liu[1], cf_toby[1]),
-  V_coef    = c(cf_liu[2], cf_toby[2]),
-  TS_coef   = c(cf_liu[3], cf_toby[3]),
+  Intercept = c(cf_exposed[1], cf_unexposed[1]),
+  V_coef    = c(cf_exposed[2], cf_unexposed[2]),
+  TS_coef   = c(cf_exposed[3], cf_unexposed[3]),
   
-  RMSE = c(rmse_liu, rmse_toby),
-  MAE  = c(mae_liu,  mae_toby),
-  R2   = c(r2_liu,   r2_toby)
+  RMSE = c(rmse_exposed, rmse_unexposed),
+  MAE  = c(mae_exposed,  mae_unexposed),
+  R2   = c(r2_exposed,   r2_unexposed)
 ) %>%
   mutate(
     eta = sprintf("%.4f + %.4f*V + %.4f*TS",Intercept, V_coef, TS_coef),
@@ -1017,5 +916,5 @@ model_formula <- tibble(
     )
   )
 
-rm(grid_base,grid_liu,grid_toby,Liumodel_calibrationcurve,m_approx_liu,m_approx_toby,
-   m_glmm_liu,m_glmm_toby,plot_grid_liu,plot_grid_toby)
+rm(grid_base,grid_exposed,grid_unexposed,Liumodel_calibrationcurve,m_approx_exposed,m_approx_unexposed,
+   m_glmm_exposed,m_glmm_unexposed,plot_grid_exposed,plot_grid_unexposed)
