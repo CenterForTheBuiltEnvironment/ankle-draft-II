@@ -41,13 +41,13 @@ plot_stacked_pct_ws <- function(data, var, palette) {
     drop_na({{ var }})
 
   ggplot(df, aes(x = workstation, fill = {{ var }})) +
-    geom_bar(position = "fill") +
+    geom_bar(position = position_fill(reverse = TRUE), show.legend = TRUE) +
     facet_wrap(~ session_sat) +
     scale_y_continuous(
       labels = percent,
       expand = expansion(mult = c(0, 0.01))
     ) +
-    scale_fill_manual(values = palette, labels = label_wrap_gen(width = 9)) +
+    scale_fill_manual(values = palette, labels = label_wrap_gen(width = 9), drop = FALSE) +
     labs(x = "Workstation", y = "No. of Subjects (%)") +
     theme_minimal(base_size = 7) +
     theme(
@@ -60,6 +60,18 @@ plot_stacked_pct_ws <- function(data, var, palette) {
       axis.ticks.y = element_line(color = "grey", linewidth = 0.25),
       axis.ticks.x = element_blank(),
       axis.ticks.length = unit(1, "mm")
+    ) +
+    guides(
+      fill = guide_legend(
+        reverse = TRUE,
+        ncol = 1,
+        byrow = TRUE,
+        label.position = "right",
+        keywidth = unit(7.5, "mm"),
+        keyheight = unit(5, "mm"),
+        label.hjust = 0,
+        label.vjust = 0.5
+      )
     )
 }
 
