@@ -125,6 +125,52 @@ plot_lmm <- function(dat, xterm, xlab, model) {
 }
 
 
+# Time Course Plot Functions ===================================================
+
+#' Plot mean +/- SD time course with workstation colors and session facets
+#'
+#' @param data Summary data frame with `plot_time_min`, `mean_value`, and `sd_value`
+#' @param y_lab Y-axis label
+#' @return ggplot object
+plot_timecourse_mean_sd <- function(data, y_lab) {
+  ggplot(data, aes(x = plot_time_min, y = mean_value, color = workstation, fill = workstation)) +
+    geom_ribbon(
+      aes(ymin = mean_value - sd_value, ymax = mean_value + sd_value),
+      alpha = 0.15,
+      linewidth = 0
+    ) +
+    geom_line(linewidth = 0.8) +
+    facet_grid(
+      tsk_site ~ session_type,
+      labeller = ggplot2::labeller(
+        session_type = c(
+          yosemite = "15C",
+          yellowstone = "17C",
+          sequoia = "19C"
+        )
+      )
+    ) +
+    scale_color_manual(values = workstation_palette, drop = FALSE) +
+    scale_fill_manual(values = workstation_palette, drop = FALSE) +
+    labs(
+      x = "Time (min)",
+      y = y_lab,
+      color = "Air speed",
+      fill = "Air speed"
+    ) +
+    theme_minimal(base_size = 7) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.x = element_text(margin = margin(t = 4)),
+      legend.position = "top",
+      strip.text = element_text()
+    )
+}
+
+
 # Statistical Comparison Plot Functions ========================================
 
 #' Plot paired t-test comparisons with boxplots
