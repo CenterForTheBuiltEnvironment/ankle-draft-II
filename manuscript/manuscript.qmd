@@ -511,6 +511,15 @@ Air movement preference responses indicated that a substantial proportion of par
 ![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width=75%}
 
 
+Ankle skin temperature ($T_{\text{sk}}$) provides a direct physiological indicator of the local response to ankle-level airflow under winter clothing. @fig-tsk presents, for each of the nine experimental conditions, both the absolute time course of ankle skin temperature during the formal exposure phase and its change relative to the pre-exposure adaptation baseline ($\Delta T_{\text{sk}}$).
+
+During the final 5-minute window of exposure, ankle skin temperature remained between 28.3 and 29.3°C across conditions. Within each supply air temperature, $T_{\text{sk}}$ decreased modestly as air speed increased: at 15°C, from 29.0°C at low speed to 28.5 and 28.6°C at medium and high speed, respectively; at 17°C, from 28.7°C to 28.5 and 28.3°C; and at 19°C, from 29.3°C to 28.9 and 28.8°C. After Benjamini–Hochberg (BH) correction for multiple comparisons, statistically significant differences at 15°C were observed between low and medium speed (mean difference = 0.5°C, Cohen's $d$ = 0.37, $p_{\text{adj}}$ = 0.035) and between low and high speed (0.5°C, $d$ = 0.34, $p_{\text{adj}}$ = 0.035). Overall, at a given supply air temperature, high air speed produced an additional steady-state reduction of about 0.4–0.5°C in ankle skin temperature relative to low speed.
+
+Using each participant's pre-exposure adaptation-period skin temperature as the baseline, $\Delta T_{\text{sk}}$ during the final 1 minute of exposure was negative under all conditions, ranging from −1.7 to −0.8°C. $\Delta T_{\text{sk}}$ was more sensitive to air speed than the absolute skin temperature: at 15°C, low, medium, and high speeds corresponded to $\Delta T_{\text{sk}}$ values of −1.0, −1.6, and −1.7°C, respectively; at 17°C, −1.0, −1.5, and −1.7°C; and at 19°C, −0.8, −1.2, and −1.6°C. After BH correction, the pattern of significance was consistent across the three supply air temperatures: low speed differed significantly from both medium and high speed (low vs. medium: $p_{\text{adj}} \le 0.020$, $d$ = 0.35–0.83; low vs. high: $p_{\text{adj}} < 0.001$, $d$ = 0.61–0.92), whereas the difference between medium and high speed reached significance only at 19°C ($p_{\text{adj}}$ = 0.012, $d$ = 0.40) and not at 15°C or 17°C ($p_{\text{adj}}$ = 0.268 and 0.146).
+
+
+![Time course of ankle skin temperature during the formal exposure phase across the nine experimental conditions: (a) absolute skin temperature; (b) change relative to the adaptation-period baseline, $\Delta T_{\text{sk}}$. Shaded bands denote the between-subject mean ± 1 SD.](figs/tsk_p.png){#fig-tsk width=90%}
+
 
 ## Dissatisfaction with ankle draft
 
@@ -519,12 +528,14 @@ Air movement preference responses indicated that a substantial proportion of par
 - Define binary outcome (matching Liu et al. definition)
 - Observed dissatisfaction rates by condition (table or figure)
 - Comparison with Liu et al. model predictions:
-  - Apply Liu et al. model to observed conditions → predicted PPD
+  - Apply Liu et al. model to observed conditions to obtain predicted PPD
   - Compare predicted vs. observed dissatisfaction rates
   - Figure: Predicted vs. observed, or overlay on Liu et al. PPD contour plot
 - Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing? Hypothesis: Yes, it doesn't work well and should be updated using the entire dataset
 -->
 ```
+
+Under winter clothing conditions (0.75 clo), the observed dissatisfaction rate caused by ankle-level air movement is substantially lower than that predicted by the model of Liu et al.[@liuPredictedPercentageDissatisfied2017]. While the Liu's model demonstrates acceptable discriminative performance on this dataset (AUC = 0.847), indicating its ability to distinguish between high- and low-risk conditions, its calibration results (intercept = −1.67, slope = 1.20) and Brier score (0.155) both suggest a systematic overestimation under winter clothing conditions. Across all nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu's model predicted an average of 36%, corresponding to an overestimation by approximately 2.8 times. This overestimation is most pronounced under high air velocity conditions. At 15°C with high air speed, the predicted dissatisfaction rate was 58.4%, compared to an observed value of only 19.1%; at 17°C and 19°C under high air speed, the differences were 32.0% and 33.7%, respectively. Under low air speed, the discrepancy is smaller but still ranges from 8.0% to 14.6%.
 
 ## Updated model for winter conditions
 
@@ -540,18 +551,17 @@ Air movement preference responses indicated that a substantial proportion of par
 
 # Discussion
 
-The primary finding of this study is \[summary of main result regarding
-winter clothing effect on ankle draft sensitivity\].
-
 ## Comparison with prior research
 
-```{=html}
-<!--
-- How do results compare to Liu et al. (2017) and Schiavon et al. (2016)?
-- Quantify the difference: e.g., "Observed dissatisfaction was X% lower than predicted by the current model"
-- Discuss whether this difference is practically meaningful
--->
-```
+The core finding of this study is that, under winter clothing conditions (0.75 clo), the observed dissatisfaction rate caused by ankle-level air movement is substantially lower than that predicted by the model of @liuPredictedPercentageDissatisfied2017. Compared with @schiavonSensationDraftUncovered2016, the overall dissatisfaction rates in this study are lower. Their study, which involved subjects with exposed ankles and lower legs wearing approximately 0.6 clo summer clothing, reported unacceptable rates ranging from 23% to 57%. In contrast, under ankle-covered conditions (≥0.75 clo) in this study, airflow unacceptability ranges from 6% to 20%.
+
+GLMM Model coefficients further support these findings. The most prominent difference between the two models lies in the intercept: the intercept of the covered model (−3.54) is 1.13 units lower than that of the exposed model (−1.64), reflecting a substantial reduction in baseline dissatisfaction risk due to winter clothing. Additionally, the air speed coefficient (V) in the covered model (2.62) is smaller than that in the exposed model (3.51), indicating reduced sensitivity of dissatisfaction to air velocity under winter clothing conditions. These results support a hypothesis proposed but not tested in @liuPredictedPercentageDissatisfied2017, that increased lower-body clothing insulation significantly reduces ankle draft dissatisfaction.
+
+These conclusions are consistent with several previous studies. @zhouDraughtSensationAssessment2022 reported that, in stratified heating environments, high-top shoes increased ankle airflow acceptability by approximately 15%, indicating that ankle coverage significantly reduces sensitivity to airflow. Similarly, Toftum and Nielsen found that, at the same air velocity, subjects with a cooler overall thermal sensation are more likely to perceive airflow as uncomfortable, suggesting that when clothing insulation is higher, the influence of ambient temperature and its interaction with airflow on perceived discomfort is attenuated [@toftumDraughtSensitivityInfluenced1996].
+
+Regarding predictor selection, this study explored the inclusion of additional variables; however, aside from clothing condition, only overall thermal sensation and air speed (V) were found to have significant effects on dissatisfaction, consistent with the model structures reported by @toftumDraughtSensitivityInfluenced1996 and @liuPredictedPercentageDissatisfied2017. @chengExperimentalStudyDraftrelated2023 also identified a relationship between overall thermal sensation and draft rate thresholds in stratified ventilation experiments, further supporting the use of overall thermal sensation as a predictor. However, although the dataset used by @liuPredictedPercentageDissatisfied2017 included both exposed and covered ankle conditions under summer clothing, no significant clothing effect was identified. This discrepancy may be attributed to their use of standard logistic regression, which pooled all observations across subjects and failed to account for the non-independence introduced by repeated measures, thereby masking the effect of clothing as a between-subject variable due to inter-individual variability.
+
+
 
 ## Mechanisms
 
@@ -559,13 +569,18 @@ winter clothing effect on ankle draft sensitivity\].
 <!--
 - Why might covered ankles respond differently?
 - Thermal insulation of clothing reducing convective heat loss
-- Reduced skin exposure → less direct air contact
+- Reduced skin exposure and less direct air contact
 - Possible psychological factors (feeling "protected")
 - Relate to skin temperature findings if included
 -->
 ```
 
-## Implications for building design
+The ankle skin temperature ($T_{\text{sk}}$) results indicate that winter clothing does not completely block the effect of airflow on the ankle, but it exerts a substantial attenuating effect. During the final 5-minute steady-state period, a significant reduction in ankle skin temperature was observed only at 15°C, where medium and high air speeds were significantly lower than the low speed condition. At 17°C and 19°C, variations in air speed did not result in significant differences in skin temperature. In addition, no significant differences were found between medium and high air speed conditions at any of the three supply temperatures. That is, only when the environmental contrast is sufficiently pronounced can the local cooling effect of airflow on the ankle be detected in steady-state skin temperature. From a thermophysiological perspective, changes in thermal sensation are more likely to be associated with rapid variations in skin temperature [@ChoiInvestigationHumanBody2012; @KenshaloCoolThresholds1968]. In this study, ankle $\Delta T_{\text{sk}}$ was calculated relative to the baseline adaptation period. The results show that, across all supply air temperatures, the differences in $\Delta T_{\text{sk}}$ between low and medium/high air speed conditions were statistically significant (effect size $d \approx 0.6\text{--}0.9$). Consistent with this, under the 15°C condition, local ankle thermal sensation at medium and high speeds was significantly lower than at low speed, with changes aligned in direction with the observed skin temperature reductions. Notably, no significant differences were observed across conditions in terms of air movement acceptability. In other words, although variations in air speed produced measurable shifts in both skin temperature and local thermal sensation, the magnitude of these changes appears insufficient, within the tested speed range, to generate distinguishable differences in dissatisfaction rates. From a heat transfer perspective, clothing coverage increases local thermal resistance and reduces convective heat exchange between the body and ambient airflow [@lee3DQuantificationMicroclimate2007]. This insulating effect likely suppresses both the magnitude and variability of skin temperature reduction, making it more difficult for the human body to cross the thresholds that trigger discomfort.
+
+In addition, ankle coverage may influence airflow acceptability through psychological pathways, such as altered risk perception or attentional allocation. Occupants may perceive themselves as “protected” due to wearing thicker clothing on the lower body, which could increase tolerance to local airflow. Previous studies have shown that providing occupants with temperature information or “group perception feedback” can positively improve thermal comfort evaluations, suggesting that thermal perception is not solely determined by physical stimuli but is also modulated by expectations and informational cues [@zhangGroupPerceptionFeedback2022]. Similarly, research on thermal expectation indicates that expectation levels themselves influence thermal perception and evaluation [@schweikerThermalExpectation2020]. Field studies in winter conditions have also identified associations between perceived control and thermal comfort or satisfaction [@xuPerceivedControlWinter2021]. These findings suggest that the subjective perception of being “alreday protected” or “more in control” due to ankle coverage may enhance tolerance to local airflow. However, this psychological pathway was not directly measured in the present study and requires further investigation through controlled manipulation of coverage conditions alongside measurements of expectation, attention, and perceived control.
+
+
+## Implications for building design and standards
 
 ```{=html}
 <!--
@@ -576,15 +591,15 @@ winter clothing effect on ankle draft sensitivity\].
 -->
 ```
 
-## Relationship to standards
+The ankle draft model proposed by @liuPredictedPercentageDissatisfied2017 has been incorporated into ASHRAE-55 as a basis for assessing ankle-level draft risk. However, this model does not distinguish between covered and uncovered ankle conditions in its formulation. Given that ASHRAE specifies an acceptable overall thermal sensation range of PMV = −0.5 to +0.5, the current standard requires ankle-level air velocity V_{\text{ankle}} < 0.22 \, \text{m/s} (corresponding to <20% dissatisfied) when TS = −0.5. This constraint may be overly conservative in practical winter conditions in office buildings.
 
-```{=html}
-<!--
-- How do findings relate to current ASHRAE 55 ankle draft criteria?
-- Should the standard include clothing-specific adjustments?
-- Recommendations for standards committees
--->
-```
+Based on empirical algorithms considering window surface temperature, window size, and occupant distance from the façade, the maximum downdraft velocity at approximately 1 m from a window is around 0.25 m/s. Under milder outdoor conditions or with smaller window areas, peak velocities are often predicted to fall within the range of 0.1–0.2 m/s [@lyonsWindowPerformanceHuman1999]. Within this context, for the winter perimeter conditions examined in this study (air velocity 0.1–0.7 m/s, supply air temperature 15–19°C), the covered model developed here suggests that ankle-level dissatisfaction remains within acceptable limits under many typical winter scenarios. Therefore, the single-threshold constraint in ASHRAE, based on the Liu model, may lead to conservative design decisions regarding the sizing or necessity of perimeter heating or reheat systems. From an energy and system sizing perspective, perimeter heating systems are often nontrivial in both cost and energy use. For example, commercial electric 
+perimeter heaters typically have a rated power density of approximately 150–250 W/ft (≈490–820 W/m) [@stelproCommercialBaseboardCBF2026]. For a continuous 10 m window perimeter, this corresponds to an installed capacity of roughly 5–8 kW. If “covered” (≥0.75 clo) and “uncovered” (<0.5 clo) scenarios are evaluated separately, it may be possible to relax ankle-level air speed limits under winter clothing conditions, thereby reducing unnecessary perimeter heating deployment and operation, and unlocking energy-saving potential and cost reductions.
+
+In practical applications, the model proposed in this study is consistent with the framework of the ankle draft model in ASHRAE. By constraining overall thermal sensation within the range of −0.5 to +0.5 and adopting a dissatisfaction threshold of <20%, acceptable air velocity limits can be derived.
+
+Within this near-neutral thermal range, the Predicted Mean Vote (PMV) model provides relatively reliable predictions of overall thermal sensation. Therefore, PMV can be used as a proxy for overall thermal sensation during the design or evaluation stage. After specifying the ankle exposure condition (covered vs. uncovered), the corresponding model can then be applied to determine the acceptable range of ankle-level air speed.
+
 
 ## Limitations
 
