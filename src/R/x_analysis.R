@@ -10,6 +10,61 @@ source(here::here("src", "R", "x_func.R"))
 source(here::here("src", "R", "x_data.R"))
 source(here::here("src", "R", "x_stat.R"))
 
+# ==============================================================================
+# 0. Round Counts (per subject)
+# ==============================================================================
+#
+# Definition (per latest processing rule):
+# - Workstation round = one `clothing_change` response (workstation != adaptation)
+# - Adaptation round  = one `thermal_comfort` response during `adaptation`
+#
+# We count unique timestamps to avoid double-counting duplicates.
+
+rounds_by_subject_session <- dplyr::full_join(
+  survey %>%
+    dplyr::filter(question == "clothing_change", workstation != "adaptation") %>%
+    dplyr::group_by(subject_id, session_id) %>%
+    dplyr::summarise(
+      n_workstation_rounds = dplyr::n_distinct(timestamp),
+      .groups = "drop"
+    ),
+  survey %>%
+    dplyr::filter(question == "thermal_comfort", workstation == "adaptation") %>%
+    dplyr::group_by(subject_id, session_id) %>%
+    dplyr::summarise(
+      n_adaptation_rounds = dplyr::n_distinct(timestamp),
+      .groups = "drop"
+    ),
+  by = c("subject_id", "session_id")
+) %>%
+  dplyr::mutate(
+    n_workstation_rounds = tidyr::replace_na(n_workstation_rounds, 0L),
+    n_adaptation_rounds = tidyr::replace_na(n_adaptation_rounds, 0L),
+    n_rounds_total = n_workstation_rounds + n_adaptation_rounds
+  ) %>%
+  dplyr::arrange(subject_id, session_id)
+
+rounds_by_subject <- rounds_by_subject_session %>%
+  dplyr::group_by(subject_id) %>%
+  dplyr::summarise(
+    n_sessions = dplyr::n_distinct(session_id),
+    n_workstation_rounds = sum(n_workstation_rounds, na.rm = TRUE),
+    n_adaptation_rounds = sum(n_adaptation_rounds, na.rm = TRUE),
+    n_rounds_total = sum(n_rounds_total, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(dplyr::desc(n_rounds_total), subject_id)
+
+write_csv(
+  rounds_by_subject_session,
+  here::here("manuscript", "tables", "rounds_by_subject_session.csv")
+)
+
+write_csv(
+  rounds_by_subject,
+  here::here("manuscript", "tables", "rounds_by_subject.csv")
+)
+
 
 # ==============================================================================
 # 1. Demographics & Environmental Conditions
@@ -1022,5 +1077,220 @@ model_formula <- tibble(
     )
   )
 
-rm(grid_base,grid_exposed,grid_unexposed,Liumodel_calibrationcurve,m_approx_exposed,m_approx_unexposed,
-   m_glmm_exposed,m_glmm_unexposed,plot_grid_exposed,plot_grid_unexposed)
+
+# Skin Temperature--------------------------------------------------
+
+
+# 1) Ankle skin temperature change curve（mean +/- SD ribbon） -------------------------------------------
+# Although the raw data were also recorded every 10 seconds, 
+# re-binned them into 10-second intervals here to 
+# avoid slight misalignment in sampling timestamps across subjects.
+time_bin_s <- 10
+
+tsk_timecourse <- tsk_ankle %>%
+  dplyr::left_join(
+    sessions %>%
+      dplyr::select(session_id, session_type, session_sat) %>%
+      dplyr::distinct(),
+    by = "session_id"
+  ) %>%
+  dplyr::mutate(
+    plot_time_s = as.numeric(difftime(timestamp, anchor_time, units = "secs"))
+  ) %>%
+  dplyr::rename(interval_phase = interval_type) %>%
+  dplyr::select(
+    subject_id, session_id, session_type, session_sat, round_id, workstation, tsk_site,
+    interval_phase, anchor_time, timestamp, tsk_c, plot_time_s
+  )
+
+tsk_timecourse_subject <- tsk_timecourse %>%
+  dplyr::mutate(
+    plot_time_s_bin = time_bin_s * floor(plot_time_s / time_bin_s),
+    plot_time_min = plot_time_s_bin / 60
+  ) %>%
+  dplyr::group_by(
+    subject_id, session_id, session_type, workstation, tsk_site,
+    plot_time_s_bin, plot_time_min
+  ) %>%
+  dplyr::summarise(
+    tsk_c = mean(tsk_c, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+tsk_timecourse_summary <- tsk_timecourse_subject %>%
+  dplyr::group_by(session_type, workstation, tsk_site, plot_time_s_bin, plot_time_min) %>%
+  dplyr::summarise(
+    mean_value = mean(tsk_c, na.rm = TRUE),
+    sd_value = sd(tsk_c, na.rm = TRUE),
+    n = dplyr::n_distinct(subject_id),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(session_type, workstation, tsk_site, plot_time_s_bin)
+
+tsk_timecourse_p <- plot_timecourse_mean_sd(
+  tsk_timecourse_summary,
+  y_lab = "Skin temperature (°C)"
+) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.4) +
+  geom_segment(
+    data = tibble::tibble(x = c(0, 5, 10, 15, 20)),
+    aes(
+      x = x, xend = x,
+      y = -Inf, yend = -Inf
+    ),
+    inherit.aes = FALSE,
+    linewidth = 0.3,
+    color = "grey30",
+    lineend = "butt"
+  ) +
+  scale_x_continuous(
+    breaks = c(-10, 0, 5, 10, 15, 20),
+    labels = c("Adaptation", "0", "5", "10", "15", "20"),
+    limits = c(-20, 20)
+  )
+
+# 2) Stable skin temperature (last 5 minutes) ----------------------------------
+
+# the skin temperature during the last 5 minutes is treated as the “stable” value
+tsk_stable_last5 <- tsk_timecourse %>%
+  dplyr::filter(interval_phase == "Workstation", plot_time_s > 15 * 60, plot_time_s <= 20 * 60) %>%
+  dplyr::group_by(subject_id, session_id, round_id, workstation, tsk_site) %>%
+  dplyr::summarise(
+    mean_last5_c = mean(tsk_c, na.rm = TRUE),
+    sd_last5_c = sd(tsk_c, na.rm = TRUE),
+    n_obs = dplyr::n(),
+    .groups = "drop"
+  ) %>%
+  dplyr::left_join(
+    sessions %>% dplyr::select(session_id, session_sat) %>% dplyr::distinct(),
+    by = "session_id"
+  )
+
+tsk_last5_paired_ttest <- paired_t_test(
+  data = tsk_stable_last5,
+  group_by_var = "session_sat",
+  within_var = "tsk_site",
+  subject_var = "subject_id",
+  question_var = "workstation",
+  value_var = "mean_last5_c"
+)
+
+# 3) Time course relative to pre-workstation thermal comfort baseline ----------
+
+# kin temperature was divided into the “formal experiment period” and the “adaptation period” 
+# based on the 0-20 min and 20-40 min intervals preceding the final response.
+# I also considered defining the “adaptation period” as the 20 min preceding the last response during adaptation. 
+# However, because response speed varied across participants, this introduced a small fluctuation in skin temperature 
+# at the transition between the two periods.
+
+baseline_values <- tsk_timecourse %>%
+  dplyr::filter(interval_phase == "Adaptation") %>%
+  dplyr::group_by(subject_id, session_id, round_id, workstation, tsk_site, anchor_time) %>%
+  dplyr::slice_min(
+    order_by = abs(as.numeric(difftime(timestamp, anchor_time, units = "secs"))),
+    n = 1
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::transmute(
+    subject_id,
+    session_id,
+    round_id,
+    workstation,
+    tsk_site,
+    anchor_time,
+    baseline_timestamp = timestamp,
+    baseline_tsk_c = tsk_c,
+    baseline_gap_s = abs(as.numeric(difftime(timestamp, anchor_time, units = "secs")))
+  )
+
+tsk_timecourse_delta <- tsk_timecourse %>%
+  dplyr::filter(interval_phase == "Workstation", plot_time_s >= 0, plot_time_s <= 20 * 60) %>%
+  dplyr::left_join(
+    baseline_values,
+    by = c("subject_id", "session_id", "round_id", "workstation", "tsk_site", "anchor_time")
+  ) %>%
+  dplyr::mutate(delta_tsk_c = tsk_c - baseline_tsk_c)
+
+tsk_timecourse_delta_subject <- tsk_timecourse_delta %>%
+  dplyr::mutate(
+    plot_time_s_bin = time_bin_s * floor(plot_time_s / time_bin_s),
+    plot_time_min = plot_time_s_bin / 60
+  ) %>%
+  dplyr::group_by(
+    subject_id, session_id, session_type, workstation, tsk_site,
+    plot_time_s_bin, plot_time_min
+  ) %>%
+  dplyr::summarise(
+    delta_tsk_c = mean(delta_tsk_c, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+tsk_timecourse_delta_summary <- tsk_timecourse_delta_subject %>%
+  dplyr::group_by(session_type, workstation, tsk_site, plot_time_s_bin, plot_time_min) %>%
+  dplyr::summarise(
+    mean_value = mean(delta_tsk_c, na.rm = TRUE),
+    sd_value = sd(delta_tsk_c, na.rm = TRUE),
+    n = dplyr::n_distinct(subject_id),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(session_type, workstation, tsk_site, plot_time_s_bin)
+
+# 4) Delta skin temperature in the last minute (19-20 min) --------------------
+
+# To compare delta skin temperature across different conditions, 
+# the delta skin temperature during the last 1 minute is defined
+# as the final value for paired-sample t-tests.
+tsk_delta_last1 <- tsk_timecourse_delta %>%
+  dplyr::filter(plot_time_s > 19 * 60, plot_time_s <= 20 * 60) %>%
+  dplyr::group_by(subject_id, session_id, session_sat, workstation, tsk_site) %>%
+  dplyr::summarise(
+    mean_delta_last1_c = mean(delta_tsk_c, na.rm = TRUE),
+    sd_delta_last1_c = sd(delta_tsk_c, na.rm = TRUE),
+    n_obs = dplyr::n(),
+    .groups = "drop"
+  )
+
+tsk_delta_last1_paired_ttest <- paired_t_test(
+  data = tsk_delta_last1,
+  group_by_var = "session_sat",
+  within_var = "tsk_site",
+  subject_var = "subject_id",
+  question_var = "workstation",
+  value_var = "mean_delta_last1_c"
+)
+
+tsk_timecourse_delta_p <- plot_timecourse_mean_sd(
+  tsk_timecourse_delta_summary,
+  y_lab = expression(Delta * "Skin temperature from baseline (" * degree * "C)")
+) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.4) +
+  scale_x_continuous(breaks = seq(0, 20, by = 5), limits = c(0, 20)) +
+  theme(legend.position = "none")
+
+tsk_p <- (tsk_timecourse_p / tsk_timecourse_delta_p) +
+  plot_annotation(tag_levels = "a", tag_suffix = ".") &
+  theme(
+    plot.subtitle = element_text(hjust = 0.05, margin = margin(b = 3, unit = "mm")),
+    plot.tag = element_text(size = 7, face = "bold"),
+    plot.margin = margin(b = 5, unit = "mm"),
+    axis.title = element_text(margin = margin(r = 2, unit = "mm")),
+    legend.margin = margin(l = 3, unit = "mm")
+  )
+
+ggsave(
+  here::here("manuscript", "figs", "tsk_p.png"),
+  plot = tsk_p,
+  dpi = 500,
+  width = double_col_width,
+  height = 120,
+  units = "mm",
+  bg = "transparent"
+)
+
+rm(
+  grid_base, grid_exposed, grid_unexposed, Liumodel_calibrationcurve,
+  m_approx_exposed, m_approx_unexposed, m_glmm_exposed, m_glmm_unexposed,
+  plot_grid_exposed, plot_grid_unexposed,
+  tsk_ankle, tsk_timecourse,
+  baseline_values, tsk_timecourse_delta
+)
