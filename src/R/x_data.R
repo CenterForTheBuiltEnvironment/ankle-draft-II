@@ -57,18 +57,19 @@ env <- read_csv(
   )
 
 # Limit env to session times using interval overlap join
-setDT(env)
-setDT(sessions)
+# NOTE: use local data.table copies to avoid modifying `sessions`/`env` in-place
+env_dt <- data.table::as.data.table(env)
+sessions_dt <- data.table::as.data.table(sessions)
 
-env[, `:=`(
+env_dt[, `:=`(
   session_time_start = timestamp,
   session_time_end = timestamp
 )]
 
-setkey(sessions, session_time_start, session_time_end)
-setkey(env, session_time_start, session_time_end)
+data.table::setkey(sessions_dt, session_time_start, session_time_end)
+data.table::setkey(env_dt, session_time_start, session_time_end)
 
-env <- foverlaps(env, sessions, nomatch = 0L) %>%
+env <- foverlaps(env_dt, sessions_dt, nomatch = 0L) %>%
   dplyr::select(
     "timestamp", "session_id", "session_type", "session_sat",
     "t_air_c", "rh_percent", "co2_ppm", "pm25_ug_m3",
@@ -86,6 +87,8 @@ env_sessions <- env %>%
     ) %>%
       dplyr::mutate(across(where(is.numeric), \(x) round(x, 2)))
   )
+
+rm(env_dt, sessions_dt)
 
 
 # Airflow Measurements =========================================================
@@ -166,55 +169,13 @@ rm(sessions_for_airflow, airflow_with_sessions, airflow_sessions_dot_mean)
 
 # Skin Temperature Measurements ================================================
 
-tsk <- read_csv(
+tsk_raw <- read_csv(
   here::here("data", "01-processed", "tsk", "tsk_combined.csv"),
   col_types = col_tsk
 ) %>%
   janitor::clean_names() %>%
   dplyr::mutate(
     timestamp = lubridate::force_tz(timestamp, tz = "America/Los_Angeles")
-  )
-
-# Add session metadata via interval join
-setDT(tsk)
-setDT(sessions)
-
-tsk[, timestamp := as.POSIXct(timestamp)]
-sessions[, c("session_time_start", "session_time_end") :=
-           lapply(.SD, as.POSIXct),
-         .SDcols = c("session_time_start", "session_time_end")
-]
-
-tsk[, session_id := NA_character_]
-tsk[sessions,
-    on = .(
-      timestamp >= session_time_start,
-      timestamp <= session_time_end
-    ),
-    session_id := i.session_id
-]
-
-tsk <- tsk %>%
-  dplyr::left_join(
-    sessions %>% select(session_id, session_type) %>% distinct(),
-    by = "session_id"
-  ) %>%
-  dplyr::arrange(session_id, subject_id, tsk_sensing_location, timestamp) %>%
-  # Add running_time_s column
-  dplyr::group_by(subject_id, session_id) %>%
-  dplyr::mutate(
-    delta = as.numeric(difftime(timestamp, lag(timestamp), units = "secs")),
-    delta = replace_na(delta, 0),
-    running_time_s = cumsum(delta)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(
-    running_time = if_else(is.na(session_id), NA_real_, running_time_s)
-  ) %>%
-  dplyr::select(-delta, -running_time) %>%
-  dplyr::filter(running_time_s > 0) %>%
-  dplyr::select(
-    timestamp, session_id, session_type, running_time_s, everything()
   )
 
 
@@ -253,8 +214,92 @@ survey <- read_csv(
     session_id, session_date, session_sat, workstation, everything()
   ) %>%
   dplyr::mutate(
-    timestamp = lubridate::as_datetime(timestamp, tz = "America/Los_Angeles")
+    # Parse survey timestamps as *local* Pacific time without any hidden shifting.
+    # This does NOT modify any global/system timezone; it only affects this column.
+    timestamp = lubridate::ymd_hms(timestamp, tz = "America/Los_Angeles")
   )
+
+
+# Workstation assignment for tsk ===============================================
+#
+# Goal: label each skin-temperature point using the same round structure as the
+# current skin-temperature analysis:
+# - One workstation round is defined by each `clothing_change` response
+# - The workstation interval is the 20 minutes before that response
+# - The paired adaptation interval is the 20 minutes immediately before the
+#   workstation interval
+#
+# Note: consecutive rounds can overlap. Because `tsk` stores a single label per
+# row, overlapping points are assigned with workstation taking precedence over
+# adaptation.
+
+window_m <- 20
+
+tsk_round_windows <- survey %>%
+  dplyr::filter(
+    question == "clothing_change",
+    workstation != "adaptation"
+  ) %>%
+  dplyr::arrange(subject_id, session_id, timestamp) %>%
+  dplyr::group_by(subject_id, session_id) %>%
+  dplyr::mutate(round_id = dplyr::row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::transmute(
+    subject_id,
+    session_id,
+    round_id,
+    workstation,
+    anchor_time = timestamp - lubridate::minutes(window_m),
+    clothing_change_time = timestamp
+  )
+
+tsk_ws_intervals_all <- dplyr::bind_rows(
+  tsk_round_windows %>%
+    dplyr::transmute(
+      subject_id,
+      session_id,
+      round_id,
+      anchor_time,
+      ws_time_start = anchor_time - lubridate::minutes(window_m),
+      ws_time_end = anchor_time,
+      workstation,
+      interval_type = "Adaptation",
+      interval_priority = 1L
+    ),
+  tsk_round_windows %>%
+    dplyr::transmute(
+      subject_id,
+      session_id,
+      round_id,
+      anchor_time,
+      ws_time_start = anchor_time,
+      ws_time_end = clothing_change_time,
+      workstation,
+      interval_type = "Workstation",
+      interval_priority = 2L
+    )
+) %>%
+  dplyr::arrange(
+    subject_id, session_id, ws_time_start, ws_time_end, interval_priority
+  )
+
+tsk_ankle <- tsk_raw %>%
+  dplyr::filter(tsk_sensing_location == "A") %>%
+  dplyr::mutate(tsk_site = factor("Ankle", levels = "Ankle")) %>%
+  dplyr::inner_join(
+    tsk_ws_intervals_all,
+    by = c("subject_id", "session_id"),
+    relationship = "many-to-many"
+  ) %>%
+  dplyr::filter(timestamp >= ws_time_start, timestamp < ws_time_end) %>%
+  dplyr::arrange(subject_id, session_id, timestamp, dplyr::desc(interval_priority)) %>%
+  dplyr::distinct(subject_id, session_id, timestamp, tsk_site, .keep_all = TRUE) %>%
+  dplyr::select(
+    subject_id, session_id, round_id, workstation, interval_type,
+    anchor_time, ws_time_start, ws_time_end, timestamp, tsk_site, tsk_c
+  )
+
+rm(tsk_raw, tsk_round_windows)
 
 
 # Analysis Dataframe ===========================================================
@@ -345,29 +390,32 @@ analysis <- analysis %>%
 # Subject ip043 submitted duplicate votes for the same workstation in some
 # sessions due to an experimental operating mistake. We detect true duplicates
 # as votes for the same subject-session-workstation-question.
-# Kept the first observation and removed the second one.
+# Keep the last observation and remove earlier duplicates.
 
 analysis <- analysis %>%
   dplyr::arrange(session_id, subject_id, workstation, question, timestamp) %>%
   dplyr::group_by(session_id, subject_id, workstation, question) %>%
-  dplyr::mutate(row_in_group = dplyr::row_number()) %>%
+  dplyr::mutate(
+    row_in_group = dplyr::row_number(),
+    n_in_group = dplyr::n()
+  ) %>%
   dplyr::ungroup() 
 
 n_duplicates <- sum(
-  analysis$row_in_group > 1 & analysis$workstation != "adaptation",
+  analysis$n_in_group > 1 & analysis$workstation != "adaptation",
   na.rm = TRUE
 )
 
 if (n_duplicates > 0) {
   message(
     "  - Duplicate votes detected: ", n_duplicates,
-    " (keeping first response only)"
+    " (keeping last response only)"
   )
 }
 
 analysis <- analysis %>%
-  dplyr::filter(workstation == "adaptation" | row_in_group == 1) %>%
-  dplyr::select(-row_in_group)
+  dplyr::filter(workstation == "adaptation" | row_in_group == n_in_group) %>%
+  dplyr::select(-row_in_group, -n_in_group)
 
 rm(n_duplicates)
 
