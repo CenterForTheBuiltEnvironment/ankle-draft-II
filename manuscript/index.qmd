@@ -30,6 +30,8 @@ filters:
   - authors-block
 
 date: "`r Sys.Date()`"
+project:
+  output-dir: docs
 format:
   docx:
     link-citations: true
@@ -37,6 +39,7 @@ format:
     toc: false
     number-sections: true
   html:
+    output-file: "index.html"
     toc: true
     number-sections: true
     theme: cosmo
@@ -515,6 +518,8 @@ Air movement preference responses indicated that a substantial proportion of par
 ![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width=75%}
 
 
+### Skin temperature
+
 Ankle skin temperature ($T_{\text{sk}}$) provides a direct physiological indicator of the local response to ankle-level airflow under winter clothing. @fig-tsk presents, for each of the nine experimental conditions, both the absolute time course of ankle skin temperature during the formal exposure phase and its change relative to the pre-exposure adaptation baseline ($\Delta T_{\text{sk}}$).
 
 During the final 5-minute window of exposure, ankle skin temperature remained between 28.3 and 29.3°C across conditions. Within each supply air temperature, $T_{\text{sk}}$ decreased modestly as air speed increased: at 15°C, from 29.0°C at low speed to 28.5 and 28.6°C at medium and high speed, respectively; at 17°C, from 28.7°C to 28.5 and 28.3°C; and at 19°C, from 29.3°C to 28.9 and 28.8°C. After Benjamini–Hochberg (BH) correction for multiple comparisons, statistically significant differences at 15°C were observed between low and medium speed (mean difference = 0.5°C, Cohen's $d$ = 0.37, $p_{\text{adj}}$ = 0.035) and between low and high speed (0.5°C, $d$ = 0.34, $p_{\text{adj}}$ = 0.035). Overall, at a given supply air temperature, high air speed produced an additional steady-state reduction of about 0.4–0.5°C in ankle skin temperature relative to low speed.
@@ -527,17 +532,23 @@ Using each participant's pre-exposure adaptation-period skin temperature as the 
 
 ## Dissatisfaction with ankle draft
 
-```{=html}
-<!--
-- Define binary outcome (matching Liu et al. definition)
-- Observed dissatisfaction rates by condition (table or figure)
-- Comparison with Liu et al. model predictions:
-  - Apply Liu et al. model to observed conditions to obtain predicted PPD
-  - Compare predicted vs. observed dissatisfaction rates
-  - Figure: Predicted vs. observed, or overlay on Liu et al. PPD contour plot
-- Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing? Hypothesis: Yes, it doesn't work well and should be updated using the entire dataset
--->
+```{r}
+#| label: setup-results-data
+#| echo: false
+#| message: false
+
+# Converting decimals to percentages and rounding for cleaner inline text
+res <- model_comparison_d %>%
+  mutate(across(c(ppd_liu_mean, dissatisfied_rate, diff), ~ round(.x * 100, 1)))
 ```
+
+@fig-model-comp compares the dissatisfaction rate predicted by the Liu model with the observations during our experiment. Across all tested conditions, the existing model consistently overpredicted local thermal dissatisfaction compared to the observed rates. At an ankle temperature of 15°C, the discrepancy between predicted and observed rates increased significantly with air speed: at low flow (0.2 m/s), the difference was `r res$diff[1]` percentage points (pp), rising to `r res$diff[3]` pp at high flow (0.6 m/s).
+
+Similar trends were observed at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the predicted PPD was `r res$ppd_liu_mean[9]`%, while the actual dissatisfied rate was only `r res$dissatisfied_rate[9]`%, resulting in a mean overestimation of `r res$diff[9]` pp. On average across all experimental sessions, the model overpredicted dissatisfaction by `r round(mean(res$diff), 1)` pp.
+
+
+![Comparison of predicted and observed local thermal dissatisfaction across varying ankle-level temperatures and air speeds. The dumbbell plot illustrates the discrepancy (diff) between the Liu model predictions (ppd_liu_mean) and the actual observed dissatisfied rates (dissatisfied_rate). Experimental conditions include air speeds of approximately 0.2 m/s (low), 0.4 m/s (medium), and 0.6 m/s (high). Points represent mean values, with the segment length indicating the magnitude of model overestimation.](figs/model_error.png){#fig-model-comp width=90%}
+
 
 Under winter clothing conditions (0.75 clo), the observed dissatisfaction rate caused by ankle-level air movement is substantially lower than that predicted by the model of Liu et al.[@liuPredictedPercentageDissatisfied2017]. While the Liu's model demonstrates acceptable discriminative performance on this dataset (AUC = 0.847), indicating its ability to distinguish between high- and low-risk conditions, its calibration results (intercept = −1.67, slope = 1.20) and Brier score (0.155) both suggest a systematic overestimation under winter clothing conditions. Across all nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu's model predicted an average of 36%, corresponding to an overestimation by approximately 2.8 times. This overestimation is most pronounced under high air velocity conditions. At 15°C with high air speed, the predicted dissatisfaction rate was 58.4%, compared to an observed value of only 19.1%; at 17°C and 19°C under high air speed, the differences were 32.0% and 33.7%, respectively. Under low air speed, the discrepancy is smaller but still ranges from 8.0% to 14.6%.
 

@@ -893,6 +893,8 @@ model_error_p <- ggplot(df, aes(y = condition)) +
     legend.direction = "horizontal",
   )
 
+rm(df)
+
 ggsave(
   here::here("manuscript", "figs", "model_error_raw.png"),
   plot = model_error_p,
@@ -902,6 +904,12 @@ ggsave(
   units = "mm",
   bg = "transparent"
 )
+
+model_comparison_d <- dissatisfied_with_draft_ankles_rate %>%
+  mutate(across(where(is.numeric), \(x) round(x, digits = 2))) %>% 
+  rename(
+    session_air_flow = workstation
+  )
 
 
 

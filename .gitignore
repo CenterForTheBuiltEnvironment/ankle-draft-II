@@ -22,3 +22,5 @@ manuscript/manuscript_files
 
 # Claude
 CLAUDE.md
+/.quarto/
+**/*.quarto_ipynb
