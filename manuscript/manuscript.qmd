@@ -444,7 +444,9 @@ acceptability_by_sat <- thermal_acceptability_summary %>%
 ![Thermal acceptability for whole body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall width=100%}
 
 
-## Ankle level thermal perception
+## Ankle level observations
+
+### Thermal perception
 
 ```{r}
 #| label: ankle-helpers
@@ -503,6 +505,8 @@ air_pref_less <- air_movement_preference_summary %>%
 air_pref_no_change <- air_movement_preference_summary %>%
   dplyr::filter(acceptability == "No change")
 ```
+
+### Air movement perception
 
 @fig-air-move-acc-pref shows air movement acceptability and preference at the ankle level. Despite the localized cooling, air movement at the ankles was rated acceptable by `r air_acceptability_acceptable %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants across all conditions. Acceptability was highest at 19°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`) and lowest at 17°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "17C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`). Within each supply air temperature, acceptability tended to decrease slightly with increasing air speed.
 
@@ -616,9 +620,6 @@ Within this near-neutral thermal range, the Predicted Mean Vote (PMV) model prov
 
 # Conclusions
 
-## Limitations
-
-# Conclusions
 
 # CRediT authorship contribution statement {.unnumbered}
 
