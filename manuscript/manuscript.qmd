@@ -444,7 +444,9 @@ acceptability_by_sat <- thermal_acceptability_summary %>%
 ![Thermal acceptability for whole body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall width=100%}
 
 
-## Ankle level thermal perception
+## Ankle level observations
+
+### Thermal perception
 
 ```{r}
 #| label: ankle-helpers
@@ -504,11 +506,16 @@ air_pref_no_change <- air_movement_preference_summary %>%
   dplyr::filter(acceptability == "No change")
 ```
 
+### Air movement perception
+
 @fig-air-move-acc-pref shows air movement acceptability and preference at the ankle level. Despite the localized cooling, air movement at the ankles was rated acceptable by `r air_acceptability_acceptable %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants across all conditions. Acceptability was highest at 19°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`) and lowest at 17°C (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "17C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`). Within each supply air temperature, acceptability tended to decrease slightly with increasing air speed.
 
 Air movement preference responses indicated that a substantial proportion of participants would prefer less air movement at the ankles, particularly at higher air speeds. The proportion preferring less air movement ranged from `r air_pref_less %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`. At 17°C with high air speed, `r air_pref_less %>% dplyr::filter(session_sat == "17C", workstation == "high") %>% dplyr::pull(pct_label)` preferred less air movement, compared to only `r air_pref_less %>% dplyr::filter(session_sat == "19C", workstation == "low") %>% dplyr::pull(pct_label)` at 19°C with low air speed. The majority of participants (`r air_pref_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`) preferred no change to the air movement across conditions.
 
 ![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width=75%}
+
+
+### Skin temperature measurements
 
 
 
@@ -525,6 +532,10 @@ Air movement preference responses indicated that a substantial proportion of par
 - Key finding: Does current model overestimate/underestimate dissatisfaction under winter clothing? Hypothesis: Yes, it doesn't work well and should be updated using the entire dataset
 -->
 ```
+
+
+![Comparison of the original ankle draft model's prediction with observations from our experiment.](figs/model_error.png){#fig-model_error width=100%}
+
 
 ## Updated model for winter conditions
 
@@ -601,9 +612,6 @@ winter clothing effect on ankle draft sensitivity\].
 
 # Conclusions
 
-## Limitations
-
-# Conclusions
 
 # CRediT authorship contribution statement {.unnumbered}
 

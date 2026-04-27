@@ -606,7 +606,7 @@ ggsave(
 
 dissatisfied_with_draft_ankles <- analysis %>%
   dplyr::filter(
-    question %in% c("thermal_sensation_ankles", "air_movement_acceptability_ankles","dissatisfied_with_draft_ankles"),
+    question %in% c("thermal_sensation_ankles", "air_movement_acceptability_ankles", "dissatisfied_with_draft_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
@@ -750,6 +750,105 @@ ggsave(
   units = "mm",
   bg = "transparent"
 )
+
+
+# Dumbell plot
+# https://r-graph-gallery.com/web-extended-dumbbell-plot-ggplot2.html
+
+df <- dissatisfied_with_draft_ankles_rate %>%
+  # 1. Define the custom, non-alphabetical order for workstation
+  mutate(workstation = factor(workstation, levels = c("high", "medium", "low"))) %>%
+  # 2. Sort by workstation FIRST, then by session_sat
+  arrange(workstation, session_sat) %>%
+  mutate(
+    # 3. Create the label
+    condition = paste(workstation, session_sat, sep = ", "),
+    # 4. Lock in the order and reverse it so ggplot plots it top-to-bottom
+    condition = fct_rev(fct_inorder(condition))
+  )
+
+liu_color <- "#4361ee"
+new_color <- "#f72585"
+bandwidth <- 4
+
+model_error_p <- ggplot(df, aes(y = condition)) +
+  
+  # connecting lines
+  geom_segment(aes(x = dissatisfied_rate, xend = ppd_liu_mean, yend = condition),
+               color = "gray80", size = bandwidth, alpha = 0.5) +
+  
+  # observed points (mapped for legend)
+  geom_point(aes(x = dissatisfied_rate, color = "Observed"),
+             size = bandwidth) +
+  
+  # model points (mapped for legend)
+  geom_point(aes(x = ppd_liu_mean, color = "Predicted"),
+             size = bandwidth) +
+  
+  # midpoint labels (wrapped in sprintf to force 2 decimals)
+  geom_text(aes(x = x_mid, label = sprintf("%.2f", as.numeric(diff_label))),
+            color = "grey30", size = 2) +
+  
+  # model labels (dynamic alignment, forced to 2 decimals)
+  geom_text(aes(
+    x = ppd_liu_mean,
+    label = sprintf("%.2f", ppd_liu_mean),
+    hjust = ifelse(ppd_liu_mean > dissatisfied_rate, -0.7, 1.7)
+  ),
+  color = liu_color, size = 2) +
+  
+  # observed labels (dynamic alignment, forced to 2 decimals)
+  geom_text(aes(
+    x = dissatisfied_rate,
+    label = sprintf("%.2f", dissatisfied_rate),
+    hjust = ifelse(dissatisfied_rate < ppd_liu_mean, 1.7, -0.7)
+  ),
+  color = new_color, size = 2) +
+  
+  scale_color_manual(
+    name = NULL,
+    values = c("Observed" = new_color, "Predicted" = liu_color)
+  ) +
+  
+  scale_x_continuous(
+    labels = percent_format(accuracy = 2),
+    limits = c(0, 0.6), # Updated to cap
+    expand = expansion(mult = c(0.02, 0.08))
+  ) +
+  
+  labs(
+    x = "Percentage of People Dissatisfied [%]",
+    y = "Condition",
+  ) +
+  
+  theme_minimal(base_size = 7) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    
+    axis.text.y = element_text(size = 7),
+    axis.text.x = element_text(size = 7),
+    axis.title.y = element_text(size = 8, margin = margin(r = 3, unit = "mm" )),
+    axis.title.x = element_text(size = 8, margin = margin(t = 3, unit = "mm" )),
+    
+    legend.text = element_text(size = 7),
+    legend.background = element_blank(),
+    legend.position = "inside",
+    legend.position.inside = c(0.8,0.1),
+    legend.direction = "horizontal",
+  )
+
+ggsave(
+  here::here("manuscript", "figs", "model_error_raw.png"),
+  plot = model_error_p,
+  dpi = 500,
+  width = double_col_width,
+  height = 100,
+  units = "mm",
+  bg = "transparent"
+)
+
+
 
 # - Calibration curve of Liu's model on Toby's dataset ----------------------
 
