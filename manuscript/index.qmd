@@ -30,8 +30,6 @@ filters:
   - authors-block
 
 date: "`r Sys.Date()`"
-project:
-  output-dir: docs
 format:
   docx:
     link-citations: true
@@ -39,13 +37,11 @@ format:
     toc: false
     number-sections: true
   html:
-    output-file: "index.html"
     toc: true
     number-sections: true
     theme: cosmo
     comments:
       hypothesis: true
-    output-dir: docs
 bibliography: refs.bib
 csl: apa.csl
 execute:

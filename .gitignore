@@ -5,9 +5,6 @@
 .Ruserdata
 .Rprofile
 
-# Render files
-manuscript/manuscript_files
-
 # only include renv.lock for now
 /renv
 
