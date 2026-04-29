@@ -10,6 +10,7 @@ authors:
   - name: Junmeng Lyu
     affiliations:
       - ref: cbe
+      - ref: sjtu
     orcid: 0000-0000-0000-0000
   - name: Stefano Schiavon
     affiliations:
@@ -25,6 +26,8 @@ affiliations:
     name: Department of Architecture, College of Environmental Design, University of California, Berkeley, USA
   - id: eng
     name: Department of Civil and Environmental Engineering, College of Engineering, University of California, Berkeley, USA
+  - id: sjtu
+    name: Department of Architecture, School of Design, Shanghai Jiao Tong University, Shanghai, China
 
 filters:
   - authors-block
@@ -63,172 +66,55 @@ source(here::here("src", "R", "x_analysis.R"))
 
 # Introduction
 
-Cold downdraft near windows is a common source of local thermal
-discomfort in buildings during winter. When outdoor temperatures drop,
-the interior surface of windows, particularly large or poorly insulated
-glazing, becomes significantly cooler than the surrounding air. This
-temperature differential causes nearby air to cool, increase in density,
-and descend, creating a localized airflow pattern that can cause
-discomfort at the lower extremities of seated occupants
-[@heiselbergDraftComfortReview1994
-<!--# Replace reference with BetterBibTex -->]. Building designers
-typically address this issue by installing perimeter heating systems,
-such as radiators or in-floor heating, to counteract the downdraft
-effect and maintain occupant comfort.
+Cold downdraft near windows is a common source of local thermal discomfort in buildings during winter. When outdoor temperatures drop, the interior surface of windows, particularly large or poorly insulated glazing, becomes significantly cooler than the surrounding air. This temperature differential causes nearby air to cool, increase in density, and descend, creating a localized airflow pattern that can cause discomfort at the lower extremities of seated occupants [@heiselbergDraftComfortReview1994 <!--# Replace reference with BetterBibTex -->]. Building designers typically address this issue by installing perimeter heating systems, such as radiators or in-floor heating, to counteract the downdraft effect and maintain occupant comfort.
 
-The current approach to evaluating ankle draft risk relies on a
-predictive model presented in @liuPredictedPercentageDissatisfied2017,
-which estimates the predicted percentage dissatisfied (PPD) with ankle
-draft as a function of air speed and temperature at ankle level, as well
-as whole-body thermal sensation. This model, now incorporated into
-ASHRAE Standard 55 [@ashraeANSIASHRAEStandard2023], was derived from
-laboratory experiments conducted under cooling conditions typical of
-underfloor air distribution (UFAD) and displacement ventilation systems.
-Importantly, participants in these foundational studies, including an
-earlier investigation by @schiavonSensationDraftUncovered2016, wore
-summer clothing with exposed ankles, resulting in clothing insulation
-levels of approximately 0.5 clo.
+The current approach to evaluating ankle draft risk relies on a predictive model presented in @liuPredictedPercentageDissatisfied2017, which estimates the predicted percentage dissatisfied (PPD) with ankle draft as a function of air speed and temperature at ankle level, as well as whole-body thermal sensation. This model, now incorporated into ASHRAE Standard 55 [@ashraeANSIASHRAEStandard2023], was derived from laboratory experiments conducted under cooling conditions typical of underfloor air distribution (UFAD) and displacement ventilation systems. Importantly, participants in these foundational studies, including an earlier investigation by @schiavonSensationDraftUncovered2016, wore summer clothing with exposed ankles, resulting in clothing insulation levels of approximately 0.5 clo.
 
-However, building occupants in winter typically wear substantially
-different attire. Analysis of the ASHRAE Global Thermal Comfort Database
-II [@foldvarylicinaDevelopmentASHRAEGlobal2018] indicates that median
-clothing insulation in office environments during heating seasons is
-approximately 0.75 clo, with occupants commonly wearing long trousers,
-closed-toe shoes and socks that cover the ankle region. This discrepancy
-raises an important question: does the existing ankle draft model,
-calibrated for summer conditions with exposed skin, accurately predict
-discomfort when ankles are covered by clothing?
+However, building occupants in winter typically wear substantially different attire. Analysis of the ASHRAE Global Thermal Comfort Database II [@foldvarylicinaDevelopmentASHRAEGlobal2018] indicates that median clothing insulation in office environments during heating seasons is approximately 0.75 clo, with occupants commonly wearing long trousers, closed-toe shoes and socks that cover the ankle region. This discrepancy raises an important question: does the existing ankle draft model, calibrated for summer conditions with exposed skin, accurately predict discomfort when ankles are covered by clothing?
 
-If the current model overestimates draft risk under winter clothing
-conditions, the practical implications are significant. Designers may be
-specifying perimeter heating systems that are larger than necessary, or
-installing them in situations where they could be avoided entirely. This
-has consequences for both first costs and operational energy
-consumption, as perimeter heating systems contribute to building energy
-use and associated carbon emissions. Conversely, if the model
-underestimates risk, occupants may experience discomfort that
-compromises satisfaction and productivity.
+If the current model overestimates draft risk under winter clothing conditions, the practical implications are significant. Designers may be specifying perimeter heating systems that are larger than necessary, or installing them in situations where they could be avoided entirely. This has consequences for both first costs and operational energy consumption, as perimeter heating systems contribute to building energy use and associated carbon emissions. Conversely, if the model underestimates risk, occupants may experience discomfort that compromises satisfaction and productivity.
 
-The objective of this study is to evaluate thermal comfort responses to
-ankle-level draft under winter clothing conditions through controlled
-laboratory experiments. Specifically, we aim to: (1) characterize local
-and whole-body thermal sensation and comfort responses across a range of
-supply air temperatures and air speeds representative of window
-downdraft conditions; (2) compare observed dissatisfaction rates with
-predictions from the existing ankle draft model; and (3) assess whether
-the current ASHRAE 55 criteria require adjustment for winter scenarios.
-The findings are intended to inform guidance on perimeter heating
-requirements and support more energy-efficient building design without
-compromising occupant comfort.
+The objective of this study is to evaluate thermal comfort responses to ankle-level draft under winter clothing conditions through controlled laboratory experiments. Specifically, we aim to: (1) characterize local and whole-body thermal sensation and comfort responses across a range of supply air temperatures and air speeds representative of window downdraft conditions; (2) compare observed dissatisfaction rates with predictions from the existing ankle draft model; and (3) assess whether the current ASHRAE 55 criteria require adjustment for winter scenarios. The findings are intended to inform guidance on perimeter heating requirements and support more energy-efficient building design without compromising occupant comfort.
 
 # Methods {#sec-methods}
 
 ## Experimental design
 
-We conducted a controlled laboratory experiment using a within-subjects
-repeated-measures design. Each participant was exposed to nine
-experimental conditions in a 3×3 factorial arrangement, varying supply
-air temperature (SAT) at three levels (15°C, 17°C, 19°C) and air speed
-at ankle level at three levels (low, medium, high; ranging between
-0.1–0.7 m/s). The SAT and air speeds were selected to represent the
-range of conditions associated with window downdraft under typical
-winter conditions, informed by computational fluid dynamics simulations
-conducted as part of a broader research collaboration
-<!--# This is not correct; how can we justify the selection given that the CFD will probbably not go ahead? -->.
+We conducted a controlled laboratory experiment using a within-subjects repeated-measures design. Each participant was exposed to nine experimental conditions in a 3×3 factorial arrangement, varying supply air temperature (SAT) at three levels (15°C, 17°C, 19°C) and air speed at ankle level at three levels (low, medium, high; ranging between 0.1–0.7 m/s). The SAT and air speeds were selected to represent the range of conditions associated with window downdraft under typical winter conditions, informed by computational fluid dynamics simulations conducted as part of a broader research collaboration <!--# This is not correct; how can we justify the selection given that the CFD will probbably not go ahead? -->.
 
-Participants attended four sessions: an introductory session for
-explaining the experiment and obtaining consent, followed by three
-experimental sessions of approximately two hours each. Each experimental
-session corresponded to one SAT level, with participants experiencing
-all three air speed conditions within that session in a counterbalanced
-order. Sessions were scheduled on separate days to minimize carryover
-effects and subjects were allowed to attend the three sessions in their
-preferred order.
+Participants attended four sessions: an introductory session for explaining the experiment and obtaining consent, followed by three experimental sessions of approximately two hours each. Each experimental session corresponded to one SAT level, with participants experiencing all three air speed conditions within that session in a counterbalanced order. Sessions were scheduled on separate days to minimize carryover effects and subjects were allowed to attend the three sessions in their preferred order.
 
 ## Climate chamber and apparatus
 
-The experiment was conducted in a climate-controlled chamber at the
-Center for the Built Environment, UC Berkeley. The chamber floor area is
-approximately 25 m², configured with up to three workstations to allow
-simultaneous testing of multiple participants. Ambient room conditions
-were maintained at approximately 22°C operative temperature, 50%
-relative humidity, and background air velocity below 0.1 m/s, targeting
-a whole-body thermal sensation of approximately −0.5 (slightly cool) on
-the ASHRAE seven-point scale.
+The experiment was conducted in a climate-controlled chamber at the Center for the Built Environment, UC Berkeley. The chamber floor area is approximately 25 m², configured with up to three workstations to allow simultaneous testing of multiple participants. Ambient room conditions were maintained at approximately 22°C operative temperature, 50% relative humidity, and background air velocity below 0.1 m/s, targeting a whole-body thermal sensation of approximately −0.5 (slightly cool) on the ASHRAE seven-point scale.
 
 PLACEHOLDER GRAPHIC
 
-A custom displacement diffuser was used to deliver conditioned air to
-the ankle region of seated participants. The diffuser was positioned 0.7
-m behind each workstation, directing airflow toward the participants'
-lower legs from behind and simulating the approach direction of window
-downdraft. The diffuser was connected to an independent air handling
-unit capable of delivering supply air at the target temperatures and
-flow rates. Turbulence intensity at the measurement location was
-approximately 30%, consistent with values reported in prior ankle draft
-studies [@liuPredictedPercentageDissatisfied2017].
+A custom displacement diffuser was used to deliver conditioned air to the ankle region of seated participants. The diffuser was positioned 0.7 m behind each workstation, directing airflow toward the participants' lower legs from behind and simulating the approach direction of window downdraft. The diffuser was connected to an independent air handling unit capable of delivering supply air at the target temperatures and flow rates. Turbulence intensity at the measurement location was approximately 30%, consistent with values reported in prior ankle draft studies [@liuPredictedPercentageDissatisfied2017].
 
 ## Environmental monitoring
 
-Air temperature was measured at head-height at each workstation using
-calibrated Atmocube monitors (Atmotech Inc., United States; air
-temperature: -40 to +125°C, ± 0.5°C, relative humidity: 0 to 100%RH, ± 2
-%RH, CO~2~: 0 to 5000 ppm, ± 50 ppm + 2.5% of reading at standard room
-levels) positioned within 0.5 m of participants. Air velocity at ankle
-level (0.1 m) was measured using AirDistSys 5000 omnidirectional
-hot-wire anemometers (Sensor Electronic, Poland, air velocity: 0.05-5
-m/s, accuracy: ±0.02 m/s ±2% of reading; temperature: -10 to +50°C,
-accuracy: ±0.2°C, sampling interval: 1 s). Supply air temperature was
-monitored continuously at the diffuser outlet. Room-level measurements
-of relative humidity and CO~2~ concentration were recorded throughout
-each session.
+Air temperature was measured at head-height at each workstation using calibrated Atmocube monitors (Atmotech Inc., United States; air temperature: -40 to +125°C, ± 0.5°C, relative humidity: 0 to 100%RH, ± 2 %RH, CO~2~: 0 to 5000 ppm, ± 50 ppm + 2.5% of reading at standard room levels) positioned within 0.5 m of participants. Air velocity at ankle level (0.1 m) was measured using AirDistSys 5000 omnidirectional hot-wire anemometers (Sensor Electronic, Poland, air velocity: 0.05-5 m/s, accuracy: ±0.02 m/s ±2% of reading; temperature: -10 to +50°C, accuracy: ±0.2°C, sampling interval: 1 s). Supply air temperature was monitored continuously at the diffuser outlet. Room-level measurements of relative humidity and CO~2~ concentration were recorded throughout each session.
 
 ## Participants
 
-We recruited participants from the university community and local area
-through the Experimental Social Science Laboratory (Xlab) platform and
-email outreach to individuals who had participated in previous studies
-and consented to future contact. Eligible participants were between 21
-and 55 years of age, fluent in English, and free from chronic
-cardiorespiratory conditions or recent major surgery. Pregnant
-individuals were excluded.
+We recruited participants from the university community and local area through the Experimental Social Science Laboratory (Xlab) platform and email outreach to individuals who had participated in previous studies and consented to future contact. Eligible participants were between 21 and 55 years of age, fluent in English, and free from chronic cardiorespiratory conditions or recent major surgery. Pregnant individuals were excluded.
 
 <!-- Add: final sample size, demographics summary from analysis -->
 
 ## Clothing protocol
 
-To simulate typical winter office attire, participants were instructed
-to wear a long-sleeve top, long trousers (ending just above the ankle),
-thin socks, and closed-toe shoes. This ensemble targets a clothing
-insulation of approximately 0.75 clo, consistent with the median value
-observed in office buildings during heating seasons
-[@foldvarylicinaDevelopmentASHRAEGlobal2018]. Participants were
-permitted to make minor clothing adjustments during sessions (e.g.,
-rolling sleeves), and any changes were recorded.
+To simulate typical winter office attire, participants were instructed to wear a long-sleeve top, long trousers (ending just above the ankle), thin socks, and closed-toe shoes. This ensemble targets a clothing insulation of approximately 0.75 clo, consistent with the median value observed in office buildings during heating seasons [@foldvarylicinaDevelopmentASHRAEGlobal2018]. Participants were permitted to make minor clothing adjustments during sessions (e.g., rolling sleeves), and any changes were recorded.
 
 ## Experimental protocol
 
-Upon arrival for each experimental session, participants were checked
-for elevated temperature and fitted with iButton skin temperature
-sensors ((Thermochron, Maxim Integrated, USA, Type DS1923, 20°C to 85°C,
-accuracy: ±0.1°C, resolution: 0.0625°C) at standardized locations (lower
-leg, feet). Participants then entered the climate chamber and completed
-a 20-minute adaptation period at their assigned workstation under
-baseline conditions.
+Upon arrival for each experimental session, participants were checked for elevated temperature and fitted with skin temperature sensors. Participants then entered the climate chamber and completed a 20-minute adaptation period at their assigned workstation under baseline conditions.
 
-Following adaptation, participants were exposed to three consecutive
-20-minute conditions at different air speed levels, with 20-minute rest
-periods between conditions. The sequence of air speed conditions was
-counterbalanced across participants and sessions. During each exposure
-period, participants completed standardized questionnaires at the end of
-each interval.
+Following adaptation, participants were exposed to three consecutive 20-minute conditions at different air speed levels, with 20-minute rest periods between conditions. The sequence of air speed conditions was counterbalanced across participants and sessions. During each exposure period, participants completed standardized questionnaires at the end of each interval.
 
 ## Subjective measurements
 
-The perception of the thermal environment was assessed using validated
-scales consistent with prior ankle draft research and ASHRAE Standard 55
-requirements. Constructs and their scales used in the questionnaires are
-summarized in @tbl-scales below.
+The perception of the thermal environment was assessed using validated scales consistent with prior ankle draft research and ASHRAE Standard 55 requirements. Constructs and their scales used in the questionnaires are summarized in @tbl-scales below.
 
 ```{r}
 #| label: tbl-scales
@@ -240,89 +126,43 @@ readr::read_csv("tables/survey_scales.csv") |>
   knitr::kable()
 ```
 
-Surveys were administered electronically via Qualtrics. Participants
-were not required to respond to any individual question, though
-completion rates were monitored.
+Surveys were administered electronically via Qualtrics. Participants were not required to respond to any individual question, though completion rates were monitored.
 
 ## Physiological measurements
 
-Skin temperature was recorded continuously using the iButton sensors
-attached with medical-grade hypoallergenic tape. Sensors were placed on
-the lateral lower leg (mid-calf) and feet. Skin temperature data were
-used to assess local cooling responses and as physiological correlates
-of subjective thermal sensation.
+Skin temperature was recorded continuously using iButton sensors (Thermochron, Maxim Integrated, USA, Type DS1923; measurement range: 20°C to 85°C; accuracy: ±0.5°C; resolution: 0.0625°C) attached with medical-grade hypoallergenic tape. Sensor was placed on the lateral lower leg (mid-calf). Skin temperature data were used to assess local cooling responses and as physiological correlates of subjective thermal sensation.
 
-## Statistical analysis and data processing
+## Statistical analysis
 
-All statistical analyses were based on subjective questionnaire data. Subjective response 
-variables were handled according to the properties of their respective scales. Thermal 
-sensation and thermal acceptability were treated as continuous variables, whereas thermal 
-preference, ankle thermal preference, and ankle airflow preference were treated as ordinal 
-variables. Ankle airflow acceptability was dichotomized as acceptable or unacceptable for 
-following analyses. According to exsiting study @liuPredictedPercentageDissatisfied2017, 
-ankle draft dissatisfaction was defined as an ankle thermal sensation vote of less than 
-0 together with an ankle airflow acceptability vote of less than 0.
+### Variable processing
 
+Thermal sensation votes were collected on a continuous scale. For descriptive analyses, these values were mapped to the corresponding categorical sensation levels, whereas the original continuous values were retained for statistical modeling. Ankle airflow acceptability was dichotomized as acceptable or unacceptable for subsequent analyses. The original recorded votes for thermal acceptability, thermal preference, ankle thermal preference, and ankle airflow preference were retained without further processing. Consistent with the definition used by @liuPredictedPercentageDissatisfied2017, ankle draft dissatisfaction was defined as an ankle thermal sensation vote below 0 together with an ankle airflow acceptability vote below 0.
 
-Because this study used a within-subject repeated-measures design, within-subject 
-comparisons between experimental conditions were conducted using paired-samples 
-t-tests for continuous variables, with paired Cohen’s d reported as the effect size. 
-Ordinal variables were analyzed using the paired Wilcoxon signed-rank test, with 
-the test statistic calculated using the normal approximation, and effect size r 
-was reported. For multiple pairwise comparisons within each family of comparisons, 
-P values were adjusted using the Benjamini-Hochberg method @benjaminiHighberg1995。
+### Within-subject comparisons
 
-To evaluate the performance of the existing ankle draft model under the conditions 
-of this study, the exsiting model was applied to the experimental data to 
-calculate the predicted percentage of dissatisfaction with ankle draft at each observation 
-point, and these predictions were compared with the observed dissatisfaction percentages. 
-In addition, calibration curves were used to quantitatively assess the predictive 
-performance of the existing model in this study's dataset @vancalster2016. The calibration 
-intercept and slope, AUC, and Brier score were reported. All analyses were implemented using 
-the R package `CalibrationCurves` @deCockCalibrationCurves2023.
+This study used a within-subject repeated-measures design, comparisons between experimental conditions were conducted within participants. Continuous variables were analyzed using paired-samples t-tests, with paired Cohen's d reported as the effect size. Ordinal variables were analyzed using the paired Wilcoxon signed-rank test, with the test statistic based on the normal approximation and effect size r reported. For multiple pairwise comparisons within each family of tests, p-values were adjusted using the Benjamini-Hochberg method [@benjaminiHighberg1995].
 
-Because ankle draft dissatisfaction was a binary outcome and repeated observations were 
-correlated within subjects, a generalized linear mixed model with a binomial distribution 
-and logit link was used to develop the new ankle draft risk model. Subject was included 
-as a random intercept to account for between-subject heterogeneity and within-subject 
-dependence arising from repeated measurements. To enable an integrated analysis of the 
-effects of different clothing conditions on ankle draft dissatisfaction, data from Liu et al. 
-@liuPredictedPercentageDissatisfied2017 were also included in the modeling dataset. 
-Continuous predictors were mean-centered using the overall means of the combined dataset 
-before model fitting. 
+### Evaluation of the existing ankle draft model
 
-Because the inverse-logit transformation in a logistic mixed-effects model is nonlinear, 
-direct back-transformation of the fixed-effects linear predictor yields a conditional 
-probability, representing an individual-level prediction when the random effect is set 
-to zero, rather than a population-averaged probability. Therefore, to characterize the 
-average risk of dissatisfaction at the population level, population-averaged probabilities 
-were used instead of conditional probabilities @neuhausKalbfleischHauck1991. Specifically, 
-fixed-effect estimates and the variance of the random intercept were extracted from the 
-fitted model, assuming that the random intercept followed a normal distribution with mean 
-zero. Integration over the random effects was then approximated using Monte Carlo 
-simulation (K = 10,000, with a fixed random seed “1” for reproducibility), and the 
-population-averaged predicted probability was calculated for each combination of predictor values.
+To evaluate the performance of the existing ankle draft model under the conditions of this study, the existing model was applied to the experimental data to calculate the predicted percentage of dissatisfaction with ankle draft at each observation point. The predictions were then averaged by experimental condition and compared with the observed dissatisfaction percentages. In addition, calibration curves were used to quantitatively assess the predictive performance of the existing model in this study's dataset [@vancalster2016]. The calibration intercept and slope, AUC, and Brier score were reported. All analyses were implemented using the R package `CalibrationCurves` [@deCockCalibrationCurves2023].
 
-Because population-averaged probabilities generally do not have a simple closed-form analytical 
-solution, after approximating the marginal probability for each combination of predictors using 
-the Monte Carlo method, an approximate linear equation for logit(P) as a function of the 
-predictors was fitted on the logit scale using the simulated marginal probabilities as 
-the target values. an approximate linear equation for logit(P) was then fitted as a function of 
-the predictors on the logit scale. Inverse-logit transformation of the fitted equation yielded 
-a closed-form prediction equation. The accuracy of the approximation was evaluated using the 
-root mean square error (RMSE), mean absolute error (MAE), and coefficient of determination (R^2^).
+### Development of the new ankle draft model
 
+Ankle draft dissatisfaction was modeled using a generalized linear mixed model with a binomial distribution and logit link, as the outcome was binary and repeated observations were correlated within subjects. Subject was included as a random intercept to account for between-subject heterogeneity and within-subject dependence arising from repeated measurements. To enable an integrated analysis of the effects of different clothing conditions on ankle draft dissatisfaction, data from @liuPredictedPercentageDissatisfied2017 were also included in the modeling dataset. Continuous predictors were mean-centered using the overall means of the combined dataset before model fitting.
 
-All data processing, statistical analyses, and model fitting were performed in R (version 4.4.1). 
-The main packages used were lme4 (version 2.0.1), rstatix (version 0.7.3), and CalibrationCurves 
-(version 3.0.0).
+In this generalized linear mixed model, the inverse-logit transformation is nonlinear. As a result, direct back-transformation of the fixed-effects linear predictor yields a conditional probability, representing an individual-level prediction when the random effect is set to zero, rather than a population-averaged probability. To characterize the average risk of dissatisfaction at the population level, marginal probabilities were therefore used instead of conditional probabilities [@neuhausKalbfleischHauck1991]. Specifically, fixed-effect estimates and the variance of the random intercept were extracted from the fitted model, assuming that the random intercept followed a normal distribution with mean zero. Integration over the random effects was then approximated using Monte Carlo simulation (K = 10,000, random seed = 1), and the marginal predicted probability was calculated for each combination of predictor values.
 
+Because these marginal probabilities generally cannot be written as a simple closed-form equation, the Monte Carlo-simulated marginal probabilities were used to fit an approximate linear equation for logit(P). Applying the inverse-logit transformation to the fitted equation yielded a closed-form prediction equation. The accuracy of this approximation was evaluated using coefficient of determination (R^2^).
+
+## Software
+
+All data processing, statistical analyses, and model fitting were performed in R (version 4.4.1). The main packages used were tidyverse (version 2.0.0), lme4 (version 2.0.1), rstatix (version 0.7.3), and CalibrationCurves (version 3.0.0).
 
 # Results
 
 ## Participants and environmental conditions
 
-```{r demographics, echo=FALSE}
+```{r echo=FALSE}
 #| label: tbl-demographics
 #| tbl-cap: "Summary of demographic information (mean ± SD) on study participants."
 
@@ -332,10 +172,7 @@ knitr::kable(demographic_d,
 
 ```
 
-@tbl-demographics summarizes the demographic information of the study subjects. A total of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(n)` subjects 
-participated in the study (`r demographic_d %>% dplyr::filter(sex == "Female") %>% dplyr::pull(n)` 
-female, `r demographic_d %>% dplyr::filter(sex == "Male") %>% dplyr::pull(n)` male, 
-`r demographic_d %>% dplyr::filter(sex == "Third Gender / Other") %>% dplyr::pull(n)` other), with a mean age of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(age)` years.
+@tbl-demographics summarizes the demographic information of the study subjects. A total of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(n)` subjects participated in the study (`r demographic_d %>% dplyr::filter(sex == "Female") %>% dplyr::pull(n)` female, `r demographic_d %>% dplyr::filter(sex == "Male") %>% dplyr::pull(n)` male, `r demographic_d %>% dplyr::filter(sex == "Third Gender / Other") %>% dplyr::pull(n)` other), with a mean age of `r demographic_d %>% dplyr::filter(sex == "All") %>% dplyr::pull(age)` years.
 
 ```{=html}
 <!--
@@ -346,7 +183,7 @@ female, `r demographic_d %>% dplyr::filter(sex == "Male") %>% dplyr::pull(n)` ma
 -->
 ```
 
-```{r env, echo=FALSE}
+```{r echo=FALSE}
 #| label: tbl-env
 #| tbl-cap: "Summary of environmental measurements."
 
@@ -355,20 +192,9 @@ knitr::kable(env_airflow_t,
 )
 ```
 
-@tbl-env provides an overview of the measured environmental conditions. Across all three sessions, 
-head-level air temperature remained stable at
-`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("15C")` °C,
-`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("17C")` °C, and
-`r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("19C")` °C,
-and relative humidity was comparable across sessions, confirming stable background thermal conditions.
+@tbl-env provides an overview of the measured environmental conditions. Across all three sessions, head-level air temperature remained stable at `r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("15C")` °C, `r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("17C")` °C, and `r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("19C")` °C, and relative humidity was comparable across sessions, confirming stable background thermal conditions.
 
-As the primary experimental manipulation, we set supply air temperatures to 15°C, 17°C, and 19°C 
-to simulate the effect of window downdraft. Ankle-level temperatures were slightly higher than the 
-supply temperature due to mixing with the warmer ambient air, but 
-remained stable across all sessions. Within each session, we exposed subjects to three airspeed 
-levels at separate workstations. We measured consistent air speeds across all three workstations and 
-sessions, confirming reliable reproduction of the low, medium, and high airspeed conditions. 
-Turbulence intensities remained low throughout, indicating stable and controlled airflow.
+As the primary experimental manipulation, we set supply air temperatures to 15°C, 17°C, and 19°C to simulate the effect of window downdraft. Ankle-level temperatures were slightly higher than the supply temperature due to mixing with the warmer ambient air, but remained stable across all sessions. Within each session, we exposed subjects to three airspeed levels at separate workstations. We measured consistent air speeds across all three workstations and sessions, confirming reliable reproduction of the low, medium, and high airspeed conditions. Turbulence intensities remained low throughout, indicating stable and controlled airflow.
 
 ## Whole body thermal perception
 
@@ -406,7 +232,7 @@ preference_warmer <- thermal_preference_overall_summary %>%
 
 Thermal preference responses indicated that participants were generally satisfied with the thermal conditions. Across all conditions, `r preference_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)` of participants preferred "No change" to the thermal environment. The proportion preferring warmer conditions ranged from `r preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`, with the highest values observed during the 15°C supply air temperature sessions.
 
-![Thermal sensation (a) and thermal preference (b) for whole body.](figs/thermal_perception_overall.png){#fig-thermal-perception-overall width=75%}
+![Thermal sensation (a) and thermal preference (b) for whole body.](figs/thermal_perception_overall.png){#fig-thermal-perception-overall width="75%"}
 
 ```{r}
 #| label: acceptability-helpers
@@ -440,8 +266,7 @@ acceptability_by_sat <- thermal_acceptability_summary %>%
 
 @fig-thermal-acceptability-overall shows thermal acceptability responses for whole-body conditions. Overall, acceptability was high across all conditions, ranging from `r acceptability_range$min` to `r acceptability_range$max`. Acceptability rates were highest during the 19°C supply air temperature sessions (`r acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`) and lowest at 15°C (`r acceptability_by_sat %>% dplyr::filter(session_sat == "15C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`). Within each supply air temperature condition, air speed had minimal effect on whole-body thermal acceptability.
 
-![Thermal acceptability for whole body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall width=100%}
-
+![Thermal acceptability for whole body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall width="100%"}
 
 ## Ankle level observations
 
@@ -479,7 +304,7 @@ ankle_preference_warmer <- thermal_preference_ankle_summary %>%
 
 Thermal preference at the ankle level reflected this cooling effect. The proportion of participants preferring warmer ankles ranged from `r ankle_preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`. At the most demanding condition (15°C, high air speed), `r get_ankle_preference_pct("15C", "high", "Warmer")` preferred warmer ankles, while at the mildest condition (19°C, low air speed), this proportion decreased to `r get_ankle_preference_pct("19C", "low", "Warmer")`.
 
-![Thermal sensation (a) and thermal preference (b) at ankle level.](figs/thermal_perception_ankle.png){#fig-thermal-perception-ankle width=75%}
+![Thermal sensation (a) and thermal preference (b) at ankle level.](figs/thermal_perception_ankle.png){#fig-thermal-perception-ankle width="75%"}
 
 ```{r}
 #| label: air-movement-helpers
@@ -511,20 +336,68 @@ air_pref_no_change <- air_movement_preference_summary %>%
 
 Air movement preference responses indicated that a substantial proportion of participants would prefer less air movement at the ankles, particularly at higher air speeds. The proportion preferring less air movement ranged from `r air_pref_less %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`. At 17°C with high air speed, `r air_pref_less %>% dplyr::filter(session_sat == "17C", workstation == "high") %>% dplyr::pull(pct_label)` preferred less air movement, compared to only `r air_pref_less %>% dplyr::filter(session_sat == "19C", workstation == "low") %>% dplyr::pull(pct_label)` at 19°C with low air speed. The majority of participants (`r air_pref_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`) preferred no change to the air movement across conditions.
 
-![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width=75%}
-
+![(a) Air movement acceptability (a) and preference (b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref width="75%"}
 
 ### Skin temperature
 
-Ankle skin temperature ($T_{\text{sk}}$) provides a direct physiological indicator of the local response to ankle-level airflow under winter clothing. @fig-tsk presents, for each of the nine experimental conditions, both the absolute time course of ankle skin temperature during the formal exposure phase and its change relative to the pre-exposure adaptation baseline ($\Delta T_{\text{sk}}$).
+```{r}
+#| label: tsk-delta-helpers
+#| echo: false
 
-During the final 5-minute window of exposure, ankle skin temperature remained between 28.3 and 29.3°C across conditions. Within each supply air temperature, $T_{\text{sk}}$ decreased modestly as air speed increased: at 15°C, from 29.0°C at low speed to 28.5 and 28.6°C at medium and high speed, respectively; at 17°C, from 28.7°C to 28.5 and 28.3°C; and at 19°C, from 29.3°C to 28.9 and 28.8°C. After Benjamini–Hochberg (BH) correction for multiple comparisons, statistically significant differences at 15°C were observed between low and medium speed (mean difference = 0.5°C, Cohen's $d$ = 0.37, $p_{\text{adj}}$ = 0.035) and between low and high speed (0.5°C, $d$ = 0.34, $p_{\text{adj}}$ = 0.035). Overall, at a given supply air temperature, high air speed produced an additional steady-state reduction of about 0.4–0.5°C in ankle skin temperature relative to low speed.
+tsk_delta_last1_range <- tsk_delta_last1 %>%
+  dplyr::group_by(session_sat, workstation) %>%
+  dplyr::summarise(mean_delta_last1_c = mean(mean_delta_last1_c, na.rm = TRUE), .groups = "drop") %>%
+  dplyr::summarise(
+    min_val = round(min(mean_delta_last1_c, na.rm = TRUE), 1),
+    max_val = round(max(mean_delta_last1_c, na.rm = TRUE), 1)
+  )
 
-Using each participant's pre-exposure adaptation-period skin temperature as the baseline, $\Delta T_{\text{sk}}$ during the final 1 minute of exposure was negative under all conditions, ranging from −1.7 to −0.8°C. $\Delta T_{\text{sk}}$ was more sensitive to air speed than the absolute skin temperature: at 15°C, low, medium, and high speeds corresponded to $\Delta T_{\text{sk}}$ values of −1.0, −1.6, and −1.7°C, respectively; at 17°C, −1.0, −1.5, and −1.7°C; and at 19°C, −0.8, −1.2, and −1.6°C. After BH correction, the pattern of significance was consistent across the three supply air temperatures: low speed differed significantly from both medium and high speed (low vs. medium: $p_{\text{adj}} \le 0.020$, $d$ = 0.35–0.83; low vs. high: $p_{\text{adj}} < 0.001$, $d$ = 0.61–0.92), whereas the difference between medium and high speed reached significance only at 19°C ($p_{\text{adj}}$ = 0.012, $d$ = 0.40) and not at 15°C or 17°C ($p_{\text{adj}}$ = 0.268 and 0.146).
+tsk_delta_sig_low_med_all <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "low", group2 == "medium") %>%
+  dplyr::summarise(all_sig = all(p.adj < 0.05, na.rm = TRUE)) %>%
+  dplyr::pull(all_sig)
 
+tsk_delta_sig_low_med_max_p <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "low", group2 == "medium") %>%
+  dplyr::summarise(max_p = max(p.adj, na.rm = TRUE)) %>%
+  dplyr::pull(max_p)
 
-![Time course of ankle skin temperature during the formal exposure phase across the nine experimental conditions: (a) absolute skin temperature; (b) change relative to the adaptation-period baseline, $\Delta T_{\text{sk}}$. Shaded bands denote the between-subject mean ± 1 SD.](figs/tsk_p.png){#fig-tsk width=90%}
+tsk_delta_sig_low_high_all <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "low", group2 == "high") %>%
+  dplyr::summarise(all_sig = all(p.adj < 0.05, na.rm = TRUE)) %>%
+  dplyr::pull(all_sig)
 
+tsk_delta_sig_low_high_max_p <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "low", group2 == "high") %>%
+  dplyr::summarise(max_p = max(p.adj, na.rm = TRUE)) %>%
+  dplyr::pull(max_p)
+
+stopifnot(isTRUE(tsk_delta_sig_low_med_all))
+stopifnot(isTRUE(tsk_delta_sig_low_high_all))
+
+tsk_delta_sig_med_high <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "medium", group2 == "high") %>%
+  dplyr::mutate(sig = p.adj < 0.05) %>%
+  dplyr::filter(sig) %>%
+  dplyr::pull(session_sat)
+
+tsk_delta_sig_med_high_p <- tsk_delta_last1_paired_ttest %>%
+  dplyr::filter(group1 == "medium", group2 == "high", p.adj < 0.05) %>%
+  dplyr::pull(p.adj)
+
+format_p_threshold <- function(p) {
+  dplyr::case_when(
+    p < 0.001 ~ "p_adj < 0.001",
+    p < 0.01 ~ "p_adj < 0.01",
+    p < 0.05 ~ "p_adj < 0.05",
+    TRUE ~ sprintf("p_adj = %.3f", p)
+  )
+}
+```
+
+Using each participant's skin temperature during the pre-exposure adaptation period as the baseline, ankle skin temperature during the final 1 min of exposure was negative under all conditions, ranging from approximately `r tsk_delta_last1_range$min_val` to `r tsk_delta_last1_range$max_val`°C. In general, the magnitude of skin temperature reduction increased with air speed, with medium and high air speeds typically producing greater cooling than low air speed across all three supply air temperature conditions. After BH correction, the differences between low and medium air speed and between low and high air speed were significant at all three supply air temperatures (`r format_p_threshold(tsk_delta_sig_low_med_max_p)` and `r format_p_threshold(tsk_delta_sig_low_high_max_p)`, respectively), whereas the difference between medium and high air speed was significant only at `r tsk_delta_sig_med_high` (`r sprintf("p_adj = %.3f", tsk_delta_sig_med_high_p)`). These findings suggest that increasing local airflow enhanced the short-term cooling response of the ankle skin.
+
+![Time course of ankle skin temperature during the formal exposure phase across the nine experimental conditions: (a) absolute skin temperature; (b) ankle skin temperture change relative to the adaptation-period baseline. Shaded bands denote the between-subject mean ± 1 SD.](figs/tsk_p.png){#fig-tsk width="90%"}
 
 ## Dissatisfaction with ankle draft
 
@@ -536,29 +409,182 @@ Using each participant's pre-exposure adaptation-period skin temperature as the 
 # Converting decimals to percentages and rounding for cleaner inline text
 res <- model_comparison_d %>%
   mutate(across(c(ppd_liu_mean, dissatisfied_rate, diff), ~ round(.x * 100, 1)))
+
+liu_model_summary <- model_comparison_d %>%
+  dplyr::summarise(
+    mean_observed = round(mean(dissatisfied_rate) * 100, 0),
+    mean_predicted = round(mean(ppd_liu_mean) * 100, 0),
+    overprediction_ratio = round(mean(ppd_liu_mean) / mean(dissatisfied_rate), 1)
+  )
+
+liu_diff_by_speed <- model_comparison_d %>%
+  dplyr::group_by(session_air_flow) %>%
+  dplyr::summarise(mean_diff = mean(diff), .groups = "drop") %>%
+  dplyr::arrange(dplyr::desc(mean_diff))
+
+liu_max_diff_speed <- liu_diff_by_speed %>% dplyr::slice(1) %>% dplyr::pull(session_air_flow)
+liu_min_diff_speed <- liu_diff_by_speed %>% dplyr::slice(n()) %>% dplyr::pull(session_air_flow)
 ```
 
 @fig-model-comp compares the dissatisfaction rate predicted by the Liu model with the observations during our experiment. Across all tested conditions, the existing model consistently overpredicted local thermal dissatisfaction compared to the observed rates. At an ankle temperature of 15°C, the discrepancy between predicted and observed rates increased significantly with air speed: at low flow (0.2 m/s), the difference was `r res$diff[1]` percentage points (pp), rising to `r res$diff[3]` pp at high flow (0.6 m/s).
 
 Similar trends were observed at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the predicted PPD was `r res$ppd_liu_mean[9]`%, while the actual dissatisfied rate was only `r res$dissatisfied_rate[9]`%, resulting in a mean overestimation of `r res$diff[9]` pp. On average across all experimental sessions, the model overpredicted dissatisfaction by `r round(mean(res$diff), 1)` pp.
 
+![Comparison of predicted and observed local thermal dissatisfaction across varying ankle-level temperatures and air speeds. The dumbbell plot illustrates the discrepancy (diff) between the Liu model predictions (ppd_liu_mean) and the actual observed dissatisfied rates (dissatisfied_rate). Experimental conditions include air speeds of approximately 0.2 m/s (low), 0.4 m/s (medium), and 0.6 m/s (high). Points represent mean values, with the segment length indicating the magnitude of model overestimation.](figs/model_error.png){#fig-model-comp width="90%"}
 
-![Comparison of predicted and observed local thermal dissatisfaction across varying ankle-level temperatures and air speeds. The dumbbell plot illustrates the discrepancy (diff) between the Liu model predictions (ppd_liu_mean) and the actual observed dissatisfied rates (dissatisfied_rate). Experimental conditions include air speeds of approximately 0.2 m/s (low), 0.4 m/s (medium), and 0.6 m/s (high). Points represent mean values, with the segment length indicating the magnitude of model overestimation.](figs/model_error.png){#fig-model-comp width=90%}
+Under winter conditions, the observed ankle draft dissatisfaction was substantially lower than that predicted by the model of @liuPredictedPercentageDissatisfied2017. Although the model retained acceptable discrimination on this dataset (AUC = `r sprintf("%.3f", liu_calibration_stats["C (ROC)"])`), the calibration results indicated a systematic overestimation under winter conditions, as shown in @fig-liu-calibration. Across the nine experimental conditions, the mean observed dissatisfaction rate was `r liu_model_summary$mean_observed`%, whereas the Liu model predicted an average of `r liu_model_summary$mean_predicted`%, corresponding to an overestimation of approximately `r liu_model_summary$overprediction_ratio` times. The discrepancy was greatest at `r liu_max_diff_speed` air speed and smaller, but still evident, at `r liu_min_diff_speed` air speed.
 
-
-Under winter clothing conditions (0.75 clo), the observed dissatisfaction rate caused by ankle-level air movement is substantially lower than that predicted by the model of Liu et al.[@liuPredictedPercentageDissatisfied2017]. While the Liu's model demonstrates acceptable discriminative performance on this dataset (AUC = 0.847), indicating its ability to distinguish between high- and low-risk conditions, its calibration results (intercept = −1.67, slope = 1.20) and Brier score (0.155) both suggest a systematic overestimation under winter clothing conditions. Across all nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu's model predicted an average of 36%, corresponding to an overestimation by approximately 2.8 times. This overestimation is most pronounced under high air velocity conditions. At 15°C with high air speed, the predicted dissatisfaction rate was 58.4%, compared to an observed value of only 19.1%; at 17°C and 19°C under high air speed, the differences were 32.0% and 33.7%, respectively. Under low air speed, the discrepancy is smaller but still ranges from 8.0% to 14.6%.
+![Calibration curve of the Liu model evaluated on the present dataset under winter clothing conditions.](figs/Liumodel_calibrationcurve.png){#fig-liu-calibration width="50%"}
 
 ## Updated model for winter conditions
 
-```{=html}
-<!--
-- Fit model for dissatisfaction with ankle draft (predictors: air speed, supply temp, room air temperature, possibly whole-body sensation and vertical temperature gradient)
-- Present model coefficients and interpretation
-- Figure, e.g. updated PPD contour plot for both winter and summer conditions
-- Compare model form/coefficients with Liu et al. and highlight improvements
-- Identify "acceptable" operating zone under summer/winter conditions
--->
+```{r}
+#| label: setup-updated-model
+#| echo: false
+#| message: false
+
+model_input_coef <- summary(model_input)$coefficients
+
+model_screening <- tibble::tibble(
+  term = rownames(model_input_coef),
+  estimate = model_input_coef[, "Estimate"],
+  std_error = model_input_coef[, "Std. Error"],
+  z_value = model_input_coef[, "z value"],
+  p_value = model_input_coef[, "Pr(>|z|)"]
+)
+
+model_screening_table <- model_screening %>%
+  dplyr::filter(term != "(Intercept)") %>%
+  dplyr::mutate(
+    term_label = dplyr::recode(
+      term,
+      "v_air_m_s" = "Air speed at ankle",
+      "t_air_c" = "Room air temperature",
+      "t_supply_c" = "Air temperature at ankle",
+      "thermal_sensation" = "Whole-body thermal sensation",
+      "turbulence_intensity" = "Turbulence intensity",
+      "clothing_typeshort" = "Ankle condition (uncovered vs. covered)",
+      "sourcetoby" = "Season"
+    ),
+    estimate_fmt = sprintf("%.2f", estimate),
+    std_error_fmt = sprintf("%.2f", std_error),
+    z_value_fmt = sprintf("%.2f", z_value),
+    p_value_fmt = dplyr::case_when(
+      p_value < 0.001 ~ "<0.001",
+      TRUE ~ sprintf("%.3f", p_value)
+    )
+  ) %>%
+  dplyr::select(term_label, estimate_fmt, std_error_fmt, z_value_fmt, p_value_fmt)
+
+model_formula_inline <- model_formula %>%
+  dplyr::mutate(
+    intercept_fmt = sprintf("%.3f", Intercept),
+    v_fmt = sprintf("%.3f", V_coef),
+    r2_fmt = sprintf("%.4f", R2),
+    formula_text_expanded = sprintf(
+      r"(PPD_{AD} = \frac{\exp\left(%s + %sV %s %sTS\right)}{1 + \exp\left(%s + %sV %s %sTS\right)})",
+      intercept_fmt,
+      v_fmt,
+      ifelse(TS_coef < 0, "-", "+"),
+      sprintf("%.3f", abs(TS_coef)),
+      intercept_fmt,
+      v_fmt,
+      ifelse(TS_coef < 0, "-", "+"),
+      sprintf("%.3f", abs(TS_coef))
+    )
+  )
+
+model_exposed <- model_formula_inline %>% dplyr::filter(Model == "exposed")
+model_covered <- model_formula_inline %>% dplyr::filter(Model == "unexposed")
+
+glmm_exposed_coef <- lme4::fixef(m_glmm_exposed)
+glmm_covered_coef <- lme4::fixef(m_glmm_unexposed)
+glmm_delta_intercept <- glmm_covered_coef["(Intercept)"] - glmm_exposed_coef["(Intercept)"]
+
+extract_final_model_table <- function(mod, model_label) {
+  coef_mat <- summary(mod)$coefficients
+  tibble::tibble(
+    model = model_label,
+    term = rownames(coef_mat),
+    estimate = coef_mat[, "Estimate"],
+    std_error = coef_mat[, "Std. Error"],
+    z_value = coef_mat[, "z value"],
+    p_value = coef_mat[, "Pr(>|z|)"]
+  )
+}
+
+model_final_table <- dplyr::bind_rows(
+  extract_final_model_table(m_glmm_exposed, "Ankle uncovered"),
+  extract_final_model_table(m_glmm_unexposed, "Ankle covered")
+) %>%
+  dplyr::mutate(
+    term_label = dplyr::recode(
+      term,
+      "(Intercept)" = "Intercept",
+      "v_air_m_s" = "Air speed at ankle",
+      "thermal_sensation" = "Whole-body thermal sensation"
+    ),
+    estimate_fmt = sprintf("%.2f", estimate),
+    std_error_fmt = sprintf("%.2f", std_error),
+    z_value_fmt = sprintf("%.2f", z_value),
+    p_value_fmt = dplyr::case_when(
+      p_value < 0.001 ~ "<0.001",
+      TRUE ~ sprintf("%.3f", p_value)
+    )
+  ) %>%
+  dplyr::group_by(model) %>%
+  dplyr::mutate(
+    model_display = dplyr::if_else(dplyr::row_number() == 1, model, "")
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(model_display, term_label, estimate_fmt, std_error_fmt, z_value_fmt, p_value_fmt)
 ```
+
+As shown in @tbl-updated-model-screening, in the mixed-effects model including all candidate predictors, air speed at ankle, whole-body thermal sensation, and ankle condition were significantly associated with draft dissatisfaction at the ankle, whereas room air temperature, air temperature at ankle, and turbulence intensity were not significant within the range investigated in this study.
+
+```{r}
+#| label: tbl-updated-model-screening
+#| tbl-cap: "Results of the generalized linear mixed-effects model used for predictor screening."
+#| echo: false
+
+knitr::kable(
+  model_screening_table,
+  col.names = c("Predictor", "Estimate", "SE", "z", "p")
+)
+```
+
+As shown in @tbl-updated-model-screening, in the mixed-effects model including all candidate predictors, air speed at ankle, whole-body thermal sensation, and ankle condition were significantly associated with draft dissatisfaction at the ankle, whereas room air temperature, air temperature at ankle, and turbulence intensity were not significant within the range investigated in this study. Based on these results, separate mixed-effects models for ankle draft dissatisfaction were developed for the ankle-uncovered and ankle-covered conditions, using air speed at ankle and whole-body thermal sensation as predictors.
+
+```{r}
+#| label: tbl-updated-model-final
+#| tbl-cap: "Generalized linear mixed-effects models for the ankle-uncovered and ankle-covered conditions."
+#| echo: false
+
+knitr::kable(
+  model_final_table,
+  col.names = c("Condition", "Predictor", "Estimate", "SE", "z", "p")
+)
+```
+
+As shown in @tbl-updated-model-final, the two final models exhibited the same structure but different coefficients. The intercept of the covered model was `r sprintf("%.2f", abs(glmm_delta_intercept))` units lower than that of the uncovered model, indicating a substantially lower baseline risk of ankle draft dissatisfaction when the ankle was covered by clothing. In addition, the air speed coefficient was smaller in the covered model than in the uncovered model, indicating reduced sensitivity of dissatisfaction to air velocity under ankle-covered conditions.
+
+For the ankle-uncovered condition, the approximate closed-form equation derived from the marginal predictions of the mixed-effects model can be written as:
+
+$$
+`r model_exposed$formula_text_expanded`
+$$
+
+For the ankle-covered condition, the corresponding approximate closed-form equation is:
+
+$$
+`r model_covered$formula_text_expanded`
+$$
+
+Where, $PPD_{AD}$ is the predicted percentage dissatisfied with ankle draft, $V$ is air speed at ankle (m/s), and $TS$ is whole-body thermal sensation.
+
+These linear approximations reproduced the marginal predictions of the mixed-effects models with high accuracy. The corresponding $R^2$ values were `r model_exposed$r2_fmt` for the uncovered condition and `r model_covered$r2_fmt` for the covered condition, indicating that the approximate equations preserved the predictive behavior of the original mixed-effects models well. The resulting model predictions are shown in @fig-updated-model.
+
+![Updated ankle draft dissatisfaction model under exposed and covered conditions. (a) ankle-uncovered conditions, and (b) ankle-covered conditions.](figs/Model.png){#fig-updated-model width="60%"}
 
 # Discussion
 
@@ -566,13 +592,9 @@ Under winter clothing conditions (0.75 clo), the observed dissatisfaction rate c
 
 The core finding of this study is that, under winter clothing conditions (0.75 clo), the observed dissatisfaction rate caused by ankle-level air movement is substantially lower than that predicted by the model of @liuPredictedPercentageDissatisfied2017. Compared with @schiavonSensationDraftUncovered2016, the overall dissatisfaction rates in this study are lower. Their study, which involved subjects with exposed ankles and lower legs wearing approximately 0.6 clo summer clothing, reported unacceptable rates ranging from 23% to 57%. In contrast, under ankle-covered conditions (≥0.75 clo) in this study, airflow unacceptability ranges from 6% to 20%.
 
-GLMM Model coefficients further support these findings. The most prominent difference between the two models lies in the intercept: the intercept of the covered model (−3.54) is 1.13 units lower than that of the exposed model (−1.64), reflecting a substantial reduction in baseline dissatisfaction risk due to winter clothing. Additionally, the air speed coefficient (V) in the covered model (2.62) is smaller than that in the exposed model (3.51), indicating reduced sensitivity of dissatisfaction to air velocity under winter clothing conditions. These results support a hypothesis proposed but not tested in @liuPredictedPercentageDissatisfied2017, that increased lower-body clothing insulation significantly reduces ankle draft dissatisfaction.
-
 These conclusions are consistent with several previous studies. @zhouDraughtSensationAssessment2022 reported that, in stratified heating environments, high-top shoes increased ankle airflow acceptability by approximately 15%, indicating that ankle coverage significantly reduces sensitivity to airflow. Similarly, Toftum and Nielsen found that, at the same air velocity, subjects with a cooler overall thermal sensation are more likely to perceive airflow as uncomfortable, suggesting that when clothing insulation is higher, the influence of ambient temperature and its interaction with airflow on perceived discomfort is attenuated [@toftumDraughtSensitivityInfluenced1996].
 
 Regarding predictor selection, this study explored the inclusion of additional variables; however, aside from clothing condition, only overall thermal sensation and air speed (V) were found to have significant effects on dissatisfaction, consistent with the model structures reported by @toftumDraughtSensitivityInfluenced1996 and @liuPredictedPercentageDissatisfied2017. @chengExperimentalStudyDraftrelated2023 also identified a relationship between overall thermal sensation and draft rate thresholds in stratified ventilation experiments, further supporting the use of overall thermal sensation as a predictor. However, although the dataset used by @liuPredictedPercentageDissatisfied2017 included both exposed and covered ankle conditions under summer clothing, no significant clothing effect was identified. This discrepancy may be attributed to their use of standard logistic regression, which pooled all observations across subjects and failed to account for the non-independence introduced by repeated measures, thereby masking the effect of clothing as a between-subject variable due to inter-individual variability.
-
-
 
 ## Mechanisms
 
@@ -590,7 +612,6 @@ The ankle skin temperature ($T_{\text{sk}}$) results indicate that winter clothi
 
 In addition, ankle coverage may influence airflow acceptability through psychological pathways, such as altered risk perception or attentional allocation. Occupants may perceive themselves as “protected” due to wearing thicker clothing on the lower body, which could increase tolerance to local airflow. Previous studies have shown that providing occupants with temperature information or “group perception feedback” can positively improve thermal comfort evaluations, suggesting that thermal perception is not solely determined by physical stimuli but is also modulated by expectations and informational cues [@zhangGroupPerceptionFeedback2022]. Similarly, research on thermal expectation indicates that expectation levels themselves influence thermal perception and evaluation [@schweikerThermalExpectation2020]. Field studies in winter conditions have also identified associations between perceived control and thermal comfort or satisfaction [@xuPerceivedControlWinter2021]. These findings suggest that the subjective perception of being “alreday protected” or “more in control” due to ankle coverage may enhance tolerance to local airflow. However, this psychological pathway was not directly measured in the present study and requires further investigation through controlled manipulation of coverage conditions alongside measurements of expectation, attention, and perceived control.
 
-
 ## Implications for building design and standards
 
 ```{=html}
@@ -602,15 +623,13 @@ In addition, ankle coverage may influence airflow acceptability through psycholo
 -->
 ```
 
-The ankle draft model proposed by @liuPredictedPercentageDissatisfied2017 has been incorporated into ASHRAE-55 as a basis for assessing ankle-level draft risk. However, this model does not distinguish between covered and uncovered ankle conditions in its formulation. Given that ASHRAE specifies an acceptable overall thermal sensation range of PMV = −0.5 to +0.5, the current standard requires ankle-level air velocity V_{\text{ankle}} < 0.22 \, \text{m/s} (corresponding to <20% dissatisfied) when TS = −0.5. This constraint may be overly conservative in practical winter conditions in office buildings.
+The ankle draft model proposed by @liuPredictedPercentageDissatisfied2017 has been incorporated into ASHRAE-55 as a basis for assessing ankle-level draft risk. However, this model does not distinguish between covered and uncovered ankle conditions in its formulation. Given that ASHRAE specifies an acceptable overall thermal sensation range of PMV = −0.5 to +0.5, the current standard requires ankle level air speed < 0.22 m/s (corresponding to \<20% dissatisfied) when TS = −0.5. This constraint may be overly conservative in practical winter conditions in office buildings.
 
-Based on empirical algorithms considering window surface temperature, window size, and occupant distance from the façade, the maximum downdraft velocity at approximately 1 m from a window is around 0.25 m/s. Under milder outdoor conditions or with smaller window areas, peak velocities are often predicted to fall within the range of 0.1–0.2 m/s [@lyonsWindowPerformanceHuman1999]. Within this context, for the winter perimeter conditions examined in this study (air velocity 0.1–0.7 m/s, supply air temperature 15–19°C), the covered model developed here suggests that ankle-level dissatisfaction remains within acceptable limits under many typical winter scenarios. Therefore, the single-threshold constraint in ASHRAE, based on the Liu model, may lead to conservative design decisions regarding the sizing or necessity of perimeter heating or reheat systems. From an energy and system sizing perspective, perimeter heating systems are often nontrivial in both cost and energy use. For example, commercial electric 
-perimeter heaters typically have a rated power density of approximately 150–250 W/ft (≈490–820 W/m) [@stelproCommercialBaseboardCBF2026]. For a continuous 10 m window perimeter, this corresponds to an installed capacity of roughly 5–8 kW. If “covered” (≥0.75 clo) and “uncovered” (<0.5 clo) scenarios are evaluated separately, it may be possible to relax ankle-level air speed limits under winter clothing conditions, thereby reducing unnecessary perimeter heating deployment and operation, and unlocking energy-saving potential and cost reductions.
+Based on empirical algorithms considering window surface temperature, window size, and occupant distance from the façade, the maximum downdraft velocity at approximately 1 m from a window is around 0.25 m/s. Under milder outdoor conditions or with smaller window areas, peak velocities are often predicted to fall within the range of 0.1–0.2 m/s [@lyonsWindowPerformanceHuman1999]. Within this context, for the winter perimeter conditions examined in this study (air velocity 0.1–0.7 m/s, supply air temperature 15–19°C), the covered model developed here suggests that ankle-level dissatisfaction remains within acceptable limits under many typical winter scenarios. Therefore, the single-threshold constraint in ASHRAE, based on the Liu model, may lead to conservative design decisions regarding the sizing or necessity of perimeter heating or reheat systems. From an energy and system sizing perspective, perimeter heating systems are often nontrivial in both cost and energy use. For example, commercial electric perimeter heaters typically have a rated power density of approximately 150–250 W/ft (≈490–820 W/m) [@stelproCommercialBaseboardCBF2026]. For a continuous 10 m window perimeter, this corresponds to an installed capacity of roughly 5–8 kW. If “covered” (≥0.75 clo) and “uncovered” (\<0.5 clo) scenarios are evaluated separately, it may be possible to relax ankle-level air speed limits under winter clothing conditions, thereby reducing unnecessary perimeter heating deployment and operation, and unlocking energy-saving potential and cost reductions.
 
-In practical applications, the model proposed in this study is consistent with the framework of the ankle draft model in ASHRAE. By constraining overall thermal sensation within the range of −0.5 to +0.5 and adopting a dissatisfaction threshold of <20%, acceptable air velocity limits can be derived.
+In practical applications, the model proposed in this study is consistent with the framework of the ankle draft model in ASHRAE. By constraining overall thermal sensation within the range of −0.5 to +0.5 and adopting a dissatisfaction threshold of \<20%, acceptable air velocity limits can be derived.
 
 Within this near-neutral thermal range, the Predicted Mean Vote (PMV) model provides relatively reliable predictions of overall thermal sensation. Therefore, PMV can be used as a proxy for overall thermal sensation during the design or evaluation stage. After specifying the ankle exposure condition (covered vs. uncovered), the corresponding model can then be applied to determine the acceptable range of ankle-level air speed.
-
 
 ## Limitations
 
@@ -627,41 +646,24 @@ Within this near-neutral thermal range, the Predicted Mean Vote (PMV) model prov
 
 # Conclusions
 
-
 # CRediT authorship contribution statement {.unnumbered}
 
-**Tobias Kramer**: Conceptualization, Data curation, Formal analysis,
-Methodology, Investigation, Project administration, Software, Writing -
-original draft, Writing - review & editing. **Stefano Schiavon**:
-Conceptualization, Funding acquisition, Methodology, Project
-administration, Supervision, Writing - review & editing.
+**Tobias Kramer**: Conceptualization, Data curation, Formal analysis, Methodology, Investigation, Project administration, Software, Writing - original draft, Writing - review & editing. **Junmeng Lyu**: Formal analysis, Methodology, Software, Writing - original draft, Writing - review & editing. **Stefano Schiavon**: Conceptualization, Funding acquisition, Methodology, Project administration, Supervision, Writing - review & editing.
 
 # Declaration of competing interest {.unnumbered}
 
-All authors declare XYZ competing interest. The Center for the Built
-Environment (CBE) at the University of California, Berkeley, with which
-the authors are affiliated, is advised and funded in part by
-approximately 50 partners that represent a diversity of organizations
-from the building industry, including manufacturers, building owners,
-facility managers, contractors, architects, engineers, government
-agencies, and utilities.
+All authors declare XYZ competing interest. The Center for the Built Environment (CBE) at the University of California, Berkeley, with which the authors are affiliated, is advised and funded in part by approximately 50 partners that represent a diversity of organizations from the building industry, including manufacturers, building owners, facility managers, contractors, architects, engineers, government agencies, and utilities.
 
 # Data availability {.unnumbered}
 
-The datasets generated and analyzed during the current study as well as
-the full source code of the data analysis workflow are available in the
-following GitHub repository: XXX.
+The datasets generated and analyzed during the current study as well as the full source code of the data analysis workflow are available in the following GitHub repository: XXX.
 
 # Declaration of Generative AI and AI-assisted technologies in the writing process {.unnumbered}
 
-During the preparation of this work, the authors utilized the chatbot
-Claude to enhance the language and readability of the content.
-Subsequently, they reviewed and edited the material as required, while
-maintaining full accountability for the publication’s content.
+During the preparation of this work, the authors utilized the chatbot Claude to enhance the language and readability of the content. Subsequently, they reviewed and edited the material as required, while maintaining full accountability for the publication’s content.
 
 # Acknowledgements {.unnumbered}
 
-The Center for the Built Environment at the University of California,
-Berkeley supported this research.
+The Center for the Built Environment at the University of California, Berkeley supported this research.
 
 # References {.unnumbered}

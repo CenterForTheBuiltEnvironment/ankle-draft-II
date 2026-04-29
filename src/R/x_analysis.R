@@ -920,7 +920,7 @@ Liumodel_calibrationcurve <- valProbggplot(
   y = dissatisfied_with_draft_ankles$dissatisfied_with_draft_ankles,
   smooth = "none",
   logistic.cal = TRUE,
-  col.log = "#6b8dd6",
+  col.log = "#4361ee",
   lwd.log = 1.2,
   col.ideal = "#eb6b58",
   lwd.ideal = 1,
@@ -941,6 +941,7 @@ Liumodel_calibrationcurve <- valProbggplot(
   allowPerfectPredictions = FALSE,
   legendloc = c(0.1, 0.95)
 )
+liu_calibration_stats <- Liumodel_calibrationcurve$stats
 Liumodel_calibrationcurve <- Liumodel_calibrationcurve$ggPlot +
   theme_classic(base_size = 9)+
   coord_cartesian(xlim = c(-0.12, 1), ylim = c(-0.12, 1)) +
@@ -1396,7 +1397,7 @@ ggsave(
 
 rm(
   grid_base, grid_exposed, grid_unexposed, Liumodel_calibrationcurve,
-  m_approx_exposed, m_approx_unexposed, m_glmm_exposed, m_glmm_unexposed,
+  m_approx_exposed, m_approx_unexposed,
   plot_grid_exposed, plot_grid_unexposed,
   tsk_ankle, tsk_timecourse,
   baseline_values, tsk_timecourse_delta
