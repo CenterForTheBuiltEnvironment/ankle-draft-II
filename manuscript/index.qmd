@@ -221,7 +221,9 @@ completion rates were monitored.
 #| tbl-colwidths: [15,25,15,45]
 #| echo: false
 
+# filtering for only the question we actually analyze
 readr::read_csv("tables/survey_scales.csv") |>
+  slice(1:4, 7:8, 10) |> 
   knitr::kable()
 ```
 
@@ -286,7 +288,7 @@ paired Cohen's d as the effect size. We analyzed ordinal variables using
 the paired Wilcoxon signed-rank test, reporting the test statistic based
 on the normal approximation and the effect size r. For multiple pairwise
 comparisons within each family of tests, we adjusted p-values using the
-Benjamini-Hochberg method \[\@benjaminiHighberg1995\].
+Benjamini-Hochberg method [@benjaminiHighberg1995].
 
 ### Evaluation of the existing ankle draft model
 
@@ -295,10 +297,10 @@ percentage of dissatisfaction with ankle draft at each observation
 point. Predictions were then averaged by experimental condition and
 compared with the observed dissatisfaction percentages. We used
 calibration curves to quantitatively assess the model's predictive
-performance in this study's dataset \[\@vancalster2016\] and report the
+performance in this study's dataset [@vancalster2016] and report the
 calibration intercept and slope, AUC, and Brier score. All analyses were
 implemented using the R package CalibrationCurves
-\[\@deCockCalibrationCurves2023\].
+[@deCockCalibrationCurves2023].
 
 ### Development of the new ankle draft model
 
@@ -395,7 +397,8 @@ Across all three sessions, head-level air temperature remained stable at
 °C, and
 `r env_airflow_t %>% dplyr::filter(measurement == "Air temperature, head level (°C)") %>% dplyr::pull("19C")`
 °C, and relative humidity was comparable across sessions, confirming
-stable background thermal conditions.
+stable background thermal conditions and establishing baseline in line
+with the PMV target level of \~ -0.5 (slightly cool).
 
 As the primary experimental manipulation, we set supply air temperatures
 to 15°C, 17°C, and 19°C to simulate the effect of window downdraft.
@@ -433,6 +436,12 @@ sensation_neutral_cool <- thermal_sensation_overall_summary %>%
   dplyr::group_by(session_sat, workstation) %>%
   dplyr::summarise(pct = sum(pct), .groups = "drop")
 
+# for ankle level comparison
+sensation_slightlycool_cold <- thermal_sensation_overall_summary %>%
+  dplyr::filter(response_value %in% c("Slightly cool", "Cool", "Cold")) %>%
+  dplyr::group_by(session_sat, workstation) %>%
+  dplyr::summarise(pct = sum(pct), .groups = "drop")
+
 preference_no_change <- thermal_preference_overall_summary %>%
   dplyr::filter(response_value == "No change")
 
@@ -442,27 +451,30 @@ preference_warmer <- thermal_preference_overall_summary %>%
 
 @fig-thermal-perception-overall presents whole-body thermal sensation
 and preference responses across all experimental conditions. Thermal
-sensation votes were predominantly in the neutral to slightly cool
+sensation votes were predominantly in the *Neutral* to *Slightly cool*
 range, with
 `r sensation_neutral_cool %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`
-of participants reporting sensations between "Cool" and "Neutral" across
+of participants reporting sensations between *Cool* and *Neutral* across
 conditions. At the lowest supply air temperature (15°C),
 `r get_sensation_pct("15C", "high", "Slightly cool")` of participants
-reported feeling slightly cool at the highest air speed, compared to
+reported feeling *Slightly cool* at the highest air speed, compared to
 `r get_sensation_pct("15C", "low", "Slightly cool")` at the lowest air
 speed. This pattern was less pronounced at warmer supply temperatures.
 
 Thermal preference responses indicated that participants were generally
 satisfied with the thermal conditions. Across all conditions,
 `r preference_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`
-of participants preferred "No change" to the thermal environment. The
-proportion preferring warmer conditions ranged from
+of participants preferred *No change* to the thermal environment. The
+proportion preferring *Warmer* conditions ranged from
 `r preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`,
 with the highest values observed during the 15°C supply air temperature
 sessions.
 
-![Thermal sensation (a) and thermal preference (b) for whole
-body.](figs/thermal_perception_overall.png){#fig-thermal-perception-overall
+![Whole body thermal sensation (a) and thermal preference (b) votes:
+Participants predominantly reported neutral to cool sensations and
+mostly a preference for no change, though cooler supply air temperatures
+increased the desire for warmer
+conditions.](figs/thermal_perception_overall.png){#fig-thermal-perception-overall
 width="75%"}
 
 ```{r}
@@ -506,8 +518,9 @@ and lowest at 15°C
 Within each supply air temperature condition, air speed had minimal
 effect on whole-body thermal acceptability.
 
-![Thermal acceptability for whole
-body.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall
+![Whole body thermal acceptability: Participants reported high overall
+acceptability across all sessions, with minimal variation driven by air
+speed.](figs/thermal_acceptability_overall.png){#fig-thermal-acceptability-overall
 width="100%"}
 
 ## Ankle level observations
@@ -544,28 +557,33 @@ ankle_preference_warmer <- thermal_preference_ankle_summary %>%
 
 @fig-thermal-perception-ankle presents thermal sensation and preference
 responses at the ankle level. Compared to whole-body responses,
-participants reported cooler sensations at the ankles. The proportion
-reporting sensations on the cool side of neutral (cold, cool, or
-slightly cool) ranged from
+participants overall reported cooler sensations at the ankles. The
+proportion reporting sensations on the cool side of neutral (*Cold*,
+*Cool*, or *Slightly cool*) ranged from
 `r ankle_sensation_cool_side %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`
-across conditions. At the coldest supply air temperature (15°C) with
-high air speed,
+across conditions (compared to
+`r sensation_slightlycool_cold %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`
+for whole-body thermal sensation). At the coldest supply air temperature
+(15°C) with high air speed,
 `r ankle_sensation_cool_side %>% dplyr::filter(session_sat == "15C", workstation == "high") %>% dplyr::mutate(pct = scales::percent(pct)) %>% dplyr::pull(pct)`
-of participants reported cool sensations at the ankles, compared to
+of participants reported *Cool* sensations at the ankles, compared to
 `r ankle_sensation_cool_side %>% dplyr::filter(session_sat == "19C", workstation == "low") %>% dplyr::mutate(pct = scales::percent(pct)) %>% dplyr::pull(pct)`
 at 19°C with low air speed.
 
 Thermal preference at the ankle level reflected this cooling effect. The
-proportion of participants preferring warmer ankles ranged from
+proportion of participants preferring *Warmer* ankles ranged from
 `r ankle_preference_warmer %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), " to ", scales::percent(max(pct)))) %>% dplyr::pull(range)`.
 At the most demanding condition (15°C, high air speed),
-`r get_ankle_preference_pct("15C", "high", "Warmer")` preferred warmer
+`r get_ankle_preference_pct("15C", "high", "Warmer")` preferred *Warmer*
 ankles, while at the mildest condition (19°C, low air speed), this
 proportion decreased to
 `r get_ankle_preference_pct("19C", "low", "Warmer")`.
 
-![Thermal sensation (a) and thermal preference (b) at ankle
-level.](figs/thermal_perception_ankle.png){#fig-thermal-perception-ankle
+![Ankle-level thermal sensation (a) and thermal preference (b):
+Participants reported cooler sensations at the ankles than the whole
+body, with cooler supply air and higher air speeds slightly increasing
+both cool sensations and the preference for warmer
+conditions.](figs/thermal_perception_ankle.png){#fig-thermal-perception-ankle
 width="75%"}
 
 ```{r}
@@ -596,7 +614,7 @@ air_pref_no_change <- air_movement_preference_summary %>%
 
 @fig-air-move-acc-pref shows air movement acceptability and preference
 at the ankle level. Despite the localized cooling, air movement at the
-ankles was rated acceptable by
+ankles was rated *Acceptable* by
 `r air_acceptability_acceptable %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`
 of participants across all conditions. Acceptability was highest at 19°C
 (`r air_acceptability_by_sat %>% dplyr::filter(session_sat == "19C") %>% dplyr::mutate(range = paste0(min, "–", max)) %>% dplyr::pull(range)`)
@@ -618,8 +636,11 @@ at 19°C with low air speed. The majority of participants
 (`r air_pref_no_change %>% dplyr::summarise(range = paste0(scales::percent(min(pct)), "–", scales::percent(max(pct)))) %>% dplyr::pull(range)`)
 preferred no change to the air movement across conditions.
 
-![(a) Air movement acceptability (a) and preference
-(b).](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref
+![Ankle-level air movement acceptability (a) and preference (b): Most
+participants found ankle air movement acceptable (80%–94%), though
+higher air speeds increased the preference for less air movement,
+particularly at cooler supply
+temperatures.](figs/air_movement_acc_pref.png){#fig-air-move-acc-pref
 width="75%"}
 
 ### Skin temperature
@@ -679,29 +700,34 @@ format_p_threshold <- function(p) {
 }
 ```
 
-Using each participant's skin temperature during the pre-exposure
-adaptation period as the baseline, ankle skin temperature during the
-final 1 min of exposure was negative under all conditions, ranging from
-approximately `r tsk_delta_last1_range$min_val` to
-`r tsk_delta_last1_range$max_val`°C. In general, the magnitude of skin
-temperature reduction increased with air speed, with medium and high air
-speeds typically producing greater cooling than low air speed across all
-three supply air temperature conditions. After BH correction, the
-differences between low and medium air speed and between low and high
-air speed were significant at all three supply air temperatures
+@fig-tsk illustrates the progression of ankle skin temperatures
+throughout the exposure period. Using the pre-exposure adaptation period
+as a baseline, ankle skin temperatures dropped under all conditions,
+with final reductions ranging from `r tsk_delta_last1_range$min_val`°C
+to `r tsk_delta_last1_range$max_val`°C. In general, the magnitude of
+this skin temperature reduction increased with air speed, as medium and
+high air speeds produced greater local cooling than low air speed across
+all three supply air temperatures.
+
+Statistical analysis using BH correction confirmed that the cooling
+differences between low and medium air speeds, as well as between low
+and high air speeds, were significant at all supply temperatures
 (`r format_p_threshold(tsk_delta_sig_low_med_max_p)` and
-`r format_p_threshold(tsk_delta_sig_low_high_max_p)`, respectively),
-whereas the difference between medium and high air speed was significant
-only at `r tsk_delta_sig_med_high`
+`r format_p_threshold(tsk_delta_sig_low_high_max_p)`, respectively). In
+contrast, the difference between medium and high air speeds reached
+significance only at `r tsk_delta_sig_med_high`
 (`r sprintf("p_adj = %.3f", tsk_delta_sig_med_high_p)`). These findings
-suggest that increasing local airflow enhanced the short-term cooling
-response of the ankle skin.
+indicate that increasing local airflow increases the short-term cooling
+response of the ankle skin and most noticeable temperature drops occur
+when shifting away from the lowest air speed setting.
 
 ![Time course of ankle skin temperature during the formal exposure phase
-across the nine experimental conditions: (a) absolute skin temperature;
-(b) ankle skin temperture change relative to the adaptation-period
-baseline. Shaded bands denote the between-subject mean ± 1
-SD.](figs/tsk_p.png){#fig-tsk width="90%"}
+across the nine experimental conditions for (a) absolute skin
+temperature and (b) change relative to the adaptation-period baseline (
+Shaded bands denote the between-subject mean ± 1 SD): Local cooling
+intensified as air speed increased, with the most significant
+temperature drops occurring when moving from low to medium
+airflow.](figs/tsk_p.png){#fig-tsk width="90%"}
 
 ## Dissatisfaction with ankle draft
 
@@ -730,51 +756,44 @@ liu_max_diff_speed <- liu_diff_by_speed %>% dplyr::slice(1) %>% dplyr::pull(sess
 liu_min_diff_speed <- liu_diff_by_speed %>% dplyr::slice(n()) %>% dplyr::pull(session_air_flow)
 ```
 
-@fig-model-comp compares the dissatisfaction rate predicted by the Liu
-model with the observations during our experiment. Across all tested
-conditions, the existing model consistently overpredicted local thermal
-dissatisfaction compared to the observed rates. At an ankle temperature
-of 15°C, the discrepancy between predicted and observed rates increased
-significantly with air speed: at low flow (0.2 m/s), the difference was
-`r res$diff[1]` percentage points (pp), rising to `r res$diff[3]` pp at
-high flow (0.6 m/s).
+@fig-model-comp(a) compares the dissatisfaction rates predicted by the
+Liu model against our experimental observations. Across all conditions,
+the existing model consistently overpredicted local thermal
+dissatisfaction. At a 15°C ankle temperature, the discrepancy between
+predicted and observed rates widened as air speed increased: the model
+overpredicted dissatisfaction by `r res$diff[1]` percentage points (pp),
+rising to `r res$diff[3]` pp at high flow (0.6 m/s).
 
-Similar trends were observed at 17°C and 19°C. Notably, for the 19°C
-condition at high air speed (0.6 m/s), the predicted PPD was
+We observed similar trends at 17°C and 19°C. Notably, for the 19°C
+condition at high air speed (0.6 m/s), the model predicted a PPD of
 `r res$ppd_liu_mean[9]`%, while the actual dissatisfied rate was only
 `r res$dissatisfied_rate[9]`%, resulting in a mean overestimation of
-`r res$diff[9]` pp. On average across all experimental sessions, the
-model overpredicted dissatisfaction by `r round(mean(res$diff), 1)` pp.
+`r res$diff[9]` pp. Across all experimental sessions, the model
+overpredicted dissatisfaction by an average of `r round(mean(res$diff))`
+pp.
 
-![Comparison of predicted and observed local thermal dissatisfaction
-across varying ankle-level temperatures and air speeds. The dumbbell
-plot illustrates the discrepancy (diff) between the Liu model
-predictions (ppd_liu_mean) and the actual observed dissatisfied rates
-(dissatisfied_rate). Experimental conditions include air speeds of
-approximately 0.2 m/s (low), 0.4 m/s (medium), and 0.6 m/s (high).
-Points represent mean values, with the segment length indicating the
-magnitude of model
-overestimation.](figs/model_error.png){#fig-model-comp width="90%"}
+![Performance and calibration of the Liu local dissatisfaction model:
+(a) The model consistently overpredicted ankle-level dissatisfaction
+across all conditions, with discrepancies widening at higher air speeds
+(points represent mean values, with the segment length indicating the
+magnitude of model overestimation); (b) while maintaining acceptable
+discrimination (AUC =
+`r sprintf("%.2f", liu_calibration_stats["C (ROC)"])`), the calibration
+curve confirms a systematic overestimation of dissatisfaction in winter
+conditions.](figs/model_error_combined.png){#fig-model-comp width="90%"}
 
-Under winter conditions, the observed ankle draft dissatisfaction was
-substantially lower than that predicted by the model of
-@liuPredictedPercentageDissatisfied2017. Although the model retained
+In addition, as shown in @fig-model-comp(b), the model retained
 acceptable discrimination on this dataset (AUC =
 `r sprintf("%.3f", liu_calibration_stats["C (ROC)"])`), the calibration
-results indicated a systematic overestimation under winter conditions,
-as shown in @fig-liu-calibration. Across the nine experimental
-conditions, the mean observed dissatisfaction rate was
-`r liu_model_summary$mean_observed`%, whereas the Liu model predicted an
-average of `r liu_model_summary$mean_predicted`%, corresponding to an
+results indicated a systematic overestimation under winter conditions.
+Across the nine experimental conditions, the mean observed
+dissatisfaction rate was `r liu_model_summary$mean_observed`%, whereas
+the Liu model predicted an average of
+`r liu_model_summary$mean_predicted`%, corresponding to an
 overestimation of approximately
 `r liu_model_summary$overprediction_ratio` times. The discrepancy was
 greatest at `r liu_max_diff_speed` air speed and smaller, but still
 evident, at `r liu_min_diff_speed` air speed.
-
-![Calibration curve of the Liu model evaluated on the present dataset
-under winter clothing
-conditions.](figs/Liumodel_calibrationcurve.png){#fig-liu-calibration
-width="50%"}
 
 ## Updated model for winter conditions
 

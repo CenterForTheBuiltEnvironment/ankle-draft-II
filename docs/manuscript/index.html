@@ -352,18 +352,6 @@ Table&nbsp;1: Survey constructs and measurement scales
 <td style="text-align: left;">−2 (clearly unacceptable) −1 (just unacceptable) +1 (just acceptable) +2 (clearly acceptable)</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Thermal satisfaction</td>
-<td style="text-align: left;">How satisfied are you with the thermal environment right now?</td>
-<td style="text-align: left;">7-point continuous</td>
-<td style="text-align: left;">−3 (very dissatisfied) −2 (dissatisfied) −1 (slightly dissatisfied) 0 (neither nor) +1 (slightly satisfied) +2 (satisfied) +3 (very satisfied)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Thermal pleasantness</td>
-<td style="text-align: left;">Right now do you find this thermal environment…?</td>
-<td style="text-align: left;">7-point continuous</td>
-<td style="text-align: left;">−3 (very unpleasant) −2 (unpleasant) −1 (slightly unpleasant) 0 (neutral) +1 (slightly pleasant) +2 (pleasant) +3 (very pleasant)</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">Air movement acceptability at ankles</td>
 <td style="text-align: left;">Please rate your acceptance of air movement at your ankles</td>
 <td style="text-align: left;">4-point continuous</td>
@@ -376,12 +364,6 @@ Table&nbsp;1: Survey constructs and measurement scales
 <td style="text-align: left;">−1 (less air movement) | 0 (no change) | +1 (more air movement)</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Air quality preference</td>
-<td style="text-align: left;">Please rate your acceptance of the current air quality in the room</td>
-<td style="text-align: left;">4-point continuous</td>
-<td style="text-align: left;">−2 (clearly unacceptable) −1 (just unacceptable) +1 (just acceptable) +2 (clearly acceptable)</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">Clothing change</td>
 <td style="text-align: left;">Did you adjust your upper body clothing?</td>
 <td style="text-align: left;">binary</td>
@@ -414,11 +396,11 @@ Table&nbsp;1: Survey constructs and measurement scales
 </section>
 <section id="within-subject-comparisons" class="level3" data-number="2.6.2">
 <h3 data-number="2.6.2" class="anchored" data-anchor-id="within-subject-comparisons"><span class="header-section-number">2.6.2</span> Within-subject comparisons</h3>
-<p>We used a within-subject repeated-measures design and conducted comparisons between experimental conditions within participants. We analyzed continuous variables using paired-samples t-tests and reported paired Cohen’s d as the effect size. We analyzed ordinal variables using the paired Wilcoxon signed-rank test, reporting the test statistic based on the normal approximation and the effect size r. For multiple pairwise comparisons within each family of tests, we adjusted p-values using the Benjamini-Hochberg method [@benjaminiHighberg1995].</p>
+<p>We used a within-subject repeated-measures design and conducted comparisons between experimental conditions within participants. We analyzed continuous variables using paired-samples t-tests and reported paired Cohen’s d as the effect size. We analyzed ordinal variables using the paired Wilcoxon signed-rank test, reporting the test statistic based on the normal approximation and the effect size r. For multiple pairwise comparisons within each family of tests, we adjusted p-values using the Benjamini-Hochberg method <span class="citation" data-cites="benjaminiHighberg1995">(<a href="#ref-benjaminiHighberg1995" role="doc-biblioref">Benjamini &amp; Hochberg, 1995</a>)</span>.</p>
 </section>
 <section id="evaluation-of-the-existing-ankle-draft-model" class="level3" data-number="2.6.3">
 <h3 data-number="2.6.3" class="anchored" data-anchor-id="evaluation-of-the-existing-ankle-draft-model"><span class="header-section-number">2.6.3</span> Evaluation of the existing ankle draft model</h3>
-<p>Applying it to the experimental data, we calculated the predicted percentage of dissatisfaction with ankle draft at each observation point. Predictions were then averaged by experimental condition and compared with the observed dissatisfaction percentages. We used calibration curves to quantitatively assess the model’s predictive performance in this study’s dataset [@vancalster2016] and report the calibration intercept and slope, AUC, and Brier score. All analyses were implemented using the R package CalibrationCurves [@deCockCalibrationCurves2023].</p>
+<p>Applying it to the experimental data, we calculated the predicted percentage of dissatisfaction with ankle draft at each observation point. Predictions were then averaged by experimental condition and compared with the observed dissatisfaction percentages. We used calibration curves to quantitatively assess the model’s predictive performance in this study’s dataset <span class="citation" data-cites="vancalster2016">(<a href="#ref-vancalster2016" role="doc-biblioref">Van Calster et al., 2016</a>)</span> and report the calibration intercept and slope, AUC, and Brier score. All analyses were implemented using the R package CalibrationCurves <span class="citation" data-cites="deCockCalibrationCurves2023">(<a href="#ref-deCockCalibrationCurves2023" role="doc-biblioref">De Cock et al., 2025</a>)</span>.</p>
 </section>
 <section id="development-of-the-new-ankle-draft-model" class="level3" data-number="2.6.4">
 <h3 data-number="2.6.4" class="anchored" data-anchor-id="development-of-the-new-ankle-draft-model"><span class="header-section-number">2.6.4</span> Development of the new ankle draft model</h3>
@@ -595,20 +577,20 @@ Table&nbsp;3: Summary of environmental measurements.
 </figure>
 </div>
 </div>
-<p><a href="#tbl-env" class="quarto-xref">Table&nbsp;3</a> provides an overview of the measured environmental conditions. Across all three sessions, head-level air temperature remained stable at 21.9 ( +/- 0.2) °C, 21.9 ( +/- 0.3) °C, and 21.9 ( +/- 0.2) °C, and relative humidity was comparable across sessions, confirming stable background thermal conditions.</p>
+<p><a href="#tbl-env" class="quarto-xref">Table&nbsp;3</a> provides an overview of the measured environmental conditions. Across all three sessions, head-level air temperature remained stable at 21.9 ( +/- 0.2) °C, 21.9 ( +/- 0.3) °C, and 21.9 ( +/- 0.2) °C, and relative humidity was comparable across sessions, confirming stable background thermal conditions and establishing baseline in line with the PMV target level of ~ -0.5 (slightly cool).</p>
 <p>As the primary experimental manipulation, we set supply air temperatures to 15°C, 17°C, and 19°C to simulate the effect of window downdraft. Ankle-level temperatures were slightly higher than the supply temperature due to mixing with the warmer ambient air, but remained stable across all sessions. Within each session, we exposed subjects to three airspeed levels at separate workstations. We measured consistent air speeds across all three workstations and sessions, confirming reliable reproduction of the low, medium, and high airspeed conditions. Turbulence intensities remained low throughout, indicating stable and controlled airflow.</p>
 </section>
 <section id="whole-body-thermal-perception" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="whole-body-thermal-perception"><span class="header-section-number">3.2</span> Whole body thermal perception</h2>
-<p><a href="#fig-thermal-perception-overall" class="quarto-xref">Figure&nbsp;1</a> presents whole-body thermal sensation and preference responses across all experimental conditions. Thermal sensation votes were predominantly in the neutral to slightly cool range, with 81%–92% of participants reporting sensations between “Cool” and “Neutral” across conditions. At the lowest supply air temperature (15°C), 43% of participants reported feeling slightly cool at the highest air speed, compared to 28% at the lowest air speed. This pattern was less pronounced at warmer supply temperatures.</p>
-<p>Thermal preference responses indicated that participants were generally satisfied with the thermal conditions. Across all conditions, 47%–65% of participants preferred “No change” to the thermal environment. The proportion preferring warmer conditions ranged from 25% to 45%, with the highest values observed during the 15°C supply air temperature sessions.</p>
+<p><a href="#fig-thermal-perception-overall" class="quarto-xref">Figure&nbsp;1</a> presents whole-body thermal sensation and preference responses across all experimental conditions. Thermal sensation votes were predominantly in the <em>Neutral</em> to <em>Slightly cool</em> range, with 81%–92% of participants reporting sensations between <em>Cool</em> and <em>Neutral</em> across conditions. At the lowest supply air temperature (15°C), 43% of participants reported feeling <em>Slightly cool</em> at the highest air speed, compared to 28% at the lowest air speed. This pattern was less pronounced at warmer supply temperatures.</p>
+<p>Thermal preference responses indicated that participants were generally satisfied with the thermal conditions. Across all conditions, 47%–65% of participants preferred <em>No change</em> to the thermal environment. The proportion preferring <em>Warmer</em> conditions ranged from 25% to 45%, with the highest values observed during the 15°C supply air temperature sessions.</p>
 <div id="fig-thermal-perception-overall" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-thermal-perception-overall-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figs/thermal_perception_overall.png" class="img-fluid figure-img" style="width:75.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-thermal-perception-overall-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Thermal sensation (a) and thermal preference (b) for whole body.
+Figure&nbsp;1: Whole body thermal sensation (a) and thermal preference (b) votes: Participants predominantly reported neutral to cool sensations and mostly a preference for no change, though cooler supply air temperatures increased the desire for warmer conditions.
 </figcaption>
 </figure>
 </div>
@@ -619,7 +601,7 @@ Figure&nbsp;1: Thermal sensation (a) and thermal preference (b) for whole body.
 <img src="figs/thermal_acceptability_overall.png" class="img-fluid figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-thermal-acceptability-overall-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Thermal acceptability for whole body.
+Figure&nbsp;2: Whole body thermal acceptability: Participants reported high overall acceptability across all sessions, with minimal variation driven by air speed.
 </figcaption>
 </figure>
 </div>
@@ -628,22 +610,22 @@ Figure&nbsp;2: Thermal acceptability for whole body.
 <h2 data-number="3.3" class="anchored" data-anchor-id="ankle-level-observations"><span class="header-section-number">3.3</span> Ankle level observations</h2>
 <section id="thermal-perception" class="level3" data-number="3.3.1">
 <h3 data-number="3.3.1" class="anchored" data-anchor-id="thermal-perception"><span class="header-section-number">3.3.1</span> Thermal perception</h3>
-<p><a href="#fig-thermal-perception-ankle" class="quarto-xref">Figure&nbsp;3</a> presents thermal sensation and preference responses at the ankle level. Compared to whole-body responses, participants reported cooler sensations at the ankles. The proportion reporting sensations on the cool side of neutral (cold, cool, or slightly cool) ranged from 38% to 66% across conditions. At the coldest supply air temperature (15°C) with high air speed, 66% of participants reported cool sensations at the ankles, compared to 39% at 19°C with low air speed.</p>
-<p>Thermal preference at the ankle level reflected this cooling effect. The proportion of participants preferring warmer ankles ranged from 28% to 53%. At the most demanding condition (15°C, high air speed), 53% preferred warmer ankles, while at the mildest condition (19°C, low air speed), this proportion decreased to 31%.</p>
+<p><a href="#fig-thermal-perception-ankle" class="quarto-xref">Figure&nbsp;3</a> presents thermal sensation and preference responses at the ankle level. Compared to whole-body responses, participants overall reported cooler sensations at the ankles. The proportion reporting sensations on the cool side of neutral (<em>Cold</em>, <em>Cool</em>, or <em>Slightly cool</em>) ranged from 38% to 66% across conditions (compared to 27% to 54% for whole-body thermal sensation). At the coldest supply air temperature (15°C) with high air speed, 66% of participants reported <em>Cool</em> sensations at the ankles, compared to 39% at 19°C with low air speed.</p>
+<p>Thermal preference at the ankle level reflected this cooling effect. The proportion of participants preferring <em>Warmer</em> ankles ranged from 28% to 53%. At the most demanding condition (15°C, high air speed), 53% preferred <em>Warmer</em> ankles, while at the mildest condition (19°C, low air speed), this proportion decreased to 31%.</p>
 <div id="fig-thermal-perception-ankle" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-thermal-perception-ankle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figs/thermal_perception_ankle.png" class="img-fluid figure-img" style="width:75.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-thermal-perception-ankle-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Thermal sensation (a) and thermal preference (b) at ankle level.
+Figure&nbsp;3: Ankle-level thermal sensation (a) and thermal preference (b): Participants reported cooler sensations at the ankles than the whole body, with cooler supply air and higher air speeds slightly increasing both cool sensations and the preference for warmer conditions.
 </figcaption>
 </figure>
 </div>
 </section>
 <section id="air-movement-perception" class="level3" data-number="3.3.2">
 <h3 data-number="3.3.2" class="anchored" data-anchor-id="air-movement-perception"><span class="header-section-number">3.3.2</span> Air movement perception</h3>
-<p><a href="#fig-air-move-acc-pref" class="quarto-xref">Figure&nbsp;4</a> shows air movement acceptability and preference at the ankle level. Despite the localized cooling, air movement at the ankles was rated acceptable by 80%–94% of participants across all conditions. Acceptability was highest at 19°C (83%–94%) and lowest at 17°C (80%–92%). Within each supply air temperature, acceptability tended to decrease slightly with increasing air speed.</p>
+<p><a href="#fig-air-move-acc-pref" class="quarto-xref">Figure&nbsp;4</a> shows air movement acceptability and preference at the ankle level. Despite the localized cooling, air movement at the ankles was rated <em>Acceptable</em> by 80%–94% of participants across all conditions. Acceptability was highest at 19°C (83%–94%) and lowest at 17°C (80%–92%). Within each supply air temperature, acceptability tended to decrease slightly with increasing air speed.</p>
 <p>Air movement preference responses indicated that a substantial proportion of participants would prefer less air movement at the ankles, particularly at higher air speeds. The proportion preferring less air movement ranged from 12% to 41%. At 17°C with high air speed, 41% preferred less air movement, compared to only 12% at 19°C with low air speed. The majority of participants (43%–75%) preferred no change to the air movement across conditions.</p>
 <div id="fig-air-move-acc-pref" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -651,21 +633,22 @@ Figure&nbsp;3: Thermal sensation (a) and thermal preference (b) at ankle level.
 <img src="figs/air_movement_acc_pref.png" class="img-fluid figure-img" style="width:75.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-air-move-acc-pref-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: (a) Air movement acceptability (a) and preference (b).
+Figure&nbsp;4: Ankle-level air movement acceptability (a) and preference (b): Most participants found ankle air movement acceptable (80%–94%), though higher air speeds increased the preference for less air movement, particularly at cooler supply temperatures.
 </figcaption>
 </figure>
 </div>
 </section>
 <section id="skin-temperature" class="level3" data-number="3.3.3">
 <h3 data-number="3.3.3" class="anchored" data-anchor-id="skin-temperature"><span class="header-section-number">3.3.3</span> Skin temperature</h3>
-<p>Using each participant’s skin temperature during the pre-exposure adaptation period as the baseline, ankle skin temperature during the final 1 min of exposure was negative under all conditions, ranging from approximately -1.7 to -0.8°C. In general, the magnitude of skin temperature reduction increased with air speed, with medium and high air speeds typically producing greater cooling than low air speed across all three supply air temperature conditions. After BH correction, the differences between low and medium air speed and between low and high air speed were significant at all three supply air temperatures (p_adj &lt; 0.05 and p_adj &lt; 0.001, respectively), whereas the difference between medium and high air speed was significant only at 19C (p_adj = 0.012). These findings suggest that increasing local airflow enhanced the short-term cooling response of the ankle skin.</p>
+<p><a href="#fig-tsk" class="quarto-xref">Figure&nbsp;5</a> illustrates the progression of ankle skin temperatures throughout the exposure period. Using the pre-exposure adaptation period as a baseline, ankle skin temperatures dropped under all conditions, with final reductions ranging from -1.7°C to -0.8°C. In general, the magnitude of this skin temperature reduction increased with air speed, as medium and high air speeds produced greater local cooling than low air speed across all three supply air temperatures.</p>
+<p>Statistical analysis using BH correction confirmed that the cooling differences between low and medium air speeds, as well as between low and high air speeds, were significant at all supply temperatures (p_adj &lt; 0.05 and p_adj &lt; 0.001, respectively). In contrast, the difference between medium and high air speeds reached significance only at 19C (p_adj = 0.012). These findings indicate that increasing local airflow increases the short-term cooling response of the ankle skin and most noticeable temperature drops occur when shifting away from the lowest air speed setting.</p>
 <div id="fig-tsk" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tsk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figs/tsk_p.png" class="img-fluid figure-img" style="width:90.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tsk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Time course of ankle skin temperature during the formal exposure phase across the nine experimental conditions: (a) absolute skin temperature; (b) ankle skin temperture change relative to the adaptation-period baseline. Shaded bands denote the between-subject mean ± 1 SD.
+Figure&nbsp;5: Time course of ankle skin temperature during the formal exposure phase across the nine experimental conditions for (a) absolute skin temperature and (b) change relative to the adaptation-period baseline ( Shaded bands denote the between-subject mean ± 1 SD): Local cooling intensified as air speed increased, with the most significant temperature drops occurring when moving from low to medium airflow.
 </figcaption>
 </figure>
 </div>
@@ -673,29 +656,19 @@ Figure&nbsp;5: Time course of ankle skin temperature during the formal exposure 
 </section>
 <section id="dissatisfaction-with-ankle-draft" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="dissatisfaction-with-ankle-draft"><span class="header-section-number">3.4</span> Dissatisfaction with ankle draft</h2>
-<p><a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;6</a> compares the dissatisfaction rate predicted by the Liu model with the observations during our experiment. Across all tested conditions, the existing model consistently overpredicted local thermal dissatisfaction compared to the observed rates. At an ankle temperature of 15°C, the discrepancy between predicted and observed rates increased significantly with air speed: at low flow (0.2 m/s), the difference was 8 percentage points (pp), rising to 39 pp at high flow (0.6 m/s).</p>
-<p>Similar trends were observed at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the predicted PPD was 50%, while the actual dissatisfied rate was only 17%, resulting in a mean overestimation of 34 pp.&nbsp;On average across all experimental sessions, the model overpredicted dissatisfaction by 23.1 pp.</p>
+<p><a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;6</a>(a) compares the dissatisfaction rates predicted by the Liu model against our experimental observations. Across all conditions, the existing model consistently overpredicted local thermal dissatisfaction. At a 15°C ankle temperature, the discrepancy between predicted and observed rates widened as air speed increased: the model overpredicted dissatisfaction by 8 percentage points (pp), rising to 39 pp at high flow (0.6 m/s).</p>
+<p>We observed similar trends at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the model predicted a PPD of 50%, while the actual dissatisfied rate was only 17%, resulting in a mean overestimation of 34 pp.&nbsp;Across all experimental sessions, the model overpredicted dissatisfaction by an average of 23 pp.</p>
 <div id="fig-model-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figs/model_error.png" class="img-fluid figure-img" style="width:90.0%">
+<img src="figs/model_error_combined.png" class="img-fluid figure-img" style="width:90.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: Comparison of predicted and observed local thermal dissatisfaction across varying ankle-level temperatures and air speeds. The dumbbell plot illustrates the discrepancy (diff) between the Liu model predictions (ppd_liu_mean) and the actual observed dissatisfied rates (dissatisfied_rate). Experimental conditions include air speeds of approximately 0.2 m/s (low), 0.4 m/s (medium), and 0.6 m/s (high). Points represent mean values, with the segment length indicating the magnitude of model overestimation.
+Figure&nbsp;6: Performance and calibration of the Liu local dissatisfaction model: (a) The model consistently overpredicted ankle-level dissatisfaction across all conditions, with discrepancies widening at higher air speeds (points represent mean values, with the segment length indicating the magnitude of model overestimation); (b) while maintaining acceptable discrimination (AUC = 0.85), the calibration curve confirms a systematic overestimation of dissatisfaction in winter conditions.
 </figcaption>
 </figure>
 </div>
-<p>Under winter conditions, the observed ankle draft dissatisfaction was substantially lower than that predicted by the model of <span class="citation" data-cites="liuPredictedPercentageDissatisfied2017">Liu et al. (<a href="#ref-liuPredictedPercentageDissatisfied2017" role="doc-biblioref">2017</a>)</span>. Although the model retained acceptable discrimination on this dataset (AUC = 0.847), the calibration results indicated a systematic overestimation under winter conditions, as shown in <a href="#fig-liu-calibration" class="quarto-xref">Figure&nbsp;7</a>. Across the nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu model predicted an average of 36%, corresponding to an overestimation of approximately 2.8 times. The discrepancy was greatest at high air speed and smaller, but still evident, at low air speed.</p>
-<div id="fig-liu-calibration" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-liu-calibration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figs/Liumodel_calibrationcurve.png" class="img-fluid figure-img" style="width:50.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-liu-calibration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: Calibration curve of the Liu model evaluated on the present dataset under winter clothing conditions.
-</figcaption>
-</figure>
-</div>
+<p>In addition, as shown in <a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;6</a>(b), the model retained acceptable discrimination on this dataset (AUC = 0.847), the calibration results indicated a systematic overestimation under winter conditions. Across the nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu model predicted an average of 36%, corresponding to an overestimation of approximately 2.8 times. The discrepancy was greatest at high air speed and smaller, but still evident, at low air speed.</p>
 </section>
 <section id="updated-model-for-winter-conditions" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="updated-model-for-winter-conditions"><span class="header-section-number">3.5</span> Updated model for winter conditions</h2>
@@ -876,14 +849,14 @@ PPD_{AD} = \frac{\exp\left(-2.087 + 2.255V - 0.915TS\right)}{1 + \exp\left(-2.08
 PPD_{AD} = \frac{\exp\left(-3.222 + 1.878V - 0.983TS\right)}{1 + \exp\left(-3.222 + 1.878V - 0.983TS\right)}
 \]</span></p>
 <p>Where, <span class="math inline">\(PPD_{AD}\)</span> is the predicted percentage dissatisfied with ankle draft, <span class="math inline">\(V\)</span> is air speed at ankle (m/s), and <span class="math inline">\(TS\)</span> is whole-body thermal sensation.</p>
-<p>These linear approximations reproduced the marginal predictions of the mixed-effects models with high accuracy. The corresponding <span class="math inline">\(R^2\)</span> values were 0.9989 for the uncovered condition and 0.9967 for the covered condition, indicating that the approximate equations preserved the predictive behavior of the original mixed-effects models well. The resulting model predictions are shown in <a href="#fig-updated-model" class="quarto-xref">Figure&nbsp;8</a>.</p>
+<p>These linear approximations reproduced the marginal predictions of the mixed-effects models with high accuracy. The corresponding <span class="math inline">\(R^2\)</span> values were 0.9989 for the uncovered condition and 0.9967 for the covered condition, indicating that the approximate equations preserved the predictive behavior of the original mixed-effects models well. The resulting model predictions are shown in <a href="#fig-updated-model" class="quarto-xref">Figure&nbsp;7</a>.</p>
 <div id="fig-updated-model" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-updated-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figs/Model.png" class="img-fluid figure-img" style="width:60.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-updated-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8: Updated ankle draft dissatisfaction model under exposed and covered conditions. (a) ankle-uncovered conditions, and (b) ankle-covered conditions.
+Figure&nbsp;7: Updated ankle draft dissatisfaction model under exposed and covered conditions. (a) ankle-uncovered conditions, and (b) ankle-covered conditions.
 </figcaption>
 </figure>
 </div>
@@ -965,11 +938,17 @@ Figure&nbsp;8: Updated ankle draft dissatisfaction model under exposed and cover
 <div id="ref-ashraeANSIASHRAEStandard2023" class="csl-entry" role="listitem">
 ASHRAE. (2023). <em><span>ANSI</span>/<span>ASHRAE</span> <span>Standard</span> 55-2023: <span>Thermal</span> <span>Environmental</span> <span>Conditions</span> for <span>Human</span> <span>Occupancy</span></em>. American Society of Heating, Refrigerating; Air-Conditioning Engineers.
 </div>
+<div id="ref-benjaminiHighberg1995" class="csl-entry" role="listitem">
+Benjamini, Y., &amp; Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. <em>Journal of the Royal Statistical Society: Series B (Methodological)</em>, <em>57</em>(1), 289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">https://doi.org/10.1111/j.2517-6161.1995.tb02031.x</a>
+</div>
 <div id="ref-chengExperimentalStudyDraftrelated2023" class="csl-entry" role="listitem">
 Cheng, F., Cheng, Y., &amp; Lin, Z. (2023). Experimental study of draft-related local discomfort in a room with stratum ventilation. <em>Applied Thermal Engineering</em>, <em>234</em>, 121259. <a href="https://doi.org/10.1016/j.applthermaleng.2023.121259">https://doi.org/10.1016/j.applthermaleng.2023.121259</a>
 </div>
 <div id="ref-ChoiInvestigationHumanBody2012" class="csl-entry" role="listitem">
 Choi, J.-H., &amp; Loftness, V. (2012). <em>Investigation of human body skin temperatures as a bio-signal to indicate overall thermal sensations</em>. <em>58</em>, 258–269.
+</div>
+<div id="ref-deCockCalibrationCurves2023" class="csl-entry" role="listitem">
+De Cock, B., Nieboer, D., Van Calster, B., Steyerberg, E. W., &amp; Vergouwe, Y. (2025). <em>The <span>CalibrationCurves</span> package: Assessing the agreement between observed outcomes and predictions</em>. <a href="https://doi.org/10.32614/CRAN.package.CalibrationCurves">https://doi.org/10.32614/CRAN.package.CalibrationCurves</a>
 </div>
 <div id="ref-foldvarylicinaDevelopmentASHRAEGlobal2018" class="csl-entry" role="listitem">
 Földváry Ličina, V., Cheung, T., Zhang, H., Dear, R. de, Parkinson, T., Arens, E., Chun, C., Schiavon, S., Luo, M., Brager, G., Li, P., Kaam, S., Adebamowo, M. A., Andamon, M. M., Babich, F., Bouden, C., Bukovianska, H., Candido, C., Cao, B., … Zhou, X. (2018). Development of the <span>ASHRAE</span> <span>Global</span> <span>Thermal</span> <span>Comfort</span> <span>Database</span> <span>II</span>. <em>Building and Environment</em>, <em>142</em>, 502–512. <a href="https://doi.org/10.1016/j.buildenv.2018.06.022">https://doi.org/10.1016/j.buildenv.2018.06.022</a>
@@ -1006,6 +985,9 @@ Tartarini, F., Schiavon, S., Cheung, T., &amp; Hoyt, T. (2020). CBE thermal comf
 </div>
 <div id="ref-toftumDraughtSensitivityInfluenced1996" class="csl-entry" role="listitem">
 Toftum, J., &amp; Nielsen, R. (1996). Draught sensitivity is influenced by general thermal sensation. <em>International Journal of Industrial Ergonomics</em>, <em>18</em>, 295–305. <a href="https://doi.org/10.1016/0169-8141(95)00070-4">https://doi.org/10.1016/0169-8141(95)00070-4</a>
+</div>
+<div id="ref-vancalster2016" class="csl-entry" role="listitem">
+Van Calster, B., Nieboer, D., Vergouwe, Y., De Cock, B., Pencina, M. J., &amp; Steyerberg, E. W. (2016). A calibration hierarchy for risk models was defined: From utopia to empirical data. <em>Journal of Clinical Epidemiology</em>, <em>74</em>, 167–176. https://doi.org/<a href="https://doi.org/10.1016/j.jclinepi.2015.12.005">https://doi.org/10.1016/j.jclinepi.2015.12.005</a>
 </div>
 <div id="ref-xuPerceivedControlWinter2021" class="csl-entry" role="listitem">
 Xu, C., &amp; Li, S. (2021). Influence of perceived control on thermal comfort in winter, <span>A</span> case study in hot summer and cold winter zone in <span>China</span>. <em>Journal of Building Engineering</em>, <em>40</em>, 102389. <a href="https://doi.org/10.1016/j.jobe.2021.102389">https://doi.org/10.1016/j.jobe.2021.102389</a>
