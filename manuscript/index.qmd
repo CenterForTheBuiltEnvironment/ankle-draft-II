@@ -1170,15 +1170,15 @@ ankle-level air speed.
 
 **Tobias Kramer**: Conceptualization, Data curation, Formal analysis,
 Methodology, Investigation, Project administration, Software, Writing -
-original draft, Writing - review & editing. **Junmeng Lyu**: Formal
-analysis, Methodology, Software, Writing - original draft, Writing -
+original draft, Writing - review & editing. **Junmeng Lyu**: Data curation, Formal
+analysis, Methodology, Investigation, Software, Writing - original draft, Writing -
 review & editing. **Stefano Schiavon**: Conceptualization, Funding
 acquisition, Methodology, Project administration, Supervision, Writing -
 review & editing.
 
 # Declaration of competing interest {.unnumbered}
 
-All authors declare XYZ competing interest. The Center for the Built
+All authors declare no competing interest. The Center for the Built
 Environment (CBE) at the University of California, Berkeley, with which
 the authors are affiliated, is advised and funded in part by
 approximately 50 partners that represent a diversity of organizations
