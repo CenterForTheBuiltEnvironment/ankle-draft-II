@@ -138,8 +138,6 @@ range of conditions associated with window downdraft under typical
 winter conditions, informed by computational fluid dynamics simulations
 conducted as part of a broader research collaboration.
 
-PLACEHOLDER EXPERIMENTAL PROTOCOL GRAPHIC
-
 Participants attended four sessions: an introductory session for
 explaining the experiment and obtaining consent, followed by three
 experimental sessions of approximately two hours each. Each experimental
@@ -162,7 +160,8 @@ whole-body thermal sensation of approximately −0.5 (slightly cool) on
 the ASHRAE seven-point scale as calculated using the CBE Comfort Tool
 [@tartariniCBEThermalComfort2020].
 
-PLACEHOLDER CHAMBER SETUP GRAPHIC
+![Experimental configuration and temporal protocol: (a) Seated occupant positioned 0.7 m from the custom displacement diffuser, which simulates window downdraft by directing conditioned air toward the ankle region from behind; (b) Timeline of the 120-minute experimental sessions featuring overlapping participant groups and synchronized questionnaire intervals to characterize the progression of local and whole-body thermal perception.](figs/experimental_setup.png){#fig-setup
+width="75%"}
 
 We used custom displacement diffusers to deliver conditioned air to the
 ankle region of participants seated at the three workstations. The
@@ -976,73 +975,247 @@ conditions.](figs/Model.png){#fig-updated-model width="60%"}
 
 ## Comparison with prior research
 
-The central finding of this study is that ankle-level dissatisfaction under winter clothing conditions (≥0.75 clo) is substantially lower than predicted by the model of @liuPredictedPercentageDissatisfied2017 and than observed in prior studies with exposed ankles. In the experiments of @schiavonSensationDraftUncovered2016, where participants wore summer clothing (~0.6 clo) with exposed ankles and lower legs, unacceptability rates ranged from 23% to 57%. Under the ankle-covered conditions in this study, airflow unacceptability ranged from only 6% to 20% across comparable air speed and temperature conditions.
+The central finding of this study is that ankle-level dissatisfaction
+under winter clothing conditions (≥0.75 clo) is substantially lower than
+predicted by the existing model of
+@liuPredictedPercentageDissatisfied2017 and than observed in prior
+studies with exposed ankles. In the experiments of
+@schiavonSensationDraftUncovered2016, where participants wore summer
+clothing (\~0.6 clo) with exposed ankles and lower legs, unacceptability
+rates ranged from 23% to 57%. Under the ankle-covered conditions in this
+study, airflow unacceptability ranged from only 6% to 20% across
+comparable air speed and temperature conditions.
 
-These findings align with other research on the protective effects of lower-body coverage. @zhouDraughtSensationAssessment2022 reported that high-top shoes increased ankle airflow acceptability by approximately 15% in stratified heating environments, demonstrating that even partial ankle coverage meaningfully reduces sensitivity to local airflow. Similarly, @toftumDraughtSensitivityInfluenced1996 found that occupants with cooler overall thermal sensations are more likely to perceive airflow as uncomfortable, and that higher clothing insulation attenuates the interaction between ambient temperature and airflow-induced discomfort.
+These findings align with other research on the protective effects of
+lower-body coverage. @zhouDraughtSensationAssessment2022 reported that
+high-top shoes increased ankle airflow acceptability by approximately
+15% in stratified heating environments, demonstrating that even partial
+ankle coverage meaningfully reduces sensitivity to local airflow.
+Similarly, @toftumDraughtSensitivityInfluenced1996 found that occupants
+with cooler overall thermal sensations are more likely to perceive
+airflow as uncomfortable, and that higher clothing insulation attenuates
+the interaction between ambient temperature and airflow-induced
+discomfort.
 
-Regarding predictor selection, only whole-body thermal sensation and air speed were significant predictors of dissatisfaction in our models, consistent with the structures reported by @toftumDraughtSensitivityInfluenced1996 and @liuPredictedPercentageDissatisfied2017. @chengExperimentalStudyDraftrelated2023 similarly identified a relationship between overall thermal sensation and draft rate thresholds, further supporting its inclusion as a predictor.
+Regarding predictor selection, only whole-body thermal sensation and air
+speed were significant predictors of dissatisfaction in our models,
+consistent with the structures reported by
+@toftumDraughtSensitivityInfluenced1996 and
+@liuPredictedPercentageDissatisfied2017.
+@chengExperimentalStudyDraftrelated2023 similarly identified a
+relationship between overall thermal sensation and draft rate
+thresholds, further supporting its inclusion as a predictor.
 
-Although the dataset used by @liuPredictedPercentageDissatisfied2017 included both exposed and covered ankle conditions, no significant clothing effect was identified in their analysis. This discrepancy likely stems from their use of standard logistic regression, which pooled observations across subjects without accounting for the non-independence introduced by repeated measures. This approach may have masked the clothing effect as a between-subject variable due to inter-individual variability—a limitation addressed in our study through the use of mixed-effects models.
+Although the dataset used by @liuPredictedPercentageDissatisfied2017
+included both exposed and covered ankle conditions, no significant
+clothing effect was identified in their analysis. This discrepancy
+likely stems from their use of standard logistic regression, which
+pooled observations across subjects without accounting for the
+non-independence introduced by repeated measures. This approach may have
+masked the clothing effect as a between-subject variable due to
+inter-individual variability, which is a limitation addressed in our
+study through the use of mixed-effects models.
 
 ## Mechanisms
 
-Two complementary pathways—physiological and psychological—may explain the reduced sensitivity to ankle draft under winter clothing conditions.
+Two complementary pathways, physiological and psychological, may explain
+the reduced sensitivity to ankle draft under winter clothing conditions.
 
-From a physiological perspective, the skin temperature results indicate that winter clothing attenuates, though does not eliminate, the local cooling effect of airflow. During the final steady-state period, significant reductions in ankle skin temperature occurred only at the coldest supply temperature (15°C), where medium and high air speeds produced lower skin temperatures than the low-speed condition. At 17°C and 19°C, variations in air speed did not yield significant differences in steady-state skin temperature, and no significant differences were observed between medium and high air speeds at any supply temperature. These findings suggest that detectable local cooling requires a sufficiently large environmental contrast.
+From a physiological perspective, the skin temperature results indicate
+that winter clothing attenuates, though does not eliminate, the local
+cooling effect of airflow. During the final steady-state period,
+significant reductions in ankle skin temperature occurred only at the
+coldest supply temperature (15°C), where medium and high air speeds
+produced lower skin temperatures than the low-speed condition. At 17°C
+and 19°C, variations in air speed did not yield significant differences
+in steady-state skin temperature, and no significant differences were
+observed between medium and high air speeds at any supply temperature.
+These findings suggest that detectable local cooling requires a
+sufficiently large environmental contrast.
 
-Thermal sensation changes are more closely associated with rapid variations in skin temperature than with absolute values [@ChoiInvestigationHumanBody2012; @KenshaloCoolThresholds1968]. In this study, ankle $\Delta T_{\text{sk}}$ relative to the baseline adaptation period showed significant differences between low and medium/high air speed conditions across all supply temperatures (effect size $d \approx 0.6\text{--}0.9$). Consistent with this, local ankle thermal sensation at medium and high speeds was significantly lower than at low speed under the 15°C condition. However, air movement acceptability did not differ significantly across conditions, indicating that while air speed produced measurable shifts in skin temperature and local thermal sensation, the magnitude of these changes was insufficient to generate distinguishable differences in dissatisfaction within the tested range. From a heat transfer perspective, clothing coverage increases local thermal resistance and reduces convective heat exchange [@lee3DQuantificationMicroclimate2007], suppressing both the magnitude and variability of skin temperature changes and making it less likely that occupants cross discomfort thresholds.
+Thermal sensation changes are more closely associated with rapid
+variations in skin temperature than with absolute values
+[@ChoiInvestigationHumanBody2012; @KenshaloCoolThresholds1968]. In this
+study, ankle $\Delta T_{\text{sk}}$ relative to the baseline adaptation
+period showed significant differences between low and medium/high air
+speed conditions across all supply temperatures (effect size
+$d \approx 0.6\text{-}0.9$). Consistent with this, local ankle thermal
+sensation at medium and high speeds was significantly lower than at low
+speed under the 15°C condition. However, air movement acceptability did
+not differ significantly across conditions, indicating that while air
+speed produced measurable shifts in skin temperature and local thermal
+sensation, the magnitude of these changes was insufficient to generate
+distinguishable differences in dissatisfaction within the tested range.
+From a heat transfer perspective, clothing coverage increases local
+thermal resistance and reduces convective heat exchange
+[@lee3DQuantificationMicroclimate2007], suppressing both the magnitude
+and variability of skin temperature changes and making it less likely
+that occupants cross discomfort thresholds.
 
-Psychological factors may also contribute to the observed tolerance. Occupants wearing thicker lower-body clothing may perceive themselves as "protected," increasing their tolerance to local airflow. Prior research has demonstrated that thermal perception is not solely determined by physical stimuli but is modulated by expectations and informational cues. Providing occupants with temperature information or group perception feedback can improve thermal comfort evaluations [@zhangGroupPerceptionFeedback2022], and thermal expectations themselves influence perception [@schweikerThermalExpectation2020]. Field studies have also identified associations between perceived control and thermal satisfaction in winter conditions [@xuPerceivedControlWinter2021]. These findings suggest that the subjective sense of being protected by clothing may enhance tolerance to ankle draft, though this psychological pathway was not directly measured in the present study and warrants further investigation.
+Psychological factors may also contribute to the observed tolerance.
+Occupants wearing thicker lower-body clothing may perceive themselves as
+"protected," increasing their tolerance to local airflow. Prior research
+has demonstrated that thermal perception is not solely determined by
+physical stimuli but is modulated by expectations and informational
+cues. Providing occupants with temperature information or group
+perception feedback can improve thermal comfort evaluations
+[@zhangGroupPerceptionFeedback2022], and thermal expectations themselves
+influence perception [@schweikerThermalExpectation2020]. Field studies
+have also identified associations between perceived control and thermal
+satisfaction in winter conditions [@xuPerceivedControlWinter2021]. These
+findings suggest that the subjective sense of being protected by
+clothing may enhance tolerance to ankle draft, though this psychological
+pathway was not directly measured in the present study and warrants
+further investigation.
 
-Together, these physiological and psychological mechanisms likely act in concert: clothing reduces the physical cooling stimulus while simultaneously altering occupants' expectations and perceived vulnerability to draft.
+Together, these physiological and psychological mechanisms likely act in
+concert: clothing reduces the physical cooling stimulus while
+simultaneously altering occupants' expectations and perceived
+vulnerability to draft.
 
 ## Implications for building design and standards
 
-The ankle draft model of @liuPredictedPercentageDissatisfied2017, now incorporated into ASHRAE Standard 55, does not distinguish between covered and uncovered ankle conditions. Given the standard's acceptable thermal sensation range of PMV = −0.5 to +0.5, the current criterion requires ankle-level air speed below 0.22 m/s to achieve less than 20% dissatisfied when TS = −0.5. This constraint may be overly conservative for typical winter office environments where occupants wear clothing that covers the ankle.
+The ankle draft model of @liuPredictedPercentageDissatisfied2017, now
+incorporated into ASHRAE Standard 55, does not distinguish between
+covered and uncovered ankle conditions. Given the standard's acceptable
+thermal sensation range of PMV = −0.5 to +0.5, the current criterion
+requires ankle-level air speed below 0.22 m/s to achieve less than 20%
+dissatisfied when TS = −0.5. This constraint may be overly conservative
+for typical winter office environments where occupants wear clothing
+that covers the ankle.
 
-The findings of this study support a differentiated approach. For winter conditions with ankle coverage (≥0.75 clo), the covered-ankle model developed here indicates that dissatisfaction remains within acceptable limits at air speeds that would exceed the current threshold. Empirical predictions of window downdraft suggest that maximum velocities at approximately 1 m from the façade are around 0.25 m/s, with peak velocities often falling within 0.1–0.2 m/s under milder outdoor conditions or with smaller window areas [@lyonsWindowPerformanceHuman1999]. Many of these scenarios would be acceptable under the covered-ankle model but flagged as problematic under the current single-threshold approach.
+The findings of this study support a differentiated approach. For winter
+conditions with ankle coverage (≥0.75 clo), the covered-ankle model
+developed here indicates that dissatisfaction remains within acceptable
+limits at air speeds that would exceed the current threshold. Empirical
+predictions of window downdraft suggest that maximum velocities at
+approximately 1 m from the façade are around 0.25 m/s, with peak
+velocities often falling within 0.1–0.2 m/s under milder outdoor
+conditions or with smaller window areas
+[@lyonsWindowPerformanceHuman1999]. Many of these scenarios would be
+acceptable under the covered-ankle model but flagged as problematic
+under the current single-threshold approach.
 
-For practitioners, this suggests a two-criteria framework: apply the existing model (or the uncovered-ankle model from this study) when evaluating spaces where occupants are likely to have exposed ankles, and apply the covered-ankle model for winter heating scenarios where long trousers, socks, and closed-toe shoes are expected. Within the near-neutral thermal range where ASHRAE Standard 55 applies, PMV provides a reasonable proxy for whole-body thermal sensation during design evaluation.
+For practitioners, this suggests a two-criteria framework: apply the
+existing model (or the uncovered-ankle model from this study) when
+evaluating spaces where occupants are likely to have exposed ankles, and
+apply the covered-ankle model for winter heating scenarios where long
+trousers, socks, and closed-toe shoes are expected. Within the
+near-neutral thermal range where ASHRAE Standard 55 applies, PMV
+provides a reasonable proxy for whole-body thermal sensation during
+design evaluation.
 
-The practical benefits are significant. Perimeter heating systems represent non-trivial costs in both installation and operation. If covered and uncovered conditions are evaluated separately, designers may be able to reduce perimeter heating capacity or, in some cases, eliminate it entirely for spaces with favorable glazing and winter-clothed occupants. This approach could yield meaningful reductions in first costs, energy consumption, and associated carbon emissions while maintaining occupant comfort.
+The practical benefits are significant. Perimeter heating systems
+represent non-trivial costs in both installation and operation. If
+covered and uncovered conditions are evaluated separately, designers may
+be able to reduce perimeter heating capacity or, in some cases,
+eliminate it entirely for spaces with favorable glazing and
+winter-clothed occupants. This approach could yield meaningful
+reductions in first costs, energy consumption, and associated carbon
+emissions while maintaining occupant comfort.
 
 ## Limitations
 
-Several limitations should be considered when interpreting these findings.
+Several limitations should be considered when interpreting these
+findings.
 
-First, this study was conducted in a controlled laboratory environment with standardized clothing, which differs from real office settings where occupants exhibit considerable variability in attire even during winter months. While we targeted 0.75 clo to represent median winter office clothing, actual insulation levels vary with individual preferences, building temperatures, and cultural norms. The protective effect of ankle coverage may differ with clothing types not tested here, such as ankle-length skirts, cropped trousers, or low-cut shoes.
+First, this study was conducted in a controlled laboratory environment
+with standardized clothing, which differs from real office settings
+where occupants exhibit considerable variability in attire even during
+winter months. While we targeted 0.75 clo to represent median winter
+office clothing, actual insulation levels vary with individual
+preferences, building temperatures, and cultural norms. The protective
+effect of ankle coverage may differ with clothing types not tested here,
+such as ankle-length skirts, cropped trousers, or low-cut shoes.
 
-Second, the participant sample consisted primarily of university-affiliated individuals within a limited age range. Thermal sensitivity varies with age, and older occupants may respond differently to ankle draft. The generalizability of these findings to broader occupant populations warrants further investigation.
+Second, the participant sample consisted primarily of
+university-affiliated individuals within a limited age range. Thermal
+sensitivity varies with age, and older occupants may respond differently
+to ankle draft. The generalizability of these findings to broader
+occupant populations warrants further investigation.
 
-Third, the experimental protocol involved 20-minute exposure periods, whereas real office occupants experience sustained exposure over hours. Whether dissatisfaction accumulates or diminishes with prolonged exposure was not assessed. Similarly, participants remained seated throughout; standing or walking occupants may have different thermal experiences at the ankle level.
+Third, the experimental protocol involved 20-minute exposure periods,
+whereas real office occupants experience sustained exposure over hours.
+Whether dissatisfaction accumulates or diminishes with prolonged
+exposure was not assessed. Similarly, participants remained seated
+throughout; standing or walking occupants may have different thermal
+experiences at the ankle level.
 
-Fourth, the experimental conditions covered supply air temperatures of 15–19°C and air speeds of 0.1–0.7 m/s. While these ranges were selected to represent typical window downdraft conditions, more extreme scenarios (colder supply temperatures or higher velocities) were not tested. The model predictions should be applied with caution outside the tested parameter space.
+Fourth, the experimental conditions covered supply air temperatures of
+15–19°C and air speeds of 0.1–0.7 m/s. While these ranges were selected
+to represent typical window downdraft conditions, more extreme scenarios
+(colder supply temperatures or higher velocities) were not tested. The
+model predictions should be applied with caution outside the tested
+parameter space.
 
-Fifth, airflow was delivered from behind the participants to simulate window downdraft approaching from the façade. Other airflow directions (lateral or frontal) may produce different perceptual responses, particularly given potential differences in skin exposure and attention to the stimulus source.
+Fifth, airflow was delivered from behind the participants to simulate
+window downdraft approaching from the façade. Other airflow directions
+(lateral or frontal) may produce different perceptual responses,
+particularly given potential differences in skin exposure and attention
+to the stimulus source.
 
-Finally, the experimental setup simulated the convective component of window downdraft but did not include radiant asymmetry from a cold window surface. In real buildings, occupants near poorly insulated glazing experience both convective cooling from downdraft and radiant heat loss to the cold surface. The combined effect of these two mechanisms on ankle-level comfort was beyond the scope of this study.
+Finally, the experimental setup simulated the convective component of
+window downdraft but did not include radiant asymmetry from a cold
+window surface. In real buildings, occupants near poorly insulated
+glazing experience both convective cooling from downdraft and radiant
+heat loss to the cold surface. The combined effect of these two
+mechanisms on ankle-level comfort was beyond the scope of this study.
 
 # Conclusions
 
-This study evaluated thermal comfort responses to ankle-level draft under winter clothing conditions representative of typical office environments. Through controlled laboratory experiments with participants wearing approximately 0.75 clo ensembles that covered the ankle, we characterized local and whole-body thermal perception across a range of supply air temperatures (15-19°C) and air speeds (0.1–0.7m/s) simulating window downdraft.
+This study evaluated thermal comfort responses to ankle-level draft
+under winter clothing conditions representative of typical office
+environments. Through controlled laboratory experiments with
+participants wearing approximately 0.75 clo ensembles that covered the
+ankle, we characterized local and whole-body thermal perception across a
+range of supply air temperatures (15-19°C) and air speeds (0.1–0.7m/s)
+simulating window downdraft.
 
-The principal findings indicate that the existing ankle draft model systematically overpredicts dissatisfaction under winter clothing conditions. While prior studies with exposed ankles reported dissatisfaction rates between 23% and 57% under similar air speeds, our observations with covered ankles ranged from only 6% to 20%. This suggests that ankle coverage substantially reduces sensitivity to local draft, a conclusion supported by the covered-ankle model developed in this study; the model demonstrates both a lower baseline risk and a reduced response to air speed compared to uncovered-ankle models, with an intercept difference of approximately 1.5 units on the logit scale.
+The principal findings indicate that the existing ankle draft model
+systematically overpredicts dissatisfaction under winter clothing
+conditions. While prior studies with exposed ankles reported
+dissatisfaction rates between 23% and 57% under similar air speeds, our
+observations with covered ankles ranged from only 6% to 20%. This
+suggests that ankle coverage substantially reduces sensitivity to local
+draft, a conclusion supported by the covered-ankle model developed in
+this study; the model demonstrates both a lower baseline risk and a
+reduced response to air speed compared to uncovered-ankle models, with
+an intercept difference of approximately 1.5 units on the logit scale.
 
-Consistent with prior model structures, we found that whole-body thermal sensation and air speed at the ankle are the primary predictors of dissatisfaction, whereas ankle air temperature, room temperature, and turbulence intensity were not significant within the tested ranges. This reduced sensitivity under winter clothing appears to stem from a combination of physiological mechanisms—specifically attenuated skin cooling due to increased thermal resistance—and potentially psychological factors, such as a perceived sense of protection provided by the clothing coverage.
+Consistent with prior model structures, we found that whole-body thermal
+sensation and air speed at the ankle are the primary predictors of
+dissatisfaction, whereas ankle air temperature, room temperature, and
+turbulence intensity were not significant within the tested ranges. This
+reduced sensitivity under winter clothing appears to stem from a
+combination of physiological mechanisms, specifically attenuated skin
+cooling due to increased thermal resistance, and potentially
+psychological factors, such as a perceived sense of protection provided
+by the clothing coverage.
 
-These findings support a differentiated approach to ankle draft assessment in building standards. For winter heating scenarios where occupants typically wear clothing that covers the ankle (≥0.75 clo), the covered-ankle model provides more accurate predictions than the current ASHRAE Standard 55 criterion. Adopting separate criteria for covered and uncovered conditions could enable significant reductions in perimeter heating requirements without compromising occupant comfort, yielding benefits in installation costs, energy consumption, and carbon emissions.
+These findings support a differentiated approach to ankle draft
+assessment in building standards. For winter heating scenarios where
+occupants typically wear clothing that covers the ankle (≥0.75 clo), the
+covered-ankle model provides more accurate predictions than the current
+ASHRAE Standard 55 criterion. Adopting separate criteria for covered and
+uncovered conditions could enable significant reductions in perimeter
+heating requirements without compromising occupant comfort, yielding
+benefits in installation costs, energy consumption, and carbon
+emissions.
 
-Future research should validate these findings in field settings with diverse occupant populations and clothing practices, examine prolonged exposure effects, and investigate the combined influence of convective draft and radiant asymmetry from cold window surfaces.
+Future research should validate these findings in field settings with
+diverse occupant populations and clothing practices, examine prolonged
+exposure effects, and investigate the combined influence of convective
+draft and radiant asymmetry from cold window surfaces.
 
 # CRediT authorship contribution statement {.unnumbered}
 
 **Tobias Kramer**: Conceptualization, Data curation, Formal analysis,
 Methodology, Investigation, Project administration, Software, Writing -
-original draft, Writing - review & editing. **Junmeng Lyu**: Data curation, Formal
-analysis, Methodology, Investigation, Software, Writing - original draft, Writing -
-review & editing. **Stefano Schiavon**: Conceptualization, Funding
-acquisition, Methodology, Project administration, Supervision, Writing -
-review & editing.
+original draft, Writing - review & editing. **Junmeng Lyu**: Data
+curation, Formal analysis, Methodology, Investigation, Software,
+Writing - original draft, Writing - review & editing. **Stefano
+Schiavon**: Conceptualization, Funding acquisition, Methodology, Project
+administration, Supervision, Writing - review & editing.
 
 # Declaration of competing interest {.unnumbered}
 
@@ -1058,7 +1231,8 @@ agencies, and utilities.
 
 The datasets generated and analyzed during the current study as well as
 the full source code of the data analysis workflow are available in the
-following GitHub repository: XXX.
+following GitHub repository:
+<https://github.com/CenterForTheBuiltEnvironment/ankle-draft-II>
 
 # Declaration of Generative AI and AI-assisted technologies in the writing process {.unnumbered}
 
@@ -1069,7 +1243,7 @@ maintaining full accountability for the publication’s content.
 
 # Acknowledgements {.unnumbered}
 
-The Center for the Built Environment at the University of California,
-Berkeley supported this research.
+Schüco and the Center for the Built Environment at the University of
+California, Berkeley supported this research.
 
 # References {.unnumbered}
