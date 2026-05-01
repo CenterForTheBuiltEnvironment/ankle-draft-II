@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -53,15 +53,14 @@ div.csl-indent {
 <meta name="quarto:offset" content="../">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -110,7 +109,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+      if (mathElements[i].tagName == "SPAN") {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -410,11 +409,15 @@ Table&nbsp;1: Survey constructs and measurement scales
 </section>
 <section id="evaluation-of-the-existing-ankle-draft-model" class="level3" data-number="2.6.3">
 <h3 data-number="2.6.3" class="anchored" data-anchor-id="evaluation-of-the-existing-ankle-draft-model"><span class="header-section-number">2.6.3</span> Evaluation of the existing ankle draft model</h3>
-<p>Applying it to the experimental data, we calculated the predicted percentage of dissatisfaction with ankle draft at each observation point. Predictions were then averaged by experimental condition and compared with the observed dissatisfaction percentages. We used calibration curves to quantitatively assess the model’s predictive performance in this study’s dataset <span class="citation" data-cites="vancalster2016">(<a href="#ref-vancalster2016" role="doc-biblioref">Van Calster et al., 2016</a>)</span> and report the calibration intercept and slope, AUC, and Brier score. All analyses were implemented using the R package CalibrationCurves <span class="citation" data-cites="deCockCalibrationCurves2023">(<a href="#ref-deCockCalibrationCurves2023" role="doc-biblioref">De Cock et al., 2025</a>)</span>.</p>
+<p>Applying it to the experimental data, we calculated the predicted percentage of dissatisfaction with ankle draft using the existing ankle draft model at each observation point. For each observation, a logistic regression model was fitted with the individual-level predicted probability as the independent variable and the observed binary outcome (ankle draft dissatisfaction (1) or satisfaction (0)) as the dependent variable to form a calibration curve to assess the agreement between predicted probabilities and observed proportions <span class="citation" data-cites="vancalster2016">(<a href="#ref-vancalster2016" role="doc-biblioref">Van Calster et al., 2016</a>)</span>. Model performance was further evaluated using the C (ROC) and the Brier score. The C (ROC) quantifies the model’s discriminative ability, defined as the probability that a randomly selected dissatisfied observation receives a higher predicted probability than a randomly selected satisfied observation <span class="citation" data-cites="AlbaCROC2017">(<a href="#ref-AlbaCROC2017" role="doc-biblioref">Alba et al., 2017</a>)</span>. The Brier score measures the overall accuracy of probabilistic predictions <span class="citation" data-cites="GLENNBrier1950">(<a href="#ref-GLENNBrier1950" role="doc-biblioref">BRIER, 1950</a>)</span> and is defined as:</p>
+<p><span class="math display">\[
+\mathrm{Brier\ score} = \frac{1}{N}\sum_{i=1}^{N}(p_i - y_i)^2,
+\]</span></p>
+<p>where <span class="math inline">\(p_i\)</span> is the predicted probability from the existing model for the <span class="math inline">\(i\)</span>-th observation, and <span class="math inline">\(y_i\)</span> is the corresponding binary outcome indicating ankle draft dissatisfaction (1) or satisfaction (0). In addition, predictions were averaged by experimental condition and compared with the observed dissatisfaction percentages to examine differences in prediction accuracy across conditions.</p>
 </section>
 <section id="development-of-the-new-ankle-draft-model" class="level3" data-number="2.6.4">
 <h3 data-number="2.6.4" class="anchored" data-anchor-id="development-of-the-new-ankle-draft-model"><span class="header-section-number">2.6.4</span> Development of the new ankle draft model</h3>
-<p>We modeled ankle draft dissatisfaction using a generalized linear mixed model with a binomial distribution and logit link, as the outcome was binary and repeated observations were correlated within subjects. We included the subject as a random intercept to account for between-subject heterogeneity and within-subject dependence arising from repeated measurements. To enable an integrated analysis of the effects of different clothing conditions on ankle draft dissatisfaction, we also included data from <span class="citation" data-cites="liuPredictedPercentageDissatisfied2017">Liu et al. (<a href="#ref-liuPredictedPercentageDissatisfied2017" role="doc-biblioref">2017</a>)</span> in the modeling dataset. Continuous predictors were mean-centered using the overall means of the combined dataset before model fitting.</p>
+<p>We modeled ankle draft dissatisfaction using a generalized linear mixed model with a binomial distribution and logit link, as the outcome was binary and repeated observations were correlated within subjects. We included the subject as a random intercept to account for between-subject heterogeneity and within-subject dependence arising from repeated measurements. Continuous predictors were mean-centered using the overall means of the dataset before model fitting.</p>
 <p>In this generalized linear mixed model, the inverse-logit transformation is nonlinear. As a result, direct back-transformation of the fixed-effects linear predictor yields a conditional probability, representing an individual-level prediction when the random effect is set to zero, rather than a population-averaged probability. To characterize the average risk of dissatisfaction at the population level, we therefore use marginal probabilities instead of conditional probabilities <span class="citation" data-cites="neuhausKalbfleischHauck1991">(<a href="#ref-neuhausKalbfleischHauck1991" role="doc-biblioref">Neuhaus et al., 1991</a>)</span>. Specifically, we extracted fixed-effect estimates and the variance of the random intercept from the fitted model, assuming that the random intercept followed a normal distribution with mean zero. We then approximated integration over the random effects using Monte Carlo simulation (K = 10,000, random seed = 1), and calculated the marginal predicted probability for each combination of predictor values.</p>
 <p>Because these marginal probabilities generally cannot be written as a simple closed-form equation, we used the Monte Carlo-simulated marginal probabilities to fit an approximate linear equation for logit(P). Applying the inverse-logit transformation to the fitted equation yielded a closed-form prediction equation. We evaluated the accuracy of this approximation using coefficient of determination (R<sup>2</sup>).</p>
 </section>
@@ -534,13 +537,13 @@ Table&nbsp;3: Summary of environmental measurements.
 </tr>
 <tr class="even">
 <td style="text-align: left;">Relative humidity (%)</td>
-<td style="text-align: left;">54.9 ( +/- 5.5)</td>
+<td style="text-align: left;">55.1 ( +/- 5.4)</td>
 <td style="text-align: left;">52.3 ( +/- 5)</td>
 <td style="text-align: left;">51.2 ( +/- 4.8)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Air temperature, ankle level (°C)</td>
-<td style="text-align: left;">17.6 ( +/- 0.2)</td>
+<td style="text-align: left;">17.6 ( +/- 0.3)</td>
 <td style="text-align: left;">18.3 ( +/- 0.2)</td>
 <td style="text-align: left;">19.7 ( +/- 0.2)</td>
 </tr>
@@ -558,13 +561,13 @@ Table&nbsp;3: Summary of environmental measurements.
 </tr>
 <tr class="even">
 <td style="text-align: left;">Air speed, high (m/s)</td>
-<td style="text-align: left;">0.64 ( +/- 0.04)</td>
+<td style="text-align: left;">0.63 ( +/- 0.04)</td>
 <td style="text-align: left;">0.62 ( +/- 0.01)</td>
 <td style="text-align: left;">0.65 ( +/- 0.03)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Turbulence, low (%)</td>
-<td style="text-align: left;">0.36 ( +/- 0.02)</td>
+<td style="text-align: left;">0.37 ( +/- 0.02)</td>
 <td style="text-align: left;">0.34 ( +/- 0.01)</td>
 <td style="text-align: left;">0.3 ( +/- 0.01)</td>
 </tr>
@@ -666,23 +669,23 @@ Figure&nbsp;6: Time course of ankle skin temperature during the formal exposure 
 </section>
 <section id="dissatisfaction-with-ankle-draft" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="dissatisfaction-with-ankle-draft"><span class="header-section-number">3.4</span> Dissatisfaction with ankle draft</h2>
-<p><a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;7</a>(a) compares the dissatisfaction rates predicted by the Liu model against our experimental observations. Across all conditions, the existing model consistently overpredicted local thermal dissatisfaction. At a 15°C ankle temperature, the discrepancy between predicted and observed rates widened as air speed increased: the model overpredicted dissatisfaction by 8 percentage points (pp), rising to 39 pp at high flow (0.6 m/s).</p>
-<p>We observed similar trends at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the model predicted a PPD of 50%, while the actual dissatisfied rate was only 17%, resulting in a mean overestimation of 34 pp.&nbsp;Across all experimental sessions, the model overpredicted dissatisfaction by an average of 23 pp.</p>
+<p>For each observation sample, the predicted percentage of dissatisfaction with ankle draft using the existing ankle draft model based on ankle-level air speed and whole-body thermal sensation was fitted against the observed binary outcome of ankle draft satisfaction/dissatisfaction using logistic regression. The resulting curve is shown in <a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;7</a>(a). If the model were well calibrated, the curve would be expected to closely follow the 45° ideal line. Overall, the existing model retained acceptable discriminative ability in the present dataset (C (ROC) = 0.773), indicating that it could generally distinguish observations with higher versus lower likelihood of ankle draft dissatisfaction. However, the curve was located predominantly below the ideal line, and the Brier score was 0.137, suggesting that the existing model systematically overestimated the probability of ankle draft dissatisfaction under winter conditions.</p>
+<p><a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;7</a>(b) compares the dissatisfaction rates predicted by the existing model against our experimental observations under each experimental condition. Across all conditions, the existing model consistently overpredicted local thermal dissatisfaction. At a 15°C ankle temperature, the discrepancy between predicted and observed rates widened as air speed increased: the model overpredicted dissatisfaction by 7 percentage points (pp), rising to 30 pp at high flow (0.6 m/s). We observed similar trends at 17°C and 19°C. Notably, for the 19°C condition at high air speed (0.6 m/s), the model predicted a PPD of 42%, while the actual dissatisfied rate was only 17%, resulting in a mean overestimation of 26 pp.&nbsp;Across the nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu model predicted an average of 30%, corresponding to an overestimation of approximately 2.3 times.</p>
 <div id="fig-model-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figs/model_error_combined.png" class="img-fluid figure-img" style="width:90.0%">
+<img src="figs/model_performance_combined_raw.png" class="img-fluid figure-img" style="width:90.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: Performance and calibration of the Liu local dissatisfaction model: (a) The model consistently overpredicted ankle-level dissatisfaction across all conditions, with discrepancies widening at higher air speeds (points represent mean values, with the segment length indicating the magnitude of model overestimation); (b) while maintaining acceptable discrimination (AUC = 0.85), the calibration curve confirms a systematic overestimation of dissatisfaction in winter conditions.
+Figure&nbsp;7: Performance of the existing ankle draft model: (a) calibration curve of the existing model on this study dataset, and (b) predicted and observed dissatisfaction under each experimental conditions (points represent mean values, with the segment length indicating the magnitude of model overestimation)
 </figcaption>
 </figure>
 </div>
-<p>In addition, as shown in <a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;7</a>(b), the model retained acceptable discrimination on this dataset (AUC = 0.847), the calibration results indicated a systematic overestimation under winter conditions. Across the nine experimental conditions, the mean observed dissatisfaction rate was 13%, whereas the Liu model predicted an average of 36%, corresponding to an overestimation of approximately 2.8 times. The discrepancy was greatest at high air speed and smaller, but still evident, at low air speed.</p>
 </section>
 <section id="updated-model-for-winter-conditions" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="updated-model-for-winter-conditions"><span class="header-section-number">3.5</span> Updated model for winter conditions</h2>
-<p>As shown in <a href="#tbl-updated-model-screening" class="quarto-xref">Table&nbsp;4</a>, in the mixed-effects model including all candidate predictors, air speed at ankle, whole-body thermal sensation, and ankle condition were significantly associated with draft dissatisfaction at the ankle, whereas room air temperature, air temperature at ankle, and turbulence intensity were not significant within the range investigated in this study. Based on these results, separate mixed-effects models for ankle draft dissatisfaction were developed for the ankle-uncovered and ankle-covered conditions, using air speed at ankle and whole-body thermal sensation as predictors.</p>
+<p>As shown in Section 3.4, the existing model showed limited accuracy in predicting ankle draft dissatisfaction under winter conditions. This highlights the need for a revised model that accounts for differences in application contexts. To enable an integrated analysis of the effects of different factors on ankle draft dissatisfaction, we combined data from <span class="citation" data-cites="liuPredictedPercentageDissatisfied2017">Liu et al. (<a href="#ref-liuPredictedPercentageDissatisfied2017" role="doc-biblioref">2017</a>)</span> and collected in this study in the modeling dataset.</p>
+<p>To identify significant predictors, a model including all candidate predictors was first fitted following the methods described in Section 2.6.4. Given that both datasets were obtained from repeated measurements, subject-level dependence was accounted for in the analysis. The result of the screening model is shown in <a href="#tbl-updated-model-screening" class="quarto-xref">Table&nbsp;4</a>, ankle-level air speed, whole-body thermal sensation, and ankle condition were significantly correlated with ankle draft dissatisfaction, whereas room air temperature, ankle-level air temperature, and turbulence intensity were not significant within the range investigated in this study.</p>
 <div class="cell">
 <div id="tbl-updated-model-screening" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -718,17 +721,17 @@ Table&nbsp;4: Results of the generalized linear mixed-effects model used for pre
 </tr>
 <tr class="even">
 <td style="text-align: left;">Room air temperature</td>
-<td style="text-align: left;">-0.12</td>
+<td style="text-align: left;">-0.13</td>
 <td style="text-align: left;">0.25</td>
-<td style="text-align: left;">-0.51</td>
-<td style="text-align: left;">0.612</td>
+<td style="text-align: left;">-0.52</td>
+<td style="text-align: left;">0.600</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Air temperature at ankle</td>
 <td style="text-align: left;">-0.08</td>
 <td style="text-align: left;">0.07</td>
 <td style="text-align: left;">-1.14</td>
-<td style="text-align: left;">0.254</td>
+<td style="text-align: left;">0.255</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Whole-body thermal sensation</td>
@@ -739,24 +742,24 @@ Table&nbsp;4: Results of the generalized linear mixed-effects model used for pre
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Turbulence intensity</td>
-<td style="text-align: left;">0.39</td>
+<td style="text-align: left;">0.38</td>
 <td style="text-align: left;">1.36</td>
-<td style="text-align: left;">0.29</td>
-<td style="text-align: left;">0.776</td>
+<td style="text-align: left;">0.28</td>
+<td style="text-align: left;">0.782</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Ankle condition (uncovered vs.&nbsp;covered)</td>
 <td style="text-align: left;">1.22</td>
 <td style="text-align: left;">0.44</td>
-<td style="text-align: left;">2.79</td>
+<td style="text-align: left;">2.80</td>
 <td style="text-align: left;">0.005</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Season</td>
 <td style="text-align: left;">-1.59</td>
 <td style="text-align: left;">0.85</td>
-<td style="text-align: left;">-1.86</td>
-<td style="text-align: left;">0.063</td>
+<td style="text-align: left;">-1.87</td>
+<td style="text-align: left;">0.062</td>
 </tr>
 </tbody>
 </table>
@@ -828,9 +831,9 @@ Table&nbsp;5: Generalized linear mixed-effects models for the ankle-uncovered an
 <tr class="odd">
 <td style="text-align: left;"></td>
 <td style="text-align: left;">Air speed at ankle</td>
-<td style="text-align: left;">2.74</td>
+<td style="text-align: left;">2.75</td>
 <td style="text-align: left;">0.91</td>
-<td style="text-align: left;">3.01</td>
+<td style="text-align: left;">3.02</td>
 <td style="text-align: left;">0.003</td>
 </tr>
 <tr class="even">
@@ -848,17 +851,17 @@ Table&nbsp;5: Generalized linear mixed-effects models for the ankle-uncovered an
 </figure>
 </div>
 </div>
-<p>As shown in <a href="#tbl-updated-model-final" class="quarto-xref">Table&nbsp;5</a>, the two final models exhibited the same structure but different coefficients. The intercept of the covered model was 1.91 units lower than that of the uncovered model, indicating a substantially lower baseline risk of ankle draft dissatisfaction when the ankle was covered by clothing. In addition, the air speed coefficient was smaller in the covered model than in the uncovered model, indicating reduced sensitivity of dissatisfaction to air velocity under ankle-covered conditions.</p>
+<p>Based on these results, separate mixed-effects models for ankle draft dissatisfaction were developed for the ankle-uncovered and ankle-covered conditions, using ankle-level air speed and whole-body thermal sensation as predictors. As shown in <a href="#tbl-updated-model-final" class="quarto-xref">Table&nbsp;5</a>, the two final models exhibited the same structure but different coefficients. The intercept of the covered model was 1.91 units lower than that of the uncovered model, indicating a lower baseline risk of ankle draft dissatisfaction when the ankle was covered by clothing. In addition, the air speed coefficient was smaller in the covered model than in the uncovered model, indicating reduced sensitivity of dissatisfaction to air speed under ankle-covered conditions.</p>
 <p>For the ankle-uncovered condition, the approximate closed-form equation derived from the marginal predictions of the mixed-effects model can be written as:</p>
 <p><span class="math display">\[
 PPD_{AD} = \frac{\exp\left(-2.087 + 2.255V - 0.915TS\right)}{1 + \exp\left(-2.087 + 2.255V - 0.915TS\right)}
 \]</span></p>
 <p>For the ankle-covered condition, the corresponding approximate closed-form equation is:</p>
 <p><span class="math display">\[
-PPD_{AD} = \frac{\exp\left(-3.222 + 1.878V - 0.983TS\right)}{1 + \exp\left(-3.222 + 1.878V - 0.983TS\right)}
+PPD_{AD} = \frac{\exp\left(-3.224 + 1.884V - 0.983TS\right)}{1 + \exp\left(-3.224 + 1.884V - 0.983TS\right)}
 \]</span></p>
 <p>Where, <span class="math inline">\(PPD_{AD}\)</span> is the predicted percentage dissatisfied with ankle draft, <span class="math inline">\(V\)</span> is air speed at ankle (m/s), and <span class="math inline">\(TS\)</span> is whole-body thermal sensation.</p>
-<p>These linear approximations reproduced the marginal predictions of the mixed-effects models with high accuracy. The corresponding <span class="math inline">\(R^2\)</span> values were 0.9989 for the uncovered condition and 0.9967 for the covered condition, indicating that the approximate equations preserved the predictive behavior of the original mixed-effects models well. The resulting model predictions are shown in <a href="#fig-updated-model" class="quarto-xref">Figure&nbsp;8</a>.</p>
+<p>These linear approximations reproduced the marginal predictions of the mixed-effects models with high accuracy. The corresponding <span class="math inline">\(R^2\)</span> values were 0.9989 for the uncovered condition and 0.9968 for the covered condition, indicating that the approximate equations preserved the predictive behavior of the original mixed-effects models well. The resulting model predictions are shown in <a href="#fig-updated-model" class="quarto-xref">Figure&nbsp;8</a>.</p>
 <div id="fig-updated-model" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-updated-model-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -939,20 +942,23 @@ Figure&nbsp;8: Updated ankle draft dissatisfaction model under exposed and cover
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-AlbaCROC2017" class="csl-entry" role="listitem">
+Alba, A. C., Agoritsas, T., Walsh, M., Hanna, S., Iorio, A., Devereaux, P. J., McGinn, T., &amp; Guyatt, G. (2017). Discrimination and calibration of clinical prediction models: Users’ guides to the medical literature. <em>JAMA</em>, <em>318</em>(14), 1377–1384. <a href="https://doi.org/10.1001/jama.2017.12126">https://doi.org/10.1001/jama.2017.12126</a>
+</div>
 <div id="ref-ashraeANSIASHRAEStandard2023" class="csl-entry" role="listitem">
 ASHRAE. (2023). <em><span>ANSI</span>/<span>ASHRAE</span> <span>Standard</span> 55-2023: <span>Thermal</span> <span>Environmental</span> <span>Conditions</span> for <span>Human</span> <span>Occupancy</span></em>. American Society of Heating, Refrigerating; Air-Conditioning Engineers.
 </div>
 <div id="ref-benjaminiHighberg1995" class="csl-entry" role="listitem">
 Benjamini, Y., &amp; Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. <em>Journal of the Royal Statistical Society: Series B (Methodological)</em>, <em>57</em>(1), 289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">https://doi.org/10.1111/j.2517-6161.1995.tb02031.x</a>
 </div>
+<div id="ref-GLENNBrier1950" class="csl-entry" role="listitem">
+BRIER, G. W. (1950). VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY. <em>Monthly Weather Review</em>, <em>78</em>(1), 1–3. <a href="https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2">https://doi.org/10.1175/1520-0493(1950)078&lt;0001:VOFEIT&gt;2.0.CO;2</a>
+</div>
 <div id="ref-chengExperimentalStudyDraftrelated2023" class="csl-entry" role="listitem">
 Cheng, F., Cheng, Y., &amp; Lin, Z. (2023). Experimental study of draft-related local discomfort in a room with stratum ventilation. <em>Applied Thermal Engineering</em>, <em>234</em>, 121259. <a href="https://doi.org/10.1016/j.applthermaleng.2023.121259">https://doi.org/10.1016/j.applthermaleng.2023.121259</a>
 </div>
 <div id="ref-ChoiInvestigationHumanBody2012" class="csl-entry" role="listitem">
 Choi, J.-H., &amp; Loftness, V. (2012). <em>Investigation of human body skin temperatures as a bio-signal to indicate overall thermal sensations</em>. <em>58</em>, 258–269.
-</div>
-<div id="ref-deCockCalibrationCurves2023" class="csl-entry" role="listitem">
-De Cock, B., Nieboer, D., Van Calster, B., Steyerberg, E. W., &amp; Vergouwe, Y. (2025). <em>The <span>CalibrationCurves</span> package: Assessing the agreement between observed outcomes and predictions</em>. <a href="https://doi.org/10.32614/CRAN.package.CalibrationCurves">https://doi.org/10.32614/CRAN.package.CalibrationCurves</a>
 </div>
 <div id="ref-foldvarylicinaDevelopmentASHRAEGlobal2018" class="csl-entry" role="listitem">
 Földváry Ličina, V., Cheung, T., Zhang, H., Dear, R. de, Parkinson, T., Arens, E., Chun, C., Schiavon, S., Luo, M., Brager, G., Li, P., Kaam, S., Adebamowo, M. A., Andamon, M. M., Babich, F., Bouden, C., Bukovianska, H., Candido, C., Cao, B., … Zhou, X. (2018). Development of the <span>ASHRAE</span> <span>Global</span> <span>Thermal</span> <span>Comfort</span> <span>Database</span> <span>II</span>. <em>Building and Environment</em>, <em>142</em>, 502–512. <a href="https://doi.org/10.1016/j.buildenv.2018.06.022">https://doi.org/10.1016/j.buildenv.2018.06.022</a>
@@ -1054,14 +1060,13 @@ Zhou, B., Yang, B., Wu, M., Guo, Y., Wang, F., &amp; Li, A. (2022). Draught sens
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
         }
-      }
-      return codeEl.innerText;
+        return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
