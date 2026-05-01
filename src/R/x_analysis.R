@@ -661,7 +661,7 @@ ggsave(
 
 dissatisfied_with_draft_ankles <- analysis %>%
   dplyr::filter(
-    question %in% c("thermal_sensation_ankles", "air_movement_acceptability_ankles", "dissatisfied_with_draft_ankles"),
+    question %in% c("thermal_sensation", "thermal_sensation_ankles", "air_movement_acceptability_ankles", "dissatisfied_with_draft_ankles"),
     is_open_text == FALSE
   ) %>%
   dplyr::filter(workstation != "adaptation") %>%
@@ -669,6 +669,7 @@ dissatisfied_with_draft_ankles <- analysis %>%
   dplyr::group_by(session_sat,t_air_c, t_supply_c, v_air_m_s, session_id, 
                   subject_id, workstation) %>%
   dplyr::summarise(
+    thermal_sensation = response_value[question == "thermal_sensation"],
     thermal_sensation_ankles  = response_value[question == "thermal_sensation_ankles"],
     air_movement_acceptability_ankles = response_value[question == "air_movement_acceptability_ankles"],
     dissatisfied_with_draft_ankles = response_value[question == "dissatisfied_with_draft_ankles"],
@@ -679,7 +680,7 @@ dissatisfied_with_draft_ankles <- analysis %>%
 
 dissatisfied_with_draft_ankles <- dissatisfied_with_draft_ankles %>%
   dplyr::mutate(
-    ppd_liu = plogis(-2.58 + 3.05 * v_air_m_s - 1.06 * thermal_sensation_ankles)
+    ppd_liu = plogis(-2.58 + 3.05 * v_air_m_s - 1.06 * thermal_sensation)
   )
 
 
@@ -893,8 +894,8 @@ ggsave(
 
 # Combined figure
 
-model_performance_p <- (model_error_p | Liumodel_calibrationcurve) +
-  plot_layout(widths = c(2, 1)) +
+model_performance_p <- (Liumodel_calibrationcurve | model_error_p ) +
+  plot_layout(widths = c(1, 2)) +
   plot_annotation(tag_levels = "a", tag_suffix = ".") &
   theme(
     plot.subtitle    = element_text(hjust = 0.05, margin = margin(b = 3, unit = "mm")),
