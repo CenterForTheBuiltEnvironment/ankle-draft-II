@@ -1390,10 +1390,14 @@ sensation, the magnitude of these changes was insufficient to generate
 distinguishable differences in dissatisfaction within the tested range.
 From a heat transfer perspective, clothing coverage increases local
 thermal resistance and reduces convective and radiative heat exchange
-[@oguroEvaluationEffectAir2001; @nishiDirectMeasurementClothing1975],
-suppressing both the magnitude and variability of skin temperature
-changes and making it less likely that occupants cross discomfort
-thresholds.
+[@oguroEvaluationEffectAir2001; @nishiDirectMeasurementClothing1975]. It
+should be noted that the clothing insulation of 0.75 clo in this study
+represents the whole-body ensemble, whereas the local insulation at the
+ankle was provided by thin socks (approximately 0.02 clo
+@ashraeANSIASHRAEStandard2023). Despite this low local insulation, we
+observed that ankle coverage still suppressed both the mxagnitude and
+variability of skin temperature changes and made it less likely that
+occupants cross discomfort thresholds.
 
 Psychological factors may also contribute to the observed tolerance.
 Occupants wearing thicker lower-body clothing may perceive themselves as
