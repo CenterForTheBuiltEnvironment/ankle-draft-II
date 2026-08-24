@@ -36,7 +36,7 @@ date: "`r Sys.Date()`"
 format:
   docx:
     link-citations: true
-    reference-doc: template.docx
+    reference-doc: template_escholarship.docx
     toc: false
     number-sections: true
   html:
@@ -115,7 +115,7 @@ ASHRAE Standard 55
 # Graphical abstract {.unnumbered}
 
 ![Graphical
-abstract.](figs/graphical-abstract.png){#fig-graphical-abstract
+abstract.](figs/graphical-abstract.png){
 width="100%"}
 
 # Introduction
